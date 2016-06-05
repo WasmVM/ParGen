@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <regex>
 #include <list>
 
@@ -10,7 +11,7 @@
 
 using namespace std;
 
-typedef enum{KEY,ARITH,COMP,SPEC,CHAR,COMM} TokenType;
+typedef enum{KEYW,ARIT,COMP,SPEC,CHAR,IDEN,DIGI} TokenType;
 
 class Token{
 public:
@@ -20,9 +21,13 @@ public:
 
 class Lexer{
 public:
-	Lexer(ifstream &fin);
-	list<Token *> *lex();
+	Lexer(ifstream &fin, char *filename);
+	void lex();
+	list<Token *> *tokens;
+	bool isError;
+	string errorString;
 private:
 	ifstream &fin;
+	char *filename;
 };
 #endif

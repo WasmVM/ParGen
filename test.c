@@ -23,8 +23,8 @@ int idMain ( ) {
 
     idResult = idA + idB - idA * idB / 1 ;
     print idResult ;
-
-    if ( idA > idB ) {
+// test >= if
+    if ( idA >= idB ) {
         idResult = idA - idB ;
         print idResult ;
     }
@@ -46,6 +46,6 @@ int idMain ( ) {
 
     idResult = idFunction ( idA , idB ) ;
     print idResult ;
-
+	print "e";
     return 0 ;
 }
