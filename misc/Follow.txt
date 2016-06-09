@@ -1,0 +1,22 @@
+DL	$
+DL'	int char $
+D	int c@Thar $
+VD	int char ; return break if while { print read - ! num ( id
+VD'	int char $ ; return break if while { print read - ! num ( id
+VDL	int char ; return break if while { print read - ! num ( id
+PDLT	)
+PDLT'	)
+PD	, ) 
+B	int char $ } else ; - ! num ( id return break if while { print read
+T	id
+SL	}
+S	} else ; - ! num ( id return break if while { print read
+PR	id
+E	; ) ] , 
+EIT	; ) ] , 
+EAT	; ) ] ,
+ELT	) 
+ELT')
+E'	; ) ] ,
+UO	- ! num ( id
+BO	- ! num ( id
