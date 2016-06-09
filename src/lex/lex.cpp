@@ -1,4 +1,4 @@
-#include "lex.hpp"
+#include <lex.hpp>
 
 Lexer::Lexer(ifstream &fin, char *filename):
 	tokens(NULL),fin(fin),filename(filename)
@@ -50,7 +50,7 @@ void Lexer::lex(){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = IDEN;
+					newTok->type = ID;
 					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
 					line = line.substr(strmat.length());
 					tokens->push_back(newTok);
@@ -61,19 +61,37 @@ void Lexer::lex(){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = DIGI;
+					newTok->type = NUM;
 					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
 					line = line.substr(strmat.length());
 					tokens->push_back(newTok);
 				}
 			}
 			// Keyword
-			if(regex_search(line,strmat,regex("[^\\w]*(int|char|return|if|else|while|break|print|read)[^\\w]",regex::ECMAScript))){
+			if(regex_search(line,strmat,regex("^(int|char|return|if|else|while|break|print|read)[^\\w]",regex::ECMAScript))){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = KEYW;
-					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
+					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");				
+					if(newTok->value == "int"){
+						newTok->type = INT;
+					}else if (newTok->value == "char"){
+						newTok->type = CHAR;
+					}else if (newTok->value == "return"){
+						newTok->type = RET;
+					}else if (newTok->value == "if"){
+						newTok->type = IF;
+					}else if (newTok->value == "else"){
+						newTok->type = ELSE;
+					}else if (newTok->value == "while"){
+						newTok->type = WHILE;
+					}else if (newTok->value == "break"){
+						newTok->type = BREAK;
+					}else if (newTok->value == "read"){
+						newTok->type = READ;
+					}else{
+						newTok->type = PRINT;
+					}
 					line = line.substr(strmat.length());
 					tokens->push_back(newTok);
 				}
@@ -83,8 +101,24 @@ void Lexer::lex(){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = COMP;
 					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
+					if(newTok->value == "=="){
+						newTok->type = EQUA;
+					}else if (newTok->value == "!="){
+						newTok->type = NEQU;
+					}else if (newTok->value == "<="){
+						newTok->type = LSEQ;
+					}else if (newTok->value == ">="){
+						newTok->type = GREQ;
+					}else if (newTok->value == "<"){
+						newTok->type = GREA;
+					}else if (newTok->value == ">"){
+						newTok->type = LSTH;
+					}else if (newTok->value == "&&"){
+						newTok->type = AND;
+					}else{
+						newTok->type = OR;
+					}
 					line = line.substr(strmat.length());
 					tokens->push_back(newTok);
 				}
@@ -94,8 +128,20 @@ void Lexer::lex(){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = ARIT;
 					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
+					if(newTok->value == "="){
+						newTok->type = ASSI;
+					}else if (newTok->value == "!"){
+						newTok->type = OOPS;
+					}else if (newTok->value == "+"){
+						newTok->type = PLUS;
+					}else if (newTok->value == "-"){
+						newTok->type = MINUS;
+					}else if (newTok->value == "*"){
+						newTok->type = MULT;
+					}else{
+						newTok->type = DIVI;
+					}
 					line = line.substr(strmat.length());
 					tokens->push_back(newTok);
 				}
@@ -105,8 +151,24 @@ void Lexer::lex(){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = SPEC;
 					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
+					if(newTok->value == "("){
+						newTok->type = BRAC_SL;
+					}else if (newTok->value == "["){
+						newTok->type = BRAC_ML;
+					}else if (newTok->value == "]"){
+						newTok->type = BRAC_MR;
+					}else if (newTok->value == ")"){
+						newTok->type = BRAC_SR;
+					}else if (newTok->value == "{"){
+						newTok->type = BRAC_LL;
+					}else if (newTok->value == "}"){
+						newTok->type = BRAC_LR;
+					}else if (newTok->value == ";"){
+						newTok->type = SEMI;
+					}else{
+						newTok->type = COMMA;
+					}
 					line = line.substr(strmat.length());
 					tokens->push_back(newTok);
 				};

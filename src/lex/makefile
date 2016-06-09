@@ -1,11 +1,16 @@
 CC = g++
 OBJS = lex
-CFLAGS = -g
+CFLAGS = -g -I../include
 
-.PHONY: test clean
+.PHONY: test clean lib all
 
-%.o: %.cpp %.hpp
+all: test
+
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $< 
+
+lib:
+	$(CC) $(CFLAGS) -c -o lex.o lex.cpp 
 	
 test: $(foreach OBJ,$(OBJS),$(OBJ).o)
 	$(foreach OBJ,$(OBJS),$(CC) $(CFLAGS) -o $(OBJ)_test $(OBJ)_test.cpp $(OBJ).o)

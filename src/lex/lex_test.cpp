@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "ansi_color.h"
-#include "lex.hpp"
+#include <ansi_color.h>
+#include <lex.hpp>
 
 using namespace std;
 
@@ -27,29 +27,7 @@ int main(int argc, char **argv)
 		cout << ANSI_CYAN << "** File " << argv[i+1] << " **" << ANSI_RESET << endl;
 		while(!lexer.tokens->empty()){
 			Token *tok = lexer.tokens->front();
-			switch(tok->type){
-				case KEYW:
-					cout << "Keyword";
-					break;
-				case COMP:
-					cout << "Comparison";
-					break;
-				case ARIT:
-					cout << "Arithmetic";
-					break;
-				case SPEC:
-					cout << "Special";
-					break;
-				case IDEN:
-					cout << "Identifier";
-					break;
-				case CHAR:
-					cout << "Character";
-					break;
-				case DIGI:
-					cout << "Digit";
-					break;
-			}
+			cout << tok->type;
 			cout << " : " << tok->value << endl;
 			delete tok;
 			lexer.tokens->pop_front();
