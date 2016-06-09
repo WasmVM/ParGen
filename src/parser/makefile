@@ -1,7 +1,7 @@
 CC = g++
 OBJS = parser parserFunc
 EXTERN = ../lex/lex.o
-CFLAGS = -g -I../include
+CFLAGS = -g -I../lex -I.. -I.
 
 .PHONY: test clean all
 
