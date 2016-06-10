@@ -14,6 +14,7 @@ bool reduce(ParserParam &param, TokenType target, TokenType *parts, int partSize
 			delete symbolEnd;
 			param.symbols->pop_back();
 			param.stack.pop_back();
+            symbolEnd = param.symbols->back();
 		}
 	}
 	Token *newTok = new Token;
@@ -480,7 +481,6 @@ bool funcSEMI(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcBRAC_ML(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 7:
 			shift(param,tok,10);
@@ -1693,7 +1693,6 @@ bool funcRET(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcASSI(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 73:
 			shift(param,tok,79);
@@ -1707,7 +1706,6 @@ bool funcASSI(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcPLUS(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,99);
@@ -1730,7 +1728,6 @@ bool funcPLUS(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcMULT(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,101);
@@ -1753,7 +1750,6 @@ bool funcMULT(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcDIVI(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,102);
@@ -1776,7 +1772,6 @@ bool funcDIVI(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcEQUA(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,103);
@@ -1799,7 +1794,6 @@ bool funcEQUA(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcNEQU(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,104);
@@ -1822,7 +1816,6 @@ bool funcNEQU(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcLSTH(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,105);
@@ -1845,7 +1838,6 @@ bool funcLSTH(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcLSEQ(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,106);
@@ -1868,7 +1860,6 @@ bool funcLSEQ(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcGREA(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,107);
@@ -1891,7 +1882,6 @@ bool funcGREA(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcGREQ(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,108);
@@ -1914,7 +1904,6 @@ bool funcGREQ(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcAND(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,109);
@@ -1937,7 +1926,6 @@ bool funcAND(ParserParam &param, Token *tok){
 	return true;
 }
 bool funcOR(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 70:
 			shift(param,tok,110);
@@ -2178,7 +2166,7 @@ bool funcBRAC_LR(ParserParam &param, Token *tok){
 	}
 	return true;
 }
-bool funcEND(ParserParam &param, Token *tok){
+bool funcEND(ParserParam &param, Token *){
 	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 1:
@@ -2555,4 +2543,5 @@ bool parserGoto(ParserParam &param){
 			return false;	
 	}
 	param.stack.push_back(nextState);
+	return true;
 }

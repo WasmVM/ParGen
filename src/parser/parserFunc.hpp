@@ -51,6 +51,6 @@ bool funcOR(ParserParam &param, Token *tok);
 bool funcBRAC_MR(ParserParam &param, Token *tok);
 bool funcBRAC_SR(ParserParam &param, Token *tok);
 bool funcBRAC_LR(ParserParam &param, Token *tok);
-bool funcEND(ParserParam &param, Token *tok);
+bool funcEND(ParserParam &param, Token *);
 
 #endif

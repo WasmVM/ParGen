@@ -155,6 +155,8 @@ void Parser::parse(){
 				if(!funcEND(param,token))
 					return;
 			break;
+            default:
+            break;
 		}
 	}
 }
