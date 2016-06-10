@@ -1,6 +1,6 @@
 CC = g++
 OBJS = lex
-CFLAGS = -g -I.. -I.
+CFLAGS = -g -I.. -I. -Wall
 
 .PHONY: test clean lib all
 
