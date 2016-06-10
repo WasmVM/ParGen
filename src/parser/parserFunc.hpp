@@ -11,11 +11,12 @@ public:
 	list<Token *> *tokens;
 	list<Token *> *symbols;
 	list<int> stack;
+	bool isAccept;
 };
 
 void shift(ParserParam &param, Token *tok, int state);
 bool reduce(ParserParam &param, Token &target, Token parts[], int partSize);
-void parserGoto(ParserParam &param);
+bool parserGoto(ParserParam &param);
 
 bool funcINT(ParserParam &param, Token *tok);
 bool funcCHAR(ParserParam &param, Token *tok);

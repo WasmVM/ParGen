@@ -1,10 +1,10 @@
 #include <parser.hpp>
 
-Parser::Parser(list<Token *> *tokens):
-	isAccept(false)
+Parser::Parser(list<Token *> *tokens)
 {
 	param.tokens = tokens;
 	param.symbols = new list<Token *>;
+	param.isAccept = false;
 }
 
 void Parser::parse(){
@@ -16,7 +16,7 @@ void Parser::parse(){
 	// Add 0 state
 	param.stack.push_back(0);
 	// Parse
-	while((param.tokens->size() > 0) && (!isAccept)){
+	while((param.tokens->size() > 0) && (!param.isAccept)){
 		Token *token = param.tokens->front();
 		switch(token->type){
 			case INT:

@@ -13,7 +13,6 @@ class Parser{
 public:
 	Parser(list<Token *> *tokens);
 	void parse();
-	bool isAccept;
 private:
 	ParserParam param;
 };
