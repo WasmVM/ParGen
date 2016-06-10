@@ -7,7 +7,7 @@ VDL	int char ; return break if while { print read - ! num ( id
 PDLT	)
 PDLT'	)
 PD	, ) 
-B	int char $ } else ; - ! num ( id return break if while { print read
+B	int char $ ; return break if while { print read } - ! num ( id else
 T	id
 SL	}
 S	} else ; - ! num ( id return break if while { print read
