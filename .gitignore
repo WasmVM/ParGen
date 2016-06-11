@@ -1,1 +1,3 @@
 *.o
+lex_test
+parser_test

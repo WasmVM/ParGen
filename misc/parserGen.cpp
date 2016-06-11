@@ -14,6 +14,7 @@ int main(int argc, char *argv[]){
 	}
 	ifstream fin(argv[1]);
 	ofstream fout(argv[2]);
+	int r = 1;
 	while(!fin.eof()){
 		string line;
 		getline(fin,line);
@@ -27,11 +28,12 @@ int main(int argc, char *argv[]){
 			ss >> part;
 			parts.push_back(part);
 		}
-		fout << "parts = new TokenType["<< parts.size() <<"];";
+		fout << "bool rule" << r << "(ParserParam &param){\n\tTokenType *parts = new TokenType["<< parts.size() <<"];" << endl;
 		for(int i=0; i<parts.size(); ++i){
-			fout << "parts[" << i << "] = " << parts.at(i) << "; ";
+			fout << "\tparts[" << i << "] = " << parts.at(i) << ";" << endl;
 		}
-		fout << "reduce(param, " << target << ", parts, " << parts.size() << ");" << endl;
+		fout << "\treturn reduce(param, " << target << ", parts, " << parts.size() << ");\n}" << endl;
+		r++;
 	}	
 	fin.close();
 	fout.close();

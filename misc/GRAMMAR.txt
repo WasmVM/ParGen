@@ -59,9 +59,11 @@ BO -> MULT
 BO -> DIVI
 BO -> EQUA
 BO -> NEQU
-BO -> GREA
-BO -> GREQ
 BO -> LSTH
 BO -> LSEQ
+BO -> GREA
+BO -> GREQ
 BO -> AND
 BO -> OR
+B -> BRAC_LL BRAC_LR
+S -> PR NUM SEMI
