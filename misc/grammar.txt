@@ -13,7 +13,7 @@ PDLT -> PD PDLT'
 PDLT -> PD
 PDLT' -> , PDLT
 PD -> T id [ ] 
-PD ->  T id
+PD -> T id
 B -> { VDL SL } 
 B ->  { SL }
 T -> int 
@@ -65,3 +65,5 @@ BO -> >
 BO -> >=
 BO -> &&
 BO -> ||
+B -> { }
+S -> PR num ;

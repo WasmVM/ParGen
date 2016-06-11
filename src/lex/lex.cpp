@@ -39,9 +39,12 @@ void Lexer::lex(){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
-					newTok->type = CHAR;
-					newTok->value = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"");
-					line = line.substr(strmat.length());
+                    newTok->type = NUM;
+                    int val = regex_replace(strmat.str(0),regex("^\\s*|\\s*$",regex::ECMAScript),"").at(1);
+                    stringstream ss;
+                    ss << val;
+                    newTok->value = ss.str();
+                    line = line.substr(strmat.length());
 					tokens->push_back(newTok);
 				}
 			}

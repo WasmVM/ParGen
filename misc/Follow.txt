@@ -3,14 +3,14 @@ DL'	int char $
 D	int c@Thar $
 VD	int char ; return break if while { print read - ! num ( id
 VD'	int char $ ; return break if while { print read - ! num ( id
-VDL	int char ; return break if while { print read - ! num ( id
+VDL	; return break if while { print read - ! num ( id
 PDLT	)
 PDLT'	)
 PD	, ) 
 B	int char $ ; return break if while { print read } - ! num ( id else
 T	id
 SL	}
-S	} else ; - ! num ( id return break if while { print read
+S	id ; return break if else while { print read  - ! num ( }  
 PR	id
 E	; ) ] , 
 EIT	; ) ] , 

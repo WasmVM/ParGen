@@ -67,12 +67,7 @@ bool funcINT(ParserParam &param, Token *tok){
 			shift(param,tok,6);
 		break;
 		case 24:
-			parts = new TokenType[1]; parts[0] = VD;
-			reduce(param, VDL, parts,1);
-		break;
-		case 26:
-			parts = new TokenType[2]; parts[0] = VD; parts[1] = VDL;
-			reduce(param, VDL, parts,2);
+            shift(param,tok,6);
 		break;
 		case 27:
 			parts = new TokenType[3]; parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR;
@@ -91,9 +86,12 @@ bool funcINT(ParserParam &param, Token *tok){
 			reduce(param, B, parts,4);
 		break;
 		case 98:
-			parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = D;
+            parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = VD_;
 			reduce(param, VD, parts,3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
 		default:
 			return false;
 	}
@@ -103,10 +101,10 @@ bool funcCHAR(ParserParam &param, Token *tok){
 	TokenType *parts = NULL;
 	switch(param.stack.back()){
 		case 0:
-			shift(param,tok,6);
+            shift(param,tok,5);
 		break;
 		case 1:
-			shift(param,tok,6);
+            shift(param,tok,5);
 		break;
 		case 3:
 			parts = new TokenType[2]; parts[0] = DL_; parts[1] = DL;
@@ -125,25 +123,20 @@ bool funcCHAR(ParserParam &param, Token *tok){
 			reduce(param, DL_, parts,3);
 		break;
 		case 12:
-			shift(param,tok,6);
+            shift(param,tok,5);
 		break;
 		case 16:
 			parts = new TokenType[3]; parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR;
 			reduce(param, VD_, parts,3);
 		break;
 		case 20:
-			shift(param,tok,6);
+            shift(param,tok,5);
 		break;
 		case 22:
-			shift(param,tok,6);
+            shift(param,tok,5);
 		break;
 		case 24:
-			parts = new TokenType[1]; parts[0] = VD;
-			reduce(param, VDL, parts,1);
-		break;
-		case 26:
-			parts = new TokenType[2]; parts[0] = VD; parts[1] = VDL;
-			reduce(param, VDL, parts,2);
+            shift(param,tok,5);
 		break;
 		case 27:
 			parts = new TokenType[3]; parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR;
@@ -165,6 +158,9 @@ bool funcCHAR(ParserParam &param, Token *tok){
 			parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = D;
 			reduce(param, VD, parts,3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
 		default:
 			return false;
 	}
@@ -188,7 +184,10 @@ bool funcID(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
-		case 24:
+        case 22:
+            shift(param,tok,73);
+        break;
+        case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
 		case 26:
@@ -233,9 +232,15 @@ bool funcID(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,73);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
+        case 52:
+            shift(param,tok,73);
+        break;
 		case 54:
 			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
 		break;
@@ -315,16 +320,16 @@ bool funcID(ParserParam &param, Token *tok){
 			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
 		break;
 		case 105:
-			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
+            parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
 		break;
 		case 106:
-			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
+            parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
 		break;
 		case 107:
-			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
+            parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
 		break;
 		case 108:
-			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
+            parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
 		break;
 		case 109:
 			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
@@ -335,6 +340,15 @@ bool funcID(ParserParam &param, Token *tok){
 		case 111:
 			shift(param,tok,112);
 		break;
+        case 115:
+            shift(param,tok,73);
+        break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -355,6 +369,9 @@ bool funcSEMI(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,60);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -388,6 +405,9 @@ bool funcSEMI(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,60);
+        break;
 		case 50:
 			shift(param,tok,51);
 		break;
@@ -475,6 +495,15 @@ bool funcSEMI(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 119:
+            shift(param,tok,120);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -511,6 +540,9 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,61);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -531,9 +563,6 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 		break;
 		case 35:
 			shift(param,tok,61);
-		break;
-		case 36:
-			shift(param,tok,37);
 		break;
 		case 37:
 			shift(param,tok,61);
@@ -559,9 +588,15 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,61);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
+        case 52:
+            shift(param,tok,61);
+        break;
 		case 54:
 			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
 		break;
@@ -637,17 +672,17 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 		case 104:
 			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
 		break;
-		case 105:
+        case 105:
+            parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
+        break;
+        case 106:
+            parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
+        break;
+        case 107:
 			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
 		break;
-		case 106:
+        case 108:
 			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
-		case 107:
-			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-		break;
-		case 108:
-			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
 		break;
 		case 109:
 			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
@@ -655,6 +690,15 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 		case 110:
 			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
 		break;
+        case 115:
+            shift(param,tok,61);
+        break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -743,7 +787,13 @@ bool funcBRAC_LL(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
-		case 17:
+        case 17:
+            shift(param,tok,22);
+        break;
+        case 22:
+            shift(param,tok,22);
+        break;
+        case 23:
 			shift(param,tok,22);
 		break;
 		case 24:
@@ -779,6 +829,9 @@ bool funcBRAC_LL(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,22);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -797,6 +850,12 @@ bool funcBRAC_LL(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -811,6 +870,9 @@ bool funcMINUS(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,62);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -850,9 +912,15 @@ bool funcMINUS(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,62);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
+        case 52:
+            shift(param,tok,62);
+        break;
 		case 54:
 			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
 		break;
@@ -940,17 +1008,17 @@ bool funcMINUS(ParserParam &param, Token *tok){
 		case 104:
 			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
 		break;
-		case 105:
+        case 105:
+            parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
+        break;
+        case 106:
+            parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
+        break;
+        case 107:
 			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
 		break;
-		case 106:
+        case 108:
 			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
-		case 107:
-			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-		break;
-		case 108:
-			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
 		break;
 		case 109:
 			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
@@ -958,6 +1026,15 @@ bool funcMINUS(ParserParam &param, Token *tok){
 		case 110:
 			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
 		break;
+        case 115:
+            shift(param,tok,62);
+        break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -972,6 +1049,9 @@ bool funcOOPS(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,63);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1011,9 +1091,15 @@ bool funcOOPS(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,63);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
+        case 52:
+            shift(param,tok,63);
+        break;
 		case 54:
 			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
 		break;
@@ -1086,24 +1172,33 @@ bool funcOOPS(ParserParam &param, Token *tok){
 		case 104:
 			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
 		break;
-		case 105:
-			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-		break;
-		case 106:
-			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
-		case 107:
+        case 105:
 			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
 		break;
-		case 108:
+        case 106:
 			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
 		break;
+        case 107:
+            parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
+        break;
+        case 108:
+            parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
+        break;
 		case 109:
 			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
 		break;
 		case 110:
 			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
 		break;
+        case 115:
+            shift(param,tok,63);
+        break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1121,6 +1216,9 @@ bool funcNUM(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,65);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1136,6 +1234,12 @@ bool funcNUM(ParserParam &param, Token *tok){
 		case 30:
 			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
 		break;
+        case 32:
+            parts = new TokenType[1];parts[0] = PRINT; reduce(param, PR, parts, 1);
+        break;
+        case 33:
+            parts = new TokenType[1];parts[0] = READ; reduce(param, PR, parts, 1);
+        break;
 		case 35:
 			shift(param,tok,65);
 		break;
@@ -1160,15 +1264,24 @@ bool funcNUM(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,65);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
+        case 52:
+            shift(param,tok,65);
+        break;
 		case 54:
 			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
 		break;
 		case 56:
 			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
+        case 57:
+            shift(param,tok,119);
+        break;
 		case 59:
 			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
 		break;
@@ -1238,24 +1351,33 @@ bool funcNUM(ParserParam &param, Token *tok){
 		case 104:
 			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
 		break;
-		case 105:
-			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-		break;
-		case 106:
-			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
-		case 107:
+        case 105:
 			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
 		break;
-		case 108:
+        case 106:
 			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
 		break;
+        case 107:
+            parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
+        break;
+        case 108:
+            parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
+        break;
 		case 109:
 			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
 		break;
 		case 110:
 			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
 		break;
+        case 115:
+            shift(param,tok,65);
+        break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1270,6 +1392,9 @@ bool funcBREAK(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,55);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1303,6 +1428,9 @@ bool funcBREAK(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,55);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -1321,6 +1449,12 @@ bool funcBREAK(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1335,6 +1469,9 @@ bool funcIF(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,34);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1368,6 +1505,9 @@ bool funcIF(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,34);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -1386,6 +1526,12 @@ bool funcIF(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1427,6 +1573,12 @@ bool funcELSE(ParserParam &param, Token *tok){
 		case 60:
 			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1441,6 +1593,9 @@ bool funcWHILE(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,41);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1474,6 +1629,9 @@ bool funcWHILE(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,41);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -1492,6 +1650,12 @@ bool funcWHILE(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1506,6 +1670,9 @@ bool funcPRINT(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,32);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1539,6 +1706,9 @@ bool funcPRINT(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,32);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -1557,6 +1727,12 @@ bool funcPRINT(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1571,6 +1747,9 @@ bool funcREAD(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,33);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1604,6 +1783,9 @@ bool funcREAD(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,33);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -1622,6 +1804,12 @@ bool funcREAD(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1636,6 +1824,9 @@ bool funcRET(ParserParam &param, Token *tok){
 		case 16:
 			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
 		break;
+        case 22:
+            shift(param,tok,52);
+        break;
 		case 24:
 			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
 		break;
@@ -1669,6 +1860,9 @@ bool funcRET(ParserParam &param, Token *tok){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 48:
+            shift(param,tok,52);
+        break;
 		case 51:
 			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
 		break;
@@ -1687,6 +1881,12 @@ bool funcRET(ParserParam &param, Token *tok){
 		case 98:
 			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -1950,6 +2150,9 @@ bool funcOR(ParserParam &param, Token *tok){
 bool funcBRAC_MR(ParserParam &param, Token *tok){
 	TokenType *parts = NULL;
 	switch(param.stack.back()){
+        case 14:
+            shift(param,tok,15);
+        break;
 		case 65:
 			parts = new TokenType[1];parts[0] = NUM; reduce(param, E, parts, 1);
 		break;
@@ -2007,6 +2210,9 @@ bool funcBRAC_MR(ParserParam &param, Token *tok){
 		case 113:
 			shift(param,tok,114);
 		break;
+        case 118:
+            shift(param,tok,78);
+        break;
 		default:
 			return false;
 	}
@@ -2030,6 +2236,9 @@ bool funcBRAC_SR(ParserParam &param, Token *tok){
 		case 21:
 			parts = new TokenType[2];parts[0] = COMMA; parts[1] = PDLT; reduce(param, PDLT_, parts, 2);
 		break;
+        case 36:
+            shift(param,tok,37);
+        break;
 		case 43:
 			shift(param,tok,44);
 		break;
@@ -2105,6 +2314,9 @@ bool funcBRAC_SR(ParserParam &param, Token *tok){
 		case 112:
 			parts = new TokenType[2];parts[0] = T; parts[1] = ID; reduce(param, PD, parts, 2);
 		break;
+        case 114:
+            parts = new TokenType[4];parts[0] = T; parts[1] = ID; parts[2] = BRAC_ML; parts[3] = BRAC_MR; reduce(param, PD, parts, 4);
+        break;
 		case 116:
 			parts = new TokenType[2];parts[0] = COMMA; parts[1] = ELT; reduce(param, ELT_, parts, 2);
 		break;
@@ -2116,9 +2328,9 @@ bool funcBRAC_SR(ParserParam &param, Token *tok){
 bool funcBRAC_LR(ParserParam &param, Token *tok){
 	TokenType *parts = NULL;
 	switch(param.stack.back()){
-		case 14:
-			shift(param,tok,15);
-		break;
+        case 22:
+            shift(param,tok,117);
+        break;
 		case 25:
 			shift(param,tok,27);
 		break;
@@ -2161,6 +2373,12 @@ bool funcBRAC_LR(ParserParam &param, Token *tok){
 		case 60:
 			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
+        case 120:
+            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
+        break;
 		default:
 			return false;
 	}
@@ -2202,6 +2420,9 @@ bool funcEND(ParserParam &param, Token *){
 		case 47:
 			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
 		break;
+        case 117:
+            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
+        break;
 		default:
 			return false;
 	}
@@ -2245,6 +2466,7 @@ bool parserGoto(ParserParam &param){
 		case VD:
 			switch(state){
 				case 22:
+                case 24:
 					nextState = 24;
 				break;
 				default:
@@ -2265,6 +2487,9 @@ bool parserGoto(ParserParam &param){
 		break;
 		case VDL:
 			switch(state){
+                case 22:
+                    nextState = 29;
+                break;
 				case 24:
 					nextState = 26;
 				break;
@@ -2311,10 +2536,12 @@ bool parserGoto(ParserParam &param){
 				case 23:
 					nextState = 28;
 				break;
+                case 22:
 				case 29:
 				case 37:
 				case 39:
 				case 44:
+                case 48:
 					nextState = 30;
 				break;
 				default:
@@ -2332,6 +2559,7 @@ bool parserGoto(ParserParam &param){
 					nextState = 111;
 				break;
 				case 22:
+                case 24:
 					nextState = 96;
 				break;
 				default:
@@ -2341,7 +2569,6 @@ bool parserGoto(ParserParam &param){
 		case SL:
 			switch(state){
 				case 22:
-				case 23:
 					nextState = 25;
 				break;
 				case 29:
@@ -2356,7 +2583,9 @@ bool parserGoto(ParserParam &param){
 		break;
 		case S:
 			switch(state){
+                case 22:
 				case 29:
+                case 48:
 					nextState = 48;
 				break;
 				case 37:
@@ -2374,10 +2603,12 @@ bool parserGoto(ParserParam &param){
 		break;
 		case E:
 			switch(state){
+                case 22:
 				case 29:
 				case 37:
 				case 39:
 				case 44:
+                case 48:
 					nextState = 50;
 				break;
 				case 35:
@@ -2402,7 +2633,7 @@ bool parserGoto(ParserParam &param){
 					nextState = 75;
 				break;
 				case 76:
-					nextState = 78;
+                    nextState = 118;
 				break;
 				case 77:
 					nextState = 87;
@@ -2482,12 +2713,15 @@ bool parserGoto(ParserParam &param){
 		break;
 		case UO:
 			switch(state){
+                case 22:
 				case 29:
 				case 35:
 				case 37:
 				case 39:
 				case 42:
 				case 44:
+                case 48:
+                case 52:
 				case 61:
 				case 64:
 				case 68:
@@ -2499,6 +2733,7 @@ bool parserGoto(ParserParam &param){
 				case 85:
 				case 92:
 				case 93:
+                case 115:
 					nextState = 64;
 				break;
 				default:
@@ -2529,10 +2764,12 @@ bool parserGoto(ParserParam &param){
 		break;
 		case PR:
 			switch(state){
+                case 22:
 				case 29:
 				case 37:
 				case 39:
 				case 44:
+                case 48:
 					nextState = 57;
 				break;
 				default:
