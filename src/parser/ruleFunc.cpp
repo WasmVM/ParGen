@@ -11,6 +11,7 @@ bool reduce(ParserParam &param, TokenType target, TokenType *parts, int partSize
 			if(isTerm(symbolEnd->type)){
 				newNode->terms.push_back(*symbolEnd);
 			}else{
+                param.astStack.back()->parent = newNode;
 				newNode->derives.push_front(param.astStack.back());
 				param.astStack.pop_back();
 			}

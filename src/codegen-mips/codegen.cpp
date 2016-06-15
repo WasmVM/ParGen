@@ -21,17 +21,17 @@ void CodeGen::generate(ASTNode *tree, char *fileName)
     {
         // Prologue
         fout << "\t.text\n"
-                "\t.globl main\n"
+                "\t.globl\tmain\n"
                 "main:\n"
+                "\taddi\t$sp,\t$sp,\t-4\n"
+                "\tsw\t$ra,\t0($sp)\n"
                 "\tjal\tidMain\n"
-                "\tb\texit"
+                "\tlw\t$ra,\t0($sp)\n"
+                "\taddi\t$sp,\t$sp,\t4\n"
+                "\tjr\t$ra"
              << endl;
         fout << param.textSeg << endl;
         // Epilogue
-        fout << "exit:\n"
-                "\tli\t$v0,\t10\n"
-                "\tsyscall"
-             << endl;
     }
     fout.close();
 }

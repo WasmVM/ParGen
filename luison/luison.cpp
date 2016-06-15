@@ -504,6 +504,7 @@ int main(int argc, char *argv[]){
                 "\t\t\tif(isTerm(symbolEnd->type)){\n"
                 "\t\t\t\tnewNode->terms.push_back(*symbolEnd);\n"
                 "\t\t\t}else{\n"
+                "\t\t\t\tparam.astStack.back()->parent = newNode;\n"
                 "\t\t\t\tnewNode->derives.push_front(param.astStack.back());\n"
                 "\t\t\t\tparam.astStack.pop_back();\n"
                 "\t\t\t}\n"
@@ -606,8 +607,8 @@ int main(int argc, char *argv[]){
              << endl;
         // Function
         for(unsigned int i=1; i<rules.size(); ++i){
-            fout << "bool gen" << i << "(ASTNode *, GenParam &){\n}" << endl;
-            fout << "bool pro" << i << "(ASTNode *, GenParam &){\n}" << endl;
+            fout << "bool gen" << i << "(ASTNode *, GenParam &){\n\treturn true;\n}" << endl;
+            fout << "bool pro" << i << "(ASTNode *, GenParam &){\n\treturn true;\n}" << endl;
             hout << "bool gen" << i << "(ASTNode *, GenParam &);" << endl;
             hout << "bool pro" << i << "(ASTNode *, GenParam &);" << endl;
         }

@@ -29,6 +29,7 @@ public:
     unsigned int ruleNo;
     vector<Token> terms;
     TokenType type;
+    ASTNode *parent;
     list<ASTNode *> derives;
 };
 
@@ -44,8 +45,9 @@ public:
 class Variable{
 public:
     string id;
-    unsigned int unitSize, totalSize;
+    int unitSize, totalSize;
     int offset;
+    vector<int> paramSize;
 };
 
 class GenParam{
@@ -53,7 +55,8 @@ public:
     string dataSeg;
     string textSeg;
     string errMsg;
-    vector<Variable> varStack, gloStack;
+    vector<Variable> varStack, gloStack, funList;
+    vector<unsigned int> varCounts;
     vector<string> tmpText;
 };
 
