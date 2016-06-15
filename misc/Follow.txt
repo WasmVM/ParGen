@@ -1,22 +1,25 @@
 DL	$
 DL'	int char $
-D	int c@Thar $
-VD	int char ; return break if while { print read - ! num ( id
-VD'	int char $ ; return break if while { print read - ! num ( id
-VDL	; return break if while { print read - ! num ( id
+D	int char $
+VD	int char id ; ( { - ! num break if while print read return
+VD'	int char id ; ( { - ! num break if while print read return $
+VDL	id ; ( { - ! num break if while print read return
 PDLT	)
 PDLT'	)
 PD	, ) 
-B	int char $ ; return break if while { print read } - ! num ( id else
+B	int char id ; ( { - ! num break if else while print read return $
 T	id
 SL	}
-S	id ; return break if else while { print read  - ! num ( }  
-PR	id
-E	; ) ] , 
-EIT	; ) ] , 
-EAT	; ) ] ,
-ELT	) 
-ELT')
-E'	; ) ] ,
-UO	- ! num ( id
-BO	- ! num ( id
+S	id ; ( { - ! num break if else while print read return }  
+PR	id num 
+E	; ] ) && ||
+EC	; == != > >= < <= ] ) && ||
+EB	- + ; == != > >= < <= ] ) && ||
+EA	- + * / ; == != > >= < <= ] ) && ||
+EU	- ! + * / ; == != > >= < <= ] ) && ||
+DA	- ! = + * / ; == != > >= < <= ] ) && ||
+UO	- ! id ( num
+BOA	- ! id ( num
+BOB - ! id ( num
+BOC - ! id ( num
+BOD - ! id ( num

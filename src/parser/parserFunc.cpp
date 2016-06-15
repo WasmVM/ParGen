@@ -1,2784 +1,2780 @@
 #include <parserFunc.hpp>
-
 void shift(ParserParam &param, Token *tok, int state){
 	param.symbols->push_back(tok);
 	param.tokens->pop_front();
 	param.stack.push_back(state);
 }
-bool reduce(ParserParam &param, TokenType target, TokenType *parts, int partSize){
-	Token *symbolEnd = param.symbols->back();
-	for(int i=partSize-1; i>=0; --i){
-		if(symbolEnd->type != parts[i]){
-			return false;
-		}else{
-			delete symbolEnd;
-			param.symbols->pop_back();
-			param.stack.pop_back();
-            symbolEnd = param.symbols->back();
-		}
-	}
-	Token *newTok = new Token;
-	newTok->type = target;
-	param.symbols->push_back(newTok);
-	delete [] parts;
-	if(parserGoto(param)){
-		return true;
-	}else{
-		return false;
-	}
-}
-
-bool funcINT(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 0:
-			shift(param,tok,6);
-		break;
-		case 1:
-			shift(param,tok,6);
-		break;
-		case 3:
-			parts = new TokenType[2]; parts[0] = DL_; parts[1] = DL;
-			reduce(param, DL, parts,2);
-		break;
-		case 8:
-			parts = new TokenType[1]; parts[0] = VD_;
-			reduce(param, D, parts,1);
-		break;
-		case 9:
-			parts = new TokenType[1]; parts[0] = SEMI;
-			reduce(param, VD_, parts,1);
-		break;
-		case 11:
-			parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = D;
-			reduce(param, DL_, parts,3);
-		break;
-		case 12:
-			shift(param,tok,6);
-		break;
-		case 16:
-			parts = new TokenType[3]; parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR;
-			reduce(param, VD_, parts,3);
-		break;
-		case 20:
-			shift(param,tok,6);
-		break;
-		case 22:
-			shift(param,tok,6);
-		break;
-		case 24:
-            shift(param,tok,6);
-		break;
-		case 27:
-			parts = new TokenType[3]; parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR;
-			reduce(param, B, parts,3);
-		break;
-		case 28:
-			parts = new TokenType[4]; parts[0] = BRAC_SL; parts[1] = PDLT; parts[2] = BRAC_SR; parts[3] = B;
-			reduce(param, D, parts,4);
-		break;
-		case 31:
-			parts = new TokenType[3]; parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = B;
-			reduce(param, D, parts,3);
-		break;
-		case 47:
-			parts = new TokenType[4]; parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR;
-			reduce(param, B, parts,4);
-		break;
-		case 98:
-            parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = VD_;
-			reduce(param, VD, parts,3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcCHAR(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 0:
-            shift(param,tok,5);
-		break;
-		case 1:
-            shift(param,tok,5);
-		break;
-		case 3:
-			parts = new TokenType[2]; parts[0] = DL_; parts[1] = DL;
-			reduce(param, DL, parts,2);
-		break;
-		case 8:
-			parts = new TokenType[1]; parts[0] = VD_;
-			reduce(param, D, parts,1);
-		break;
-		case 9:
-			parts = new TokenType[1]; parts[0] = SEMI;
-			reduce(param, VD_, parts,1);
-		break;
-		case 11:
-			parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = D;
-			reduce(param, DL_, parts,3);
-		break;
-		case 12:
-            shift(param,tok,5);
-		break;
-		case 16:
-			parts = new TokenType[3]; parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR;
-			reduce(param, VD_, parts,3);
-		break;
-		case 20:
-            shift(param,tok,5);
-		break;
-		case 22:
-            shift(param,tok,5);
-		break;
-		case 24:
-            shift(param,tok,5);
-		break;
-		case 27:
-			parts = new TokenType[3]; parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR;
-			reduce(param, B, parts,3);
-		break;
-		case 28:
-			parts = new TokenType[4]; parts[0] = BRAC_SL; parts[1] = PDLT; parts[2] = BRAC_SR; parts[3] = B;
-			reduce(param, D, parts,4);
-		break;
-		case 31:
-			parts = new TokenType[3]; parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = B;
-			reduce(param, D, parts,3);
-		break;
-		case 47:
-			parts = new TokenType[4]; parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR;
-			reduce(param, B, parts,4);
-		break;
-		case 98:
-			parts = new TokenType[3]; parts[0] = T; parts[1] = ID; parts[2] = D;
-			reduce(param, VD, parts,3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-		default:
-			return false;
-	}
-	return true;
-}
 bool funcID(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
 		case 4:
-			shift(param,tok,7);
-		break;
+			if(!rule1(param)) return false;
+			break;
 		case 5:
-			parts = new TokenType[1];parts[0] = CHAR; reduce(param, T, parts, 1);
-		break;
-		case 6:
-			parts = new TokenType[1];parts[0] = INT; reduce(param, T, parts, 1);
-		break;
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,73);
-        break;
-        case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+			shift(param,tok,6);
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			if(!rule68(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
+		case 28:
+			shift(param,tok,93);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 32:
-			parts = new TokenType[1];parts[0] = PRINT; reduce(param, PR, parts, 1);
-		break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
 		case 33:
-			parts = new TokenType[1];parts[0] = READ; reduce(param, PR, parts, 1);
-		break;
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		case 35:
-			shift(param,tok,73);
-		break;
+			if(!rule21(param)) return false;
+			break;
+		case 36:
+			if(!rule22(param)) return false;
+			break;
 		case 37:
-			shift(param,tok,73);
-		break;
-		case 39:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
 		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
+			if(!rule26(param)) return false;
+			break;
 		case 42:
-			shift(param,tok,73);
-		break;
-		case 44:
-			shift(param,tok,73);
-		break;
+			if(!rule27(param)) return false;
+			break;
+		case 43:
+			shift(param,tok,93);
+			break;
 		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
+			if(!rule28(param)) return false;
+			break;
 		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,73);
-        break;
+			if(!rule29(param)) return false;
+			break;
+		case 49:
+			shift(param,tok,93);
+			break;
 		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-        case 52:
-            shift(param,tok,73);
-        break;
+			shift(param,tok,93);
+			break;
+		case 53:
+			shift(param,tok,93);
+			break;
 		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule30(param)) return false;
+			break;
 		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 57:
-			shift(param,tok,58);
-		break;
+			shift(param,tok,93);
+			break;
+		case 58:
+			shift(param,tok,93);
+			break;
 		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule31(param)) return false;
+			break;
 		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
+			if(!rule32(param)) return false;
+			break;
 		case 61:
-			shift(param,tok,73);
-		break;
-		case 62:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, UO, parts, 1);
-		break;
+			shift(param,tok,93);
+			break;
 		case 63:
-			parts = new TokenType[1];parts[0] = OOPS; reduce(param, UO, parts, 1);
-		break;
+			if(!rule33(param)) return false;
+			break;
 		case 64:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
 		case 68:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
+		case 71:
+			shift(param,tok,93);
+			break;
 		case 74:
-			shift(param,tok,73);
-		break;
-		case 76:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
 		case 77:
-			shift(param,tok,73);
-		break;
-		case 79:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
+		case 80:
+			shift(param,tok,93);
+			break;
 		case 82:
-			shift(param,tok,73);
-		break;
+			shift(param,tok,93);
+			break;
 		case 85:
-			shift(param,tok,73);
-		break;
-		case 92:
-			shift(param,tok,73);
-		break;
-		case 93:
-			shift(param,tok,73);
-		break;
-		case 96:
-			shift(param,tok,97);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-		case 99:
-			parts = new TokenType[1];parts[0] = PLUS; reduce(param, BO, parts, 1);
-		break;
-		case 100:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, BO, parts, 1);
-		break;
+			shift(param,tok,93);
+			break;
+		case 88:
+			shift(param,tok,93);
+			break;
+		case 90:
+			shift(param,tok,93);
+			break;
+		case 94:
+			shift(param,tok,93);
+			break;
+		case 97:
+			shift(param,tok,93);
+			break;
 		case 101:
-			parts = new TokenType[1];parts[0] = MULT; reduce(param, BO, parts, 1);
-		break;
+			if(!rule55(param)) return false;
+			break;
 		case 102:
-			parts = new TokenType[1];parts[0] = DIVI; reduce(param, BO, parts, 1);
-		break;
+			if(!rule56(param)) return false;
+			break;
 		case 103:
-			parts = new TokenType[1];parts[0] = EQUA; reduce(param, BO, parts, 1);
-		break;
+			if(!rule57(param)) return false;
+			break;
 		case 104:
-			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
-		break;
+			if(!rule58(param)) return false;
+			break;
 		case 105:
-            parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-		break;
+			if(!rule59(param)) return false;
+			break;
 		case 106:
-            parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
-		break;
+			if(!rule60(param)) return false;
+			break;
 		case 107:
-            parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-		break;
+			if(!rule61(param)) return false;
+			break;
 		case 108:
-            parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
+			if(!rule62(param)) return false;
+			break;
 		case 109:
-			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
-		break;
+			if(!rule63(param)) return false;
+			break;
 		case 110:
-			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
-		break;
+			if(!rule64(param)) return false;
+			break;
 		case 111:
-			shift(param,tok,112);
-		break;
-        case 115:
-            shift(param,tok,73);
-        break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule65(param)) return false;
+			break;
+		case 112:
+			if(!rule66(param)) return false;
+			break;
+		case 113:
+			if(!rule67(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
 bool funcSEMI(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 6:
+			shift(param,tok,7);
+			break;
 		case 7:
-			shift(param,tok,9);
-		break;
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 15:
-			shift(param,tok,16);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,60);
-        break;
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
 		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+			shift(param,tok,25);
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,60);
-		break;
+			shift(param,tok,40);
+			break;
+		case 28:
+			shift(param,tok,40);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		case 37:
-			shift(param,tok,60);
-		break;
-		case 39:
-			shift(param,tok,60);
-		break;
+			shift(param,tok,40);
+			break;
 		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
+			if(!rule26(param)) return false;
+			break;
+		case 41:
+			shift(param,tok,42);
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
 		case 44:
-			shift(param,tok,60);
-		break;
+			shift(param,tok,45);
+			break;
 		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
+			if(!rule28(param)) return false;
+			break;
+		case 46:
+			shift(param,tok,47);
+			break;
 		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,60);
-        break;
-		case 50:
-			shift(param,tok,51);
-		break;
+			if(!rule29(param)) return false;
+			break;
 		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			shift(param,tok,40);
+			break;
 		case 53:
-			shift(param,tok,54);
-		break;
+			shift(param,tok,40);
+			break;
 		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 55:
-			shift(param,tok,56);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			if(!rule30(param)) return false;
+			break;
 		case 58:
-			shift(param,tok,59);
-		break;
+			shift(param,tok,40);
+			break;
 		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule31(param)) return false;
+			break;
 		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
+			if(!rule32(param)) return false;
+			break;
+		case 62:
+			shift(param,tok,63);
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
 		case 65:
-			parts = new TokenType[1];parts[0] = NUM; reduce(param, E, parts, 1);
-		break;
+			shift(param,tok,66);
+			break;
 		case 66:
-			parts = new TokenType[2];parts[0] = NUM; parts[1] = E_; reduce(param, E, parts, 2);
-		break;
+			if(!rule34(param)) return false;
+			break;
 		case 67:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, E_, parts, 2);
-		break;
+			if(!rule36(param)) return false;
+			break;
+		case 69:
+			if(!rule35(param)) return false;
+			break;
 		case 70:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; reduce(param, E, parts, 3);
-		break;
-		case 71:
-			parts = new TokenType[2];parts[0] = UO; parts[1] = E; reduce(param, E, parts, 2);
-		break;
+			if(!rule38(param)) return false;
+			break;
 		case 72:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; parts[3] = E_; reduce(param, E, parts, 4);
-		break;
+			if(!rule37(param)) return false;
+			break;
 		case 73:
-			parts = new TokenType[1];parts[0] = ID; reduce(param, E, parts, 1);
-		break;
+			if(!rule40(param)) return false;
+			break;
 		case 75:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
+			if(!rule39(param)) return false;
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
 		case 78:
-			parts = new TokenType[3];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; reduce(param, EIT, parts, 3);
-		break;
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			parts = new TokenType[2];parts[0] = BRAC_SL; parts[1] = BRAC_SR; reduce(param, EIT, parts, 2);
-		break;
+			if(!rule43(param)) return false;
+			break;
 		case 83:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = BO; parts[3] = E; reduce(param, EIT, parts, 4);
-		break;
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; reduce(param, EIT, parts, 3);
-		break;
+			if(!rule47(param)) return false;
+			break;
 		case 86:
-			parts = new TokenType[5];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; parts[3] = BO; parts[4] = E; reduce(param, EIT, parts, 5);
-		break;
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
 		case 89:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 90:
-			parts = new TokenType[2];parts[0] = ID; parts[1] = EIT; reduce(param, E, parts, 2);
-		break;
-		case 91:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; parts[3] = EAT; reduce(param, EIT, parts, 4);
-		break;
-		case 94:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 95:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 97:
-			shift(param,tok,9);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 119:
-            shift(param,tok,120);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
+	}
+	return true;
+}
+bool funcBRAC_SL(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 6:
+			shift(param,tok,9);
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			if(!rule68(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,90);
+			break;
+		case 28:
+			shift(param,tok,90);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,90);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 43:
+			shift(param,tok,90);
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 48:
+			shift(param,tok,49);
+			break;
+		case 49:
+			shift(param,tok,90);
+			break;
+		case 51:
+			shift(param,tok,90);
+			break;
+		case 53:
+			shift(param,tok,90);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 55:
+			shift(param,tok,56);
+			break;
+		case 56:
+			shift(param,tok,90);
+			break;
+		case 58:
+			shift(param,tok,90);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		case 68:
+			shift(param,tok,90);
+			break;
+		case 71:
+			shift(param,tok,90);
+			break;
+		case 74:
+			shift(param,tok,90);
+			break;
+		case 77:
+			shift(param,tok,90);
+			break;
+		case 80:
+			shift(param,tok,90);
+			break;
+		case 82:
+			shift(param,tok,90);
+			break;
+		case 85:
+			shift(param,tok,90);
+			break;
+		case 90:
+			shift(param,tok,90);
+			break;
+		case 93:
+			shift(param,tok,97);
+			break;
+		case 94:
+			shift(param,tok,90);
+			break;
+		case 97:
+			shift(param,tok,90);
+			break;
+		case 103:
+			if(!rule57(param)) return false;
+			break;
+		case 104:
+			if(!rule58(param)) return false;
+			break;
+		case 105:
+			if(!rule59(param)) return false;
+			break;
+		case 106:
+			if(!rule60(param)) return false;
+			break;
+		case 107:
+			if(!rule61(param)) return false;
+			break;
+		case 108:
+			if(!rule62(param)) return false;
+			break;
+		case 109:
+			if(!rule63(param)) return false;
+			break;
+		case 110:
+			if(!rule64(param)) return false;
+			break;
+		case 111:
+			if(!rule65(param)) return false;
+			break;
+		case 112:
+			if(!rule66(param)) return false;
+			break;
+		case 113:
+			if(!rule67(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcBRAC_SR(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 6:
+			if(!rule13(param)) return false;
+			break;
+		case 9:
+			shift(param,tok,13);
+			break;
+		case 10:
+			shift(param,tok,11);
+			break;
+		case 16:
+			if(!rule9(param)) return false;
+			break;
+		case 17:
+			if(!rule11(param)) return false;
+			break;
+		case 18:
+			if(!rule10(param)) return false;
+			break;
+		case 20:
+			if(!rule12(param)) return false;
+			break;
+		case 21:
+			if(!rule14(param)) return false;
+			break;
+		case 26:
+			if(!rule16(param)) return false;
+			break;
+		case 50:
+			shift(param,tok,51);
+			break;
+		case 57:
+			shift(param,tok,58);
+			break;
+		case 67:
+			if(!rule36(param)) return false;
+			break;
+		case 69:
+			if(!rule35(param)) return false;
+			break;
+		case 70:
+			if(!rule38(param)) return false;
+			break;
+		case 72:
+			if(!rule37(param)) return false;
+			break;
+		case 73:
+			if(!rule40(param)) return false;
+			break;
+		case 75:
+			if(!rule39(param)) return false;
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
+		case 78:
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
+		case 81:
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 91:
+			shift(param,tok,92);
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 98:
+			shift(param,tok,99);
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcCOMMA(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 6:
+			if(!rule13(param)) return false;
+			break;
+		case 17:
+			shift(param,tok,19);
+			break;
+		case 21:
+			if(!rule14(param)) return false;
+			break;
+		case 26:
+			if(!rule16(param)) return false;
+			break;
+		case 67:
+			shift(param,tok,19);
+			break;
+		case 70:
+			if(!rule38(param)) return false;
+			break;
+		case 72:
+			if(!rule37(param)) return false;
+			break;
+		case 73:
+			if(!rule40(param)) return false;
+			break;
+		case 75:
+			if(!rule39(param)) return false;
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
+		case 78:
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
+		case 81:
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
+		default:
+			return false;
+		break;
 	}
 	return true;
 }
 bool funcBRAC_ML(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 7:
-			shift(param,tok,10);
-		break;
-		case 73:
-			shift(param,tok,76);
-		break;
-		case 97:
-			shift(param,tok,10);
-		break;
-		case 112:
-			shift(param,tok,113);
-		break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcBRAC_SL(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 7:
-			shift(param,tok,12);
-		break;
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,61);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,61);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 34:
-			shift(param,tok,35);
-		break;
-		case 35:
-			shift(param,tok,61);
-		break;
-		case 37:
-			shift(param,tok,61);
-		break;
-		case 39:
-			shift(param,tok,61);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 41:
-			shift(param,tok,42);
-		break;
-		case 42:
-			shift(param,tok,61);
-		break;
-		case 44:
-			shift(param,tok,61);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,61);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-        case 52:
-            shift(param,tok,61);
-        break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 61:
-			shift(param,tok,61);
-		break;
-		case 62:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, UO, parts, 1);
-		break;
-		case 63:
-			parts = new TokenType[1];parts[0] = OOPS; reduce(param, UO, parts, 1);
-		break;
-		case 64:
-			shift(param,tok,61);
-		break;
-		case 68:
-			shift(param,tok,61);
-		break;
-		case 73:
-			shift(param,tok,77);
-		break;
-		case 74:
-			shift(param,tok,61);
-		break;
-		case 76:
-			shift(param,tok,61);
-		break;
-		case 77:
-			shift(param,tok,61);
-		break;
-		case 79:
-			shift(param,tok,61);
-		break;
-		case 82:
-			shift(param,tok,61);
-		break;
-		case 85:
-			shift(param,tok,61);
-		break;
-		case 92:
-			shift(param,tok,61);
-		break;
+		case 6:
+			shift(param,tok,22);
+			break;
 		case 93:
-			shift(param,tok,61);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-		case 99:
-			parts = new TokenType[1];parts[0] = PLUS; reduce(param, BO, parts, 1);
-		break;
-		case 100:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, BO, parts, 1);
-		break;
-		case 101:
-			parts = new TokenType[1];parts[0] = MULT; reduce(param, BO, parts, 1);
-		break;
-		case 102:
-			parts = new TokenType[1];parts[0] = DIVI; reduce(param, BO, parts, 1);
-		break;
-		case 103:
-			parts = new TokenType[1];parts[0] = EQUA; reduce(param, BO, parts, 1);
-		break;
-		case 104:
-			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
-		break;
-        case 105:
-            parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-        break;
-        case 106:
-            parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
-        break;
-        case 107:
-			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-		break;
-        case 108:
-			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
-		case 109:
-			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
-		break;
-		case 110:
-			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
-		break;
-        case 115:
-            shift(param,tok,61);
-        break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			shift(param,tok,94);
+			break;
 		default:
 			return false;
-	}
-	return true;
-}
-bool funcCOMMA(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 18:
-			shift(param,tok,20);
 		break;
-		case 65:
-			parts = new TokenType[1];parts[0] = NUM; reduce(param, E, parts, 1);
-		break;
-		case 66:
-			parts = new TokenType[2];parts[0] = NUM; parts[1] = E_; reduce(param, E, parts, 2);
-		break;
-		case 67:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, E_, parts, 2);
-		break;
-		case 70:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; reduce(param, E, parts, 3);
-		break;
-		case 71:
-			parts = new TokenType[2];parts[0] = UO; parts[1] = E; reduce(param, E, parts, 2);
-		break;
-		case 72:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; parts[3] = E_; reduce(param, E, parts, 4);
-		break;
-		case 73:
-			parts = new TokenType[1];parts[0] = ID; reduce(param, E, parts, 1);
-		break;
-		case 75:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 78:
-			parts = new TokenType[3];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; reduce(param, EIT, parts, 3);
-		break;
-		case 81:
-			parts = new TokenType[2];parts[0] = BRAC_SL; parts[1] = BRAC_SR; reduce(param, EIT, parts, 2);
-		break;
-		case 83:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = BO; parts[3] = E; reduce(param, EIT, parts, 4);
-		break;
-		case 84:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; reduce(param, EIT, parts, 3);
-		break;
-		case 86:
-			parts = new TokenType[5];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; parts[3] = BO; parts[4] = E; reduce(param, EIT, parts, 5);
-		break;
-		case 87:
-			shift(param,tok,115);
-		break;
-		case 89:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 90:
-			parts = new TokenType[2];parts[0] = ID; parts[1] = EIT; reduce(param, E, parts, 2);
-		break;
-		case 91:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; parts[3] = EAT; reduce(param, EIT, parts, 4);
-		break;
-		case 94:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 95:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 112:
-			parts = new TokenType[2];parts[0] = T; parts[1] = ID; reduce(param, PD, parts, 2);
-		break;
-		case 114:
-			parts = new TokenType[4];parts[0] = T; parts[1] = ID; parts[2] = BRAC_ML; parts[3] = BRAC_MR; reduce(param, PD, parts, 4);
-		break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcBRAC_LL(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 17:
-            shift(param,tok,22);
-        break;
-        case 22:
-            shift(param,tok,22);
-        break;
-        case 23:
-			shift(param,tok,22);
-		break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,22);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 37:
-			shift(param,tok,22);
-		break;
-		case 39:
-			shift(param,tok,22);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,22);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,22);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcMINUS(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,62);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,62);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 35:
-			shift(param,tok,62);
-		break;
-		case 37:
-			shift(param,tok,62);
-		break;
-		case 39:
-			shift(param,tok,62);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 42:
-			shift(param,tok,62);
-		break;
-		case 44:
-			shift(param,tok,62);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,62);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-        case 52:
-            shift(param,tok,62);
-        break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 61:
-			shift(param,tok,62);
-		break;
-		case 62:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, UO, parts, 1);
-		break;
-		case 63:
-			parts = new TokenType[1];parts[0] = OOPS; reduce(param, UO, parts, 1);
-		break;
-		case 64:
-			shift(param,tok,62);
-		break;
-		case 68:
-			shift(param,tok,62);
-		break;
-		case 70:
-			shift(param,tok,100);
-		break;
-		case 73:
-			shift(param,tok,100);
-		break;
-		case 74:
-			shift(param,tok,62);
-		break;
-		case 76:
-			shift(param,tok,62);
-		break;
-		case 77:
-			shift(param,tok,62);
-		break;
-		case 78:
-			shift(param,tok,100);
-		break;
-		case 79:
-			shift(param,tok,62);
-		break;
-		case 81:
-			shift(param,tok,100);
-		break;
-		case 82:
-			shift(param,tok,62);
-		break;
-		case 84:
-			shift(param,tok,100);
-		break;
-		case 85:
-			shift(param,tok,62);
-		break;
-		case 92:
-			shift(param,tok,62);
-		break;
-		case 93:
-			shift(param,tok,62);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-		case 99:
-			parts = new TokenType[1];parts[0] = PLUS; reduce(param, BO, parts, 1);
-		break;
-		case 100:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, BO, parts, 1);
-		break;
-		case 101:
-			parts = new TokenType[1];parts[0] = MULT; reduce(param, BO, parts, 1);
-		break;
-		case 102:
-			parts = new TokenType[1];parts[0] = DIVI; reduce(param, BO, parts, 1);
-		break;
-		case 103:
-			parts = new TokenType[1];parts[0] = EQUA; reduce(param, BO, parts, 1);
-		break;
-		case 104:
-			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
-		break;
-        case 105:
-            parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-        break;
-        case 106:
-            parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
-        break;
-        case 107:
-			parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-		break;
-        case 108:
-			parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-		break;
-		case 109:
-			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
-		break;
-		case 110:
-			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
-		break;
-        case 115:
-            shift(param,tok,62);
-        break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcOOPS(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,63);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,63);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 35:
-			shift(param,tok,63);
-		break;
-		case 37:
-			shift(param,tok,63);
-		break;
-		case 39:
-			shift(param,tok,63);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 42:
-			shift(param,tok,63);
-		break;
-		case 44:
-			shift(param,tok,63);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,63);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-        case 52:
-            shift(param,tok,63);
-        break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 61:
-			shift(param,tok,63);
-		break;
-		case 62:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, UO, parts, 1);
-		break;
-		case 63:
-			parts = new TokenType[1];parts[0] = OOPS; reduce(param, UO, parts, 1);
-		break;
-		case 64:
-			shift(param,tok,63);
-		break;
-		case 68:
-			shift(param,tok,63);
-		break;
-		case 74:
-			shift(param,tok,63);
-		break;
-		case 76:
-			shift(param,tok,63);
-		break;
-		case 77:
-			shift(param,tok,63);
-		break;
-		case 79:
-			shift(param,tok,63);
-		break;
-		case 82:
-			shift(param,tok,63);
-		break;
-		case 85:
-			shift(param,tok,63);
-		break;
-		case 92:
-			shift(param,tok,63);
-		break;
-		case 93:
-			shift(param,tok,63);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-		case 99:
-			parts = new TokenType[1];parts[0] = PLUS; reduce(param, BO, parts, 1);
-		break;
-		case 100:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, BO, parts, 1);
-		break;
-		case 101:
-			parts = new TokenType[1];parts[0] = MULT; reduce(param, BO, parts, 1);
-		break;
-		case 102:
-			parts = new TokenType[1];parts[0] = DIVI; reduce(param, BO, parts, 1);
-		break;
-		case 103:
-			parts = new TokenType[1];parts[0] = EQUA; reduce(param, BO, parts, 1);
-		break;
-		case 104:
-			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
-		break;
-        case 105:
-			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-		break;
-        case 106:
-			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
-		break;
-        case 107:
-            parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-        break;
-        case 108:
-            parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-        break;
-		case 109:
-			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
-		break;
-		case 110:
-			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
-		break;
-        case 115:
-            shift(param,tok,63);
-        break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
-		default:
-			return false;
 	}
 	return true;
 }
 bool funcNUM(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 10:
-			shift(param,tok,14);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,65);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			if(!rule68(param)) return false;
+			break;
+		case 22:
+			shift(param,tok,23);
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
+		case 28:
+			shift(param,tok,100);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-        case 32:
-            parts = new TokenType[1];parts[0] = PRINT; reduce(param, PR, parts, 1);
-        break;
-        case 33:
-            parts = new TokenType[1];parts[0] = READ; reduce(param, PR, parts, 1);
-        break;
-		case 35:
-			shift(param,tok,65);
-		break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		case 37:
-			shift(param,tok,65);
-		break;
-		case 39:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
 		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
+			if(!rule26(param)) return false;
+			break;
 		case 42:
-			shift(param,tok,65);
-		break;
-		case 44:
-			shift(param,tok,65);
-		break;
+			if(!rule27(param)) return false;
+			break;
+		case 43:
+			shift(param,tok,100);
+			break;
 		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
+			if(!rule28(param)) return false;
+			break;
 		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,65);
-        break;
+			if(!rule29(param)) return false;
+			break;
+		case 49:
+			shift(param,tok,100);
+			break;
 		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-        case 52:
-            shift(param,tok,65);
-        break;
+			shift(param,tok,100);
+			break;
+		case 53:
+			shift(param,tok,100);
+			break;
 		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule30(param)) return false;
+			break;
 		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-        case 57:
-            shift(param,tok,119);
-        break;
+			shift(param,tok,100);
+			break;
+		case 58:
+			shift(param,tok,100);
+			break;
 		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule31(param)) return false;
+			break;
 		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
+			if(!rule32(param)) return false;
+			break;
 		case 61:
-			shift(param,tok,65);
-		break;
-		case 62:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, UO, parts, 1);
-		break;
+			shift(param,tok,100);
+			break;
 		case 63:
-			parts = new TokenType[1];parts[0] = OOPS; reduce(param, UO, parts, 1);
-		break;
+			if(!rule33(param)) return false;
+			break;
 		case 64:
-			shift(param,tok,65);
-		break;
-		case 65:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
 		case 68:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
+		case 71:
+			shift(param,tok,100);
+			break;
 		case 74:
-			shift(param,tok,65);
-		break;
-		case 76:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
 		case 77:
-			shift(param,tok,65);
-		break;
-		case 79:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
+		case 80:
+			shift(param,tok,100);
+			break;
 		case 82:
-			shift(param,tok,65);
-		break;
+			shift(param,tok,100);
+			break;
 		case 85:
-			shift(param,tok,65);
-		break;
-		case 92:
-			shift(param,tok,65);
-		break;
-		case 93:
-			shift(param,tok,65);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-		case 99:
-			parts = new TokenType[1];parts[0] = PLUS; reduce(param, BO, parts, 1);
-		break;
-		case 100:
-			parts = new TokenType[1];parts[0] = MINUS; reduce(param, BO, parts, 1);
-		break;
+			shift(param,tok,100);
+			break;
+		case 88:
+			shift(param,tok,100);
+			break;
+		case 90:
+			shift(param,tok,100);
+			break;
+		case 94:
+			shift(param,tok,100);
+			break;
+		case 97:
+			shift(param,tok,100);
+			break;
 		case 101:
-			parts = new TokenType[1];parts[0] = MULT; reduce(param, BO, parts, 1);
-		break;
+			if(!rule55(param)) return false;
+			break;
 		case 102:
-			parts = new TokenType[1];parts[0] = DIVI; reduce(param, BO, parts, 1);
-		break;
+			if(!rule56(param)) return false;
+			break;
 		case 103:
-			parts = new TokenType[1];parts[0] = EQUA; reduce(param, BO, parts, 1);
-		break;
+			if(!rule57(param)) return false;
+			break;
 		case 104:
-			parts = new TokenType[1];parts[0] = NEQU; reduce(param, BO, parts, 1);
-		break;
-        case 105:
-			parts = new TokenType[1];parts[0] = LSTH; reduce(param, BO, parts, 1);
-		break;
-        case 106:
-			parts = new TokenType[1];parts[0] = LSEQ; reduce(param, BO, parts, 1);
-		break;
-        case 107:
-            parts = new TokenType[1];parts[0] = GREA; reduce(param, BO, parts, 1);
-        break;
-        case 108:
-            parts = new TokenType[1];parts[0] = GREQ; reduce(param, BO, parts, 1);
-        break;
+			if(!rule58(param)) return false;
+			break;
+		case 105:
+			if(!rule59(param)) return false;
+			break;
+		case 106:
+			if(!rule60(param)) return false;
+			break;
+		case 107:
+			if(!rule61(param)) return false;
+			break;
+		case 108:
+			if(!rule62(param)) return false;
+			break;
 		case 109:
-			parts = new TokenType[1];parts[0] = AND; reduce(param, BO, parts, 1);
-		break;
+			if(!rule63(param)) return false;
+			break;
 		case 110:
-			parts = new TokenType[1];parts[0] = OR; reduce(param, BO, parts, 1);
-		break;
-        case 115:
-            shift(param,tok,65);
-        break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule64(param)) return false;
+			break;
+		case 111:
+			if(!rule65(param)) return false;
+			break;
+		case 112:
+			if(!rule66(param)) return false;
+			break;
+		case 113:
+			if(!rule67(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcBREAK(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
+bool funcBRAC_MR(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
+		case 22:
+			shift(param,tok,26);
+			break;
+		case 23:
+			shift(param,tok,24);
+			break;
+		case 67:
+			if(!rule36(param)) return false;
+			break;
+		case 69:
+			if(!rule35(param)) return false;
+			break;
+		case 70:
+			if(!rule38(param)) return false;
+			break;
+		case 72:
+			if(!rule37(param)) return false;
+			break;
+		case 73:
+			if(!rule40(param)) return false;
+			break;
+		case 75:
+			if(!rule39(param)) return false;
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
+		case 78:
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
+		case 81:
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 95:
+			shift(param,tok,96);
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
+		default:
+			return false;
 		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,55);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+	}
+	return true;
+}
+bool funcBRAC_LL(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 11:
+			shift(param,tok,27);
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 13:
+			shift(param,tok,27);
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,55);
-		break;
+			shift(param,tok,27);
+			break;
+		case 28:
+			shift(param,tok,27);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		case 37:
-			shift(param,tok,55);
-		break;
-		case 39:
-			shift(param,tok,55);
-		break;
+			shift(param,tok,27);
+			break;
 		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,55);
-		break;
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
 		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
+			if(!rule28(param)) return false;
+			break;
 		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,55);
-        break;
+			if(!rule29(param)) return false;
+			break;
 		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			shift(param,tok,27);
+			break;
+		case 53:
+			shift(param,tok,27);
+			break;
 		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,27);
+			break;
 		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule31(param)) return false;
+			break;
 		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcIF(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
+bool funcBRAC_LR(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,34);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
+			shift(param,tok,31);
+			break;
+		case 28:
+			shift(param,tok,34);
+			break;
 		case 29:
-			shift(param,tok,34);
-		break;
+			shift(param,tok,30);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 32:
+			shift(param,tok,33);
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		case 37:
-			shift(param,tok,34);
-		break;
-		case 39:
-			shift(param,tok,34);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,34);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,34);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcELSE(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
+			if(!rule24(param)) return false;
+			break;
 		case 38:
-			shift(param,tok,39);
-		break;
+			if(!rule23(param)) return false;
+			break;
+		case 39:
+			if(!rule25(param)) return false;
+			break;
 		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
 		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
+			if(!rule28(param)) return false;
+			break;
 		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			if(!rule29(param)) return false;
+			break;
 		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			if(!rule30(param)) return false;
+			break;
 		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule31(param)) return false;
+			break;
 		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcWHILE(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
+bool funcINT(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
+		case 0:
+			shift(param,tok,35);
+			break;
+		case 3:
+			shift(param,tok,35);
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
 		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,41);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+			shift(param,tok,35);
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			shift(param,tok,35);
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,41);
-		break;
+			shift(param,tok,35);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 37:
-			shift(param,tok,41);
-		break;
-		case 39:
-			shift(param,tok,41);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,41);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,41);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcPRINT(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
+bool funcCHAR(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
+		case 0:
+			shift(param,tok,36);
+			break;
+		case 3:
+			shift(param,tok,36);
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
 		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,32);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+			shift(param,tok,36);
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			shift(param,tok,36);
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,32);
-		break;
+			shift(param,tok,36);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 37:
-			shift(param,tok,32);
-		break;
-		case 39:
-			shift(param,tok,32);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,32);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,32);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		default:
 			return false;
-	}
-	return true;
-}
-bool funcREAD(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
 		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,33);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,33);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 37:
-			shift(param,tok,33);
-		break;
-		case 39:
-			shift(param,tok,33);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,33);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,33);
-        break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
-		default:
-			return false;
 	}
 	return true;
 }
 bool funcRET(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
 	switch(param.stack.back()){
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-        case 22:
-            shift(param,tok,52);
-        break;
-		case 24:
-			parts = new TokenType[1];parts[0] = VD; reduce(param, VDL, parts, 1);
-		break;
-		case 26:
-			parts = new TokenType[2];parts[0] = VD; parts[1] = VDL; reduce(param, VDL, parts, 2);
-		break;
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
 		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 29:
-			shift(param,tok,52);
-		break;
+			shift(param,tok,43);
+			break;
+		case 28:
+			shift(param,tok,43);
+			break;
 		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		case 37:
-			shift(param,tok,52);
-		break;
-		case 39:
-			shift(param,tok,52);
-		break;
+			shift(param,tok,43);
+			break;
 		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 44:
-			shift(param,tok,52);
-		break;
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
 		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
+			if(!rule28(param)) return false;
+			break;
 		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 48:
-            shift(param,tok,52);
-        break;
+			if(!rule29(param)) return false;
+			break;
 		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			shift(param,tok,43);
+			break;
+		case 53:
+			shift(param,tok,43);
+			break;
 		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,43);
+			break;
 		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
+			if(!rule31(param)) return false;
+			break;
 		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-		case 98:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = VD_; reduce(param, VD, parts, 3);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcASSI(ParserParam &param, Token *tok){
+bool funcBREAK(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 73:
-			shift(param,tok,79);
-		break;
-		case 78:
-			shift(param,tok,93);
-		break;
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,46);
+			break;
+		case 28:
+			shift(param,tok,46);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,46);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 51:
+			shift(param,tok,46);
+			break;
+		case 53:
+			shift(param,tok,46);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,46);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
 		default:
 			return false;
+		break;
+	}
+	return true;
+}
+bool funcIF(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,48);
+			break;
+		case 28:
+			shift(param,tok,48);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,48);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 51:
+			shift(param,tok,48);
+			break;
+		case 53:
+			shift(param,tok,48);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,48);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcELSE(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 52:
+			shift(param,tok,53);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcWHILE(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,55);
+			break;
+		case 28:
+			shift(param,tok,55);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,55);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 51:
+			shift(param,tok,55);
+			break;
+		case 53:
+			shift(param,tok,55);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,55);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcPRINT(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,61);
+			break;
+		case 28:
+			shift(param,tok,61);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,61);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 51:
+			shift(param,tok,61);
+			break;
+		case 53:
+			shift(param,tok,61);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,61);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcREAD(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,64);
+			break;
+		case 28:
+			shift(param,tok,64);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,64);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 51:
+			shift(param,tok,64);
+			break;
+		case 53:
+			shift(param,tok,64);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 58:
+			shift(param,tok,64);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcMINUS(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			if(!rule68(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,102);
+			break;
+		case 28:
+			shift(param,tok,102);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,102);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 43:
+			shift(param,tok,102);
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 49:
+			shift(param,tok,102);
+			break;
+		case 51:
+			shift(param,tok,102);
+			break;
+		case 53:
+			shift(param,tok,102);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 56:
+			shift(param,tok,102);
+			break;
+		case 58:
+			shift(param,tok,102);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		case 68:
+			shift(param,tok,102);
+			break;
+		case 71:
+			shift(param,tok,102);
+			break;
+		case 74:
+			shift(param,tok,102);
+			break;
+		case 77:
+			shift(param,tok,102);
+			break;
+		case 79:
+			shift(param,tok,80);
+			break;
+		case 80:
+			shift(param,tok,102);
+			break;
+		case 82:
+			shift(param,tok,102);
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 85:
+			shift(param,tok,102);
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 90:
+			shift(param,tok,102);
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 94:
+			shift(param,tok,102);
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 97:
+			shift(param,tok,102);
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
+		case 103:
+			if(!rule57(param)) return false;
+			break;
+		case 104:
+			if(!rule58(param)) return false;
+			break;
+		case 105:
+			if(!rule59(param)) return false;
+			break;
+		case 106:
+			if(!rule60(param)) return false;
+			break;
+		case 107:
+			if(!rule61(param)) return false;
+			break;
+		case 108:
+			if(!rule62(param)) return false;
+			break;
+		case 109:
+			if(!rule63(param)) return false;
+			break;
+		case 110:
+			if(!rule64(param)) return false;
+			break;
+		case 111:
+			if(!rule65(param)) return false;
+			break;
+		case 112:
+			if(!rule66(param)) return false;
+			break;
+		case 113:
+			if(!rule67(param)) return false;
+			break;
+		default:
+			return false;
+		break;
 	}
 	return true;
 }
 bool funcPLUS(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,99);
-		break;
-		case 73:
-			shift(param,tok,99);
-		break;
-		case 78:
-			shift(param,tok,99);
-		break;
-		case 81:
-			shift(param,tok,99);
-		break;
+		case 79:
+			shift(param,tok,82);
+			break;
 		case 84:
-			shift(param,tok,99);
-		break;
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
+	}
+	return true;
+}
+bool funcOOPS(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 3:
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
+		case 8:
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 19:
+			if(!rule68(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 27:
+			shift(param,tok,101);
+			break;
+		case 28:
+			shift(param,tok,101);
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
+		case 31:
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
+		case 37:
+			shift(param,tok,101);
+			break;
+		case 40:
+			if(!rule26(param)) return false;
+			break;
+		case 42:
+			if(!rule27(param)) return false;
+			break;
+		case 43:
+			shift(param,tok,101);
+			break;
+		case 45:
+			if(!rule28(param)) return false;
+			break;
+		case 47:
+			if(!rule29(param)) return false;
+			break;
+		case 49:
+			shift(param,tok,101);
+			break;
+		case 51:
+			shift(param,tok,101);
+			break;
+		case 53:
+			shift(param,tok,101);
+			break;
+		case 54:
+			if(!rule30(param)) return false;
+			break;
+		case 56:
+			shift(param,tok,101);
+			break;
+		case 58:
+			shift(param,tok,101);
+			break;
+		case 59:
+			if(!rule31(param)) return false;
+			break;
+		case 60:
+			if(!rule32(param)) return false;
+			break;
+		case 63:
+			if(!rule33(param)) return false;
+			break;
+		case 66:
+			if(!rule34(param)) return false;
+			break;
+		case 68:
+			shift(param,tok,101);
+			break;
+		case 71:
+			shift(param,tok,101);
+			break;
+		case 74:
+			shift(param,tok,101);
+			break;
+		case 77:
+			shift(param,tok,101);
+			break;
+		case 80:
+			shift(param,tok,101);
+			break;
+		case 82:
+			shift(param,tok,101);
+			break;
+		case 85:
+			shift(param,tok,101);
+			break;
+		case 90:
+			shift(param,tok,101);
+			break;
+		case 94:
+			shift(param,tok,101);
+			break;
+		case 97:
+			shift(param,tok,101);
+			break;
+		case 103:
+			if(!rule57(param)) return false;
+			break;
+		case 104:
+			if(!rule58(param)) return false;
+			break;
+		case 105:
+			if(!rule59(param)) return false;
+			break;
+		case 106:
+			if(!rule60(param)) return false;
+			break;
+		case 107:
+			if(!rule61(param)) return false;
+			break;
+		case 108:
+			if(!rule62(param)) return false;
+			break;
+		case 109:
+			if(!rule63(param)) return false;
+			break;
+		case 110:
+			if(!rule64(param)) return false;
+			break;
+		case 111:
+			if(!rule65(param)) return false;
+			break;
+		case 112:
+			if(!rule66(param)) return false;
+			break;
+		case 113:
+			if(!rule67(param)) return false;
+			break;
+		default:
+			return false;
+		break;
 	}
 	return true;
 }
 bool funcMULT(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,101);
-		break;
-		case 73:
-			shift(param,tok,101);
-		break;
-		case 78:
-			shift(param,tok,101);
-		break;
-		case 81:
-			shift(param,tok,101);
-		break;
 		case 84:
-			shift(param,tok,101);
-		break;
+			shift(param,tok,103);
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
 bool funcDIVI(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,102);
-		break;
-		case 73:
-			shift(param,tok,102);
-		break;
-		case 78:
-			shift(param,tok,102);
-		break;
-		case 81:
-			shift(param,tok,102);
-		break;
 		case 84:
-			shift(param,tok,102);
-		break;
+			shift(param,tok,104);
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
 bool funcEQUA(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,103);
-		break;
-		case 73:
-			shift(param,tok,103);
-		break;
-		case 78:
-			shift(param,tok,103);
-		break;
+		case 76:
+			shift(param,tok,105);
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			shift(param,tok,103);
-		break;
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			shift(param,tok,103);
-		break;
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
 bool funcNEQU(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,104);
-		break;
-		case 73:
-			shift(param,tok,104);
-		break;
-		case 78:
-			shift(param,tok,104);
-		break;
+		case 76:
+			shift(param,tok,106);
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			shift(param,tok,104);
-		break;
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			shift(param,tok,104);
-		break;
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
-	}
-	return true;
-}
-bool funcLSTH(ParserParam &param, Token *tok){
-	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,105);
 		break;
-		case 73:
-			shift(param,tok,105);
-		break;
-		case 78:
-			shift(param,tok,105);
-		break;
-		case 81:
-			shift(param,tok,105);
-		break;
-		case 84:
-			shift(param,tok,105);
-		break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcLSEQ(ParserParam &param, Token *tok){
-	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,106);
-		break;
-		case 73:
-			shift(param,tok,106);
-		break;
-		case 78:
-			shift(param,tok,106);
-		break;
-		case 81:
-			shift(param,tok,106);
-		break;
-		case 84:
-			shift(param,tok,106);
-		break;
-		default:
-			return false;
 	}
 	return true;
 }
 bool funcGREA(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
+		case 76:
 			shift(param,tok,107);
-		break;
-		case 73:
-			shift(param,tok,107);
-		break;
-		case 78:
-			shift(param,tok,107);
-		break;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			shift(param,tok,107);
-		break;
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			shift(param,tok,107);
-		break;
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
 bool funcGREQ(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
+		case 76:
 			shift(param,tok,108);
-		break;
-		case 73:
-			shift(param,tok,108);
-		break;
-		case 78:
-			shift(param,tok,108);
-		break;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			shift(param,tok,108);
-		break;
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			shift(param,tok,108);
-		break;
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
+	}
+	return true;
+}
+bool funcLSTH(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 76:
+			shift(param,tok,109);
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
+		case 81:
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
+		default:
+			return false;
+		break;
+	}
+	return true;
+}
+bool funcLSEQ(ParserParam &param, Token *tok){
+	switch(param.stack.back()){
+		case 76:
+			shift(param,tok,110);
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
+		case 81:
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
+		default:
+			return false;
+		break;
 	}
 	return true;
 }
 bool funcAND(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,109);
-		break;
 		case 73:
-			shift(param,tok,109);
-		break;
+			shift(param,tok,111);
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
 		case 78:
-			shift(param,tok,109);
-		break;
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			shift(param,tok,109);
-		break;
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			shift(param,tok,109);
-		break;
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
 bool funcOR(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,110);
-		break;
 		case 73:
-			shift(param,tok,110);
-		break;
+			shift(param,tok,112);
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
 		case 78:
-			shift(param,tok,110);
-		break;
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
 		case 81:
-			shift(param,tok,110);
-		break;
-		case 84:
-			shift(param,tok,110);
-		break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcBRAC_MR(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-        case 14:
-            shift(param,tok,15);
-        break;
-		case 65:
-			parts = new TokenType[1];parts[0] = NUM; reduce(param, E, parts, 1);
-		break;
-		case 66:
-			parts = new TokenType[2];parts[0] = NUM; parts[1] = E_; reduce(param, E, parts, 2);
-		break;
-		case 67:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, E_, parts, 2);
-		break;
-		case 70:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; reduce(param, E, parts, 3);
-		break;
-		case 71:
-			parts = new TokenType[2];parts[0] = UO; parts[1] = E; reduce(param, E, parts, 2);
-		break;
-		case 72:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; parts[3] = E_; reduce(param, E, parts, 4);
-		break;
-		case 73:
-			parts = new TokenType[1];parts[0] = ID; reduce(param, E, parts, 1);
-		break;
-		case 75:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 78:
-			parts = new TokenType[3];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; reduce(param, EIT, parts, 3);
-		break;
-		case 81:
-			parts = new TokenType[2];parts[0] = BRAC_SL; parts[1] = BRAC_SR; reduce(param, EIT, parts, 2);
-		break;
+			if(!rule43(param)) return false;
+			break;
 		case 83:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = BO; parts[3] = E; reduce(param, EIT, parts, 4);
-		break;
+			if(!rule44(param)) return false;
+			break;
 		case 84:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; reduce(param, EIT, parts, 3);
-		break;
+			if(!rule47(param)) return false;
+			break;
 		case 86:
-			parts = new TokenType[5];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; parts[3] = BO; parts[4] = E; reduce(param, EIT, parts, 5);
-		break;
-		case 89:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 90:
-			parts = new TokenType[2];parts[0] = ID; parts[1] = EIT; reduce(param, E, parts, 2);
-		break;
-		case 91:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; parts[3] = EAT; reduce(param, EIT, parts, 4);
-		break;
-		case 94:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 95:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 113:
-			shift(param,tok,114);
-		break;
-        case 118:
-            shift(param,tok,78);
-        break;
-		default:
-			return false;
-	}
-	return true;
-}
-bool funcBRAC_SR(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
-	switch(param.stack.back()){
-		case 12:
-			shift(param,tok,17);
-		break;
-		case 13:
-			shift(param,tok,23);
-		break;
-		case 18:
-			parts = new TokenType[1];parts[0] = PD; reduce(param, PDLT, parts, 1);
-		break;
-		case 19:
-			parts = new TokenType[2];parts[0] = PD; parts[1] = PDLT_; reduce(param, PDLT, parts, 2);
-		break;
-		case 21:
-			parts = new TokenType[2];parts[0] = COMMA; parts[1] = PDLT; reduce(param, PDLT_, parts, 2);
-		break;
-        case 36:
-            shift(param,tok,37);
-        break;
-		case 43:
-			shift(param,tok,44);
-		break;
-		case 65:
-			parts = new TokenType[1];parts[0] = NUM; reduce(param, E, parts, 1);
-		break;
-		case 66:
-			parts = new TokenType[2];parts[0] = NUM; parts[1] = E_; reduce(param, E, parts, 2);
-		break;
-		case 67:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, E_, parts, 2);
-		break;
-		case 69:
-			shift(param,tok,70);
-		break;
-		case 70:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; reduce(param, E, parts, 3);
-		break;
-		case 71:
-			parts = new TokenType[2];parts[0] = UO; parts[1] = E; reduce(param, E, parts, 2);
-		break;
-		case 72:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = E; parts[2] = BRAC_SR; parts[3] = E_; reduce(param, E, parts, 4);
-		break;
-		case 73:
-			parts = new TokenType[1];parts[0] = ID; reduce(param, E, parts, 1);
-		break;
-		case 75:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 77:
-			shift(param,tok,81);
-		break;
-		case 78:
-			parts = new TokenType[3];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; reduce(param, EIT, parts, 3);
-		break;
-		case 80:
-			shift(param,tok,84);
-		break;
-		case 81:
-			parts = new TokenType[2];parts[0] = BRAC_SL; parts[1] = BRAC_SR; reduce(param, EIT, parts, 2);
-		break;
-		case 83:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = BO; parts[3] = E; reduce(param, EIT, parts, 4);
-		break;
-		case 84:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; reduce(param, EIT, parts, 3);
-		break;
-		case 86:
-			parts = new TokenType[5];parts[0] = BRAC_SL; parts[1] = ELT; parts[2] = BRAC_SR; parts[3] = BO; parts[4] = E; reduce(param, EIT, parts, 5);
-		break;
+			if(!rule46(param)) return false;
+			break;
 		case 87:
-			parts = new TokenType[1];parts[0] = E; reduce(param, ELT, parts, 1);
-		break;
-		case 88:
-			parts = new TokenType[2];parts[0] = E; parts[1] = ELT_; reduce(param, ELT, parts, 2);
-		break;
+			if(!rule48(param)) return false;
+			break;
 		case 89:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EIT, parts, 2);
-		break;
-		case 90:
-			parts = new TokenType[2];parts[0] = ID; parts[1] = EIT; reduce(param, E, parts, 2);
-		break;
-		case 91:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = E; parts[2] = BRAC_MR; parts[3] = EAT; reduce(param, EIT, parts, 4);
-		break;
-		case 94:
-			parts = new TokenType[2];parts[0] = BO; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 95:
-			parts = new TokenType[2];parts[0] = ASSI; parts[1] = E; reduce(param, EAT, parts, 2);
-		break;
-		case 112:
-			parts = new TokenType[2];parts[0] = T; parts[1] = ID; reduce(param, PD, parts, 2);
-		break;
-        case 114:
-            parts = new TokenType[4];parts[0] = T; parts[1] = ID; parts[2] = BRAC_ML; parts[3] = BRAC_MR; reduce(param, PD, parts, 4);
-        break;
-		case 116:
-			parts = new TokenType[2];parts[0] = COMMA; parts[1] = ELT; reduce(param, ELT_, parts, 2);
-		break;
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcBRAC_LR(ParserParam &param, Token *tok){
-	TokenType *parts = NULL;
+bool funcASSI(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-        case 22:
-            shift(param,tok,117);
-        break;
-		case 25:
-			shift(param,tok,27);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 30:
-			parts = new TokenType[1];parts[0] = B; reduce(param, S, parts, 1);
-		break;
-		case 40:
-			parts = new TokenType[7];parts[0] = IF; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; parts[5] = ELSE; parts[6] = S; reduce(param, S, parts, 7);
-		break;
-		case 45:
-			parts = new TokenType[5];parts[0] = WHILE; parts[1] = BRAC_SL; parts[2] = E; parts[3] = BRAC_SR; parts[4] = S; reduce(param, S, parts, 5);
-		break;
-		case 46:
-			shift(param,tok,47);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-		case 48:
-			parts = new TokenType[1];parts[0] = S; reduce(param, SL, parts, 1);
-		break;
-		case 49:
-			parts = new TokenType[2];parts[0] = S; parts[1] = SL; reduce(param, SL, parts, 2);
-		break;
-		case 51:
-			parts = new TokenType[2];parts[0] = E; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 54:
-			parts = new TokenType[3];parts[0] = RET; parts[1] = E; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 56:
-			parts = new TokenType[2];parts[0] = BREAK; parts[1] = SEMI; reduce(param, S, parts, 2);
-		break;
-		case 59:
-			parts = new TokenType[3];parts[0] = PR; parts[1] = ID; parts[2] = SEMI; reduce(param, S, parts, 3);
-		break;
-		case 60:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, S, parts, 1);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
-        case 120:
-            parts = new TokenType[3]; parts[0] = PR; parts[1] = NUM; parts[2] = SEMI; reduce(param, S, parts, 3);
-        break;
+		case 70:
+			shift(param,tok,113);
+			break;
+		case 73:
+			if(!rule40(param)) return false;
+			break;
+		case 75:
+			if(!rule39(param)) return false;
+			break;
+		case 76:
+			if(!rule42(param)) return false;
+			break;
+		case 78:
+			if(!rule41(param)) return false;
+			break;
+		case 79:
+			if(!rule45(param)) return false;
+			break;
+		case 81:
+			if(!rule43(param)) return false;
+			break;
+		case 83:
+			if(!rule44(param)) return false;
+			break;
+		case 84:
+			if(!rule47(param)) return false;
+			break;
+		case 86:
+			if(!rule46(param)) return false;
+			break;
+		case 87:
+			if(!rule48(param)) return false;
+			break;
+		case 89:
+			if(!rule49(param)) return false;
+			break;
+		case 92:
+			if(!rule50(param)) return false;
+			break;
+		case 93:
+			if(!rule51(param)) return false;
+			break;
+		case 96:
+			if(!rule52(param)) return false;
+			break;
+		case 99:
+			if(!rule53(param)) return false;
+			break;
+		case 100:
+			if(!rule54(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
 	return true;
 }
-bool funcEND(ParserParam &param, Token *){
-	TokenType *parts = NULL;
+bool funcEND(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
 		case 1:
-			parts = new TokenType[1];parts[0] = DL_; reduce(param, DL, parts, 1);
-		break;
+			shift(param,tok,2);
+			break;
 		case 2:
 			param.isAccept = true;
-		break;
+			break;
 		case 3:
-			parts = new TokenType[2];parts[0] = DL_; parts[1] = DL; reduce(param, DL, parts, 2);
-		break;
+			if(!rule2(param)) return false;
+			break;
+		case 4:
+			if(!rule1(param)) return false;
+			break;
+		case 7:
+			if(!rule3(param)) return false;
+			break;
 		case 8:
-			parts = new TokenType[1];parts[0] = VD_; reduce(param, D, parts, 1);
-		break;
-		case 9:
-			parts = new TokenType[1];parts[0] = SEMI; reduce(param, VD_, parts, 1);
-		break;
-		case 11:
-			parts = new TokenType[3];parts[0] = T; parts[1] = ID; parts[2] = D; reduce(param, DL_, parts, 3);
-		break;
-		case 16:
-			parts = new TokenType[4];parts[0] = BRAC_ML; parts[1] = NUM; parts[2] = BRAC_MR; parts[3] = SEMI; reduce(param, VD_, parts, 4);
-		break;
-		case 27:
-			parts = new TokenType[3];parts[0] = BRAC_LL; parts[1] = SL; parts[2] = BRAC_LR; reduce(param, B, parts, 3);
-		break;
-		case 28:
-			parts = new TokenType[4];parts[0] = BRAC_SL; parts[1] = PDLT; parts[2] = BRAC_SR; parts[3] = B; reduce(param, D, parts, 4);
-		break;
+			if(!rule4(param)) return false;
+			break;
+		case 12:
+			if(!rule5(param)) return false;
+			break;
+		case 14:
+			if(!rule6(param)) return false;
+			break;
+		case 25:
+			if(!rule15(param)) return false;
+			break;
+		case 30:
+			if(!rule17(param)) return false;
+			break;
 		case 31:
-			parts = new TokenType[3];parts[0] = BRAC_SL; parts[1] = BRAC_SR; parts[2] = B; reduce(param, D, parts, 3);
-		break;
-		case 47:
-			parts = new TokenType[4];parts[0] = BRAC_LL; parts[1] = VDL; parts[2] = SL; parts[3] = BRAC_LR; reduce(param, B, parts, 4);
-		break;
-        case 117:
-            parts = new TokenType[2]; parts[0] = BRAC_LL; parts[1] = BRAC_LR; reduce(param, B, parts, 2);
-        break;
+			if(!rule18(param)) return false;
+			break;
+		case 33:
+			if(!rule19(param)) return false;
+			break;
+		case 34:
+			if(!rule20(param)) return false;
+			break;
 		default:
 			return false;
+		break;
 	}
-	return true;
-}
-
-bool parserGoto(ParserParam &param){
-	int state = param.stack.back(), nextState;
-	switch(param.symbols->back()->type){
-		case DL:
-			switch(state){
-				case 0:
-					nextState = 2;
-				break;
-				case 1:
-					nextState = 3;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case DL_:
-			switch(state){
-				case 0:
-				case 1:
-					nextState = 1;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case D:
-			switch(state){
-				case 7:
-					nextState = 11;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case VD:
-			switch(state){
-				case 22:
-                case 24:
-					nextState = 24;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case VD_:
-			switch(state){
-				case 7:
-					nextState = 8;
-				break;
-				case 97:
-					nextState = 98;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case VDL:
-			switch(state){
-                case 22:
-                    nextState = 29;
-                break;
-				case 24:
-					nextState = 26;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case PDLT:
-			switch(state){
-				case 12:
-					nextState = 13;
-				break;
-				case 20:
-					nextState = 21;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case PDLT_:
-			switch(state){
-				case 18:
-					nextState = 19;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case PD:
-			switch(state){
-				case 12:
-				case 20:
-					nextState = 18;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case B:
-			switch(state){
-				case 17:
-					nextState = 31;
-				break;
-				case 23:
-					nextState = 28;
-				break;
-                case 22:
-				case 29:
-				case 37:
-				case 39:
-				case 44:
-                case 48:
-					nextState = 30;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case T:
-			switch(state){
-				case 0:
-				case 1:
-					nextState = 4;
-				break;
-				case 12:
-				case 20:
-					nextState = 111;
-				break;
-				case 22:
-                case 24:
-					nextState = 96;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case SL:
-			switch(state){
-				case 22:
-					nextState = 25;
-				break;
-				case 29:
-					nextState = 46;
-				break;
-				case 48:
-					nextState = 49;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case S:
-			switch(state){
-                case 22:
-				case 29:
-                case 48:
-					nextState = 48;
-				break;
-				case 37:
-					nextState = 38;
-				break;
-				case 39:
-					nextState = 40;
-				break;
-				case 44:
-					nextState = 45;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case E:
-			switch(state){
-                case 22:
-				case 29:
-				case 37:
-				case 39:
-				case 44:
-                case 48:
-					nextState = 50;
-				break;
-				case 35:
-					nextState = 36;
-				break;
-				case 42:
-					nextState = 43;
-				break;
-				case 52:
-					nextState = 53;
-				break;
-				case 61:
-					nextState = 69;
-				break;
-				case 64:
-					nextState = 71;
-				break;
-				case 68:
-					nextState = 67;
-				break;
-				case 74:
-					nextState = 75;
-				break;
-				case 76:
-                    nextState = 118;
-				break;
-				case 77:
-					nextState = 87;
-				break;
-				case 79:
-					nextState = 89;
-				break;
-				case 82:
-					nextState = 83;
-				break;
-				case 85:
-					nextState = 86;
-				break;
-				case 92:
-					nextState = 94;
-				break;
-				case 93:
-					nextState = 95;
-				break;
-				case 115:
-					nextState = 87;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case EIT:
-			switch(state){
-				case 73:
-					nextState = 90;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case EAT:
-			switch(state){
-				case 78:
-					nextState = 91;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case E_:
-			switch(state){
-				case 65:
-					nextState = 66;
-				break;
-				case 70:
-					nextState = 72;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case ELT:
-			switch(state){
-				case 77:
-					nextState = 80;
-				break;
-				case 115:
-					nextState = 116;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case ELT_:
-			switch(state){
-				case 87:
-					nextState = 88;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case UO:
-			switch(state){
-                case 22:
-				case 29:
-				case 35:
-				case 37:
-				case 39:
-				case 42:
-				case 44:
-                case 48:
-                case 52:
-				case 61:
-				case 64:
-				case 68:
-				case 74:
-				case 76:
-				case 77:
-				case 79:
-				case 82:
-				case 85:
-				case 92:
-				case 93:
-                case 115:
-					nextState = 64;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case BO:
-			switch(state){
-				case 65:
-				case 70:
-					nextState = 68;
-				break;
-				case 73:
-					nextState = 74;
-				break;
-				case 78:
-					nextState = 92;
-				break;
-				case 81:
-					nextState = 82;
-				break;
-				case 84:
-					nextState = 85;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case PR:
-			switch(state){
-                case 22:
-				case 29:
-				case 37:
-				case 39:
-				case 44:
-                case 48:
-					nextState = 57;
-				break;
-				default:
-					return false;
-			}
-		break;	
-		default:
-			return false;	
-	}
-	param.stack.push_back(nextState);
 	return true;
 }

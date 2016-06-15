@@ -1,7 +1,8 @@
 DL -> DL' DL
 DL -> DL'
 DL' -> T id D
-D -> VD'
+D -> ;
+D -> [ num ] ;
 D -> ( PDLT ) B 
 D -> ( ) B
 VD -> T id VD'
@@ -12,10 +13,12 @@ VDL -> VD
 PDLT -> PD PDLT' 
 PDLT -> PD
 PDLT' -> , PDLT
-PD -> T id [ ] 
+PD -> T id PD' 
 PD -> T id
+PD' -> []
 B -> { VDL SL } 
 B ->  { SL }
+B -> { }
 T -> int 
 T -> char
 SL -> S SL
@@ -28,42 +31,37 @@ S -> if ( E ) S else S
 S -> while ( E ) S
 S -> B
 S -> PR id ;
+S -> PR num ;
 PR -> print 
 PR -> read
-E -> UO E
-E -> num E'
-E -> ( E ) E'
-E -> id EIT
-E -> id
-E -> num
-E -> ( E )
-EIT -> BO E 
-EIT -> ( ELT ) BO E 
-EIT -> ( ELT ) 
-EIT -> [ E ] EAT 
-EIT -> = E 
-EIT -> [ E ] 
-EIT -> ( ) BO E 
-EIT -> ( )
-EAT -> BO E 
-EAT -> = E
-E' -> BO E
-ELT -> E ELT' 
-ELT -> E
-ELT' -> , ELT
+E -> EC E'
+E -> DA = E E'
+E' -> , E E'
+E' -> BOD EC E'
+EC' -> BOC EB EC'
+EC -> EB EC'
+EB' -> BOB EA EB'
+EB -> EA EB'
+EA' -> BOA EU EA'
+EA -> EU EA'
+EU -> UO DA
+EU -> UO num
+EU -> DA
+EU -> num
+EU -> ( E )
+DA -> id
+DA -> id [ E ]
 UO -> -
 UO -> !
-BO -> +
-BO -> -
-BO -> *
-BO -> /
-BO -> ==
-BO -> !=
-BO -> <
-BO -> <=
-BO -> >
-BO -> >=
-BO -> &&
-BO -> ||
-B -> { }
-S -> PR num ;
+BOA -> *
+BOA -> /
+BOB -> +
+BOB -> -
+BOC -> ==
+BOC -> !=
+BOC -> >
+BOC -> >=
+BOC -> <
+BOC -> <=
+BOD -> &&
+BOD -> ||

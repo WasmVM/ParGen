@@ -4,7 +4,15 @@ Parser::Parser(list<Token *> *tokens)
 {
 	param.tokens = tokens;
 	param.symbols = new list<Token *>;
-	param.isAccept = false;
+    param.isAccept = false;
+}
+
+Parser::~Parser()
+{
+    for(list<Token *>::iterator it=param.symbols->begin(); it!=param.symbols->end(); ++it){
+        delete *it;
+    }
+    delete param.symbols;
 }
 
 void Parser::parse(){
@@ -16,7 +24,7 @@ void Parser::parse(){
 	// Add 0 state
 	param.stack.push_back(0);
 	// Parse
-	while((param.tokens->size() > 0) && (!param.isAccept)){
+    while((param.tokens->size() > 0) && (!param.isAccept)){
 		Token *token = param.tokens->front();
 		switch(token->type){
 			case INT:
@@ -159,4 +167,14 @@ void Parser::parse(){
             break;
 		}
 	}
+    funcEND(param,tok);
+}
+
+ASTNode *Parser::getTree()
+{
+    if(param.astStack.size() > 0){
+        return param.astStack.front();
+    }else{
+        return NULL;
+    }
 }
