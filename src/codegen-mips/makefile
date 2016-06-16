@@ -1,6 +1,6 @@
 CXX = g++
 
-OBJS = lex
+OBJS = codegen genFunc
 
 CFLAGS = -I.. -I. -Wall
 

@@ -1,20 +1,15 @@
-CC = g++
-OBJS = parser parserFunc
-EXTERN = ../lex/lex.o
-CFLAGS = -g -I../lex -I.. -I. -Wall
+CXX = g++
 
-.PHONY: test clean all
+OBJS = parser parserFunc ruleFunc
 
-all: test
+CFLAGS = -I.. -I. -I../lex -Wall
 
-../lex/lex.o:
-	make -C ../lex -f makefile lib
+.PHONY: all build
+
+all: build
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c -o $@ $< 
+	$(CXX) $(CFLAGS) -c -o $@ $<
+
+build: $(foreach OBJ,$(OBJS),$(OBJ).o)
 	
-test: $(foreach OBJ,$(OBJS),$(OBJ).o) $(EXTERN)
-	$(CC) $(CFLAGS) -o parser_test parser_test.cpp $(foreach OBJ,$(OBJS),$(OBJ).o) $(EXTERN)
-	
-clean:
-	rm *.o

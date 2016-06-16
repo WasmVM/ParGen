@@ -85,7 +85,7 @@ bool gen41(ASTNode *, GenParam &);
 bool pro41(ASTNode *, GenParam &);
 bool gen42(ASTNode *, GenParam &);
 bool pro42(ASTNode *, GenParam &);
-bool gen43(ASTNode *, GenParam &);
+bool gen43(ASTNode *, GenParam &param);
 bool pro43(ASTNode *, GenParam &);
 bool gen44(ASTNode *, GenParam &);
 bool pro44(ASTNode *, GenParam &);
