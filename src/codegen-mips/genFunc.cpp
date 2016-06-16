@@ -199,10 +199,19 @@ bool pro16(ASTNode *, GenParam &){
 	return true;
 }
 bool gen17(ASTNode *, GenParam &){
+    --blockLevel;
 	return true;
 }
-bool pro17(ASTNode *, GenParam &){
-	return true;
+bool pro17(ASTNode *node, GenParam &param){
+    if(blockLevel < 1){ //Function block
+        Variable &val = param.varStack.front();
+        val.id = node->parent->terms.at(2).value;
+        param.funList.push_back(val);
+        param.varStack.erase(param.varStack.begin());
+    }
+    ++blockLevel;
+    param.tmpText.push_back(string());
+    return true;
 }
 bool gen18(ASTNode *, GenParam &){
     return true;
@@ -218,6 +227,7 @@ bool pro18(ASTNode *node, GenParam &param){
 	return true;
 }
 bool gen19(ASTNode *, GenParam &){
+    --blockLevel;
 	return true;
 }
 bool pro19(ASTNode *node, GenParam &param){
@@ -399,8 +409,45 @@ bool gen44(ASTNode *, GenParam &){
 bool pro44(ASTNode *, GenParam &){
 	return true;
 }
-bool gen45(ASTNode *, GenParam &){
-	return true;
+bool gen45(ASTNode *node, GenParam &param){
+    Variable &data2 = param.dataStack.back();
+    param.dataStack.pop_back();
+    Variable &data1 = param.dataStack.back();
+    // Load data2
+    stringstream ss;
+    switch (data2.type) {
+        case GLOBALVAR:
+        case GLOBALREF:
+            ss << "$t" << regCount;
+            if(data2.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + ss.str() + ",\t" + data2.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + ss.str() + ",\t" + data2.id + "\n";
+            }
+            ++regCount;
+            data2.id = ss.str();
+        case REGISTER:
+            break;
+        case LOCALVAR:
+        case LOCALREF:
+            if(data2.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + data2.id + ",\t" + data2.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + data2.id + ",\t" + data2.id + "\n";
+            }
+            break;
+        default:
+            return false;
+            break;
+    }
+    data2.type = REGISTER;
+    // Compute
+    if(node->terms.at(0).type == MULT){
+        param.tmpText.back() += "\tmul\t" + data1.id + ",\t" + data1.id + ",\t" + data2.id + "\n";
+    }else{
+        param.tmpText.back() += "\tdiv\t" + data1.id + ",\t" + data1.id + ",\t" + data2.id + "\n";
+    }
+    return true;
 }
 bool pro45(ASTNode *, GenParam &){
 	return true;
@@ -418,28 +465,39 @@ bool pro47(ASTNode *, GenParam &){
 	return true;
 }
 bool gen48(ASTNode *node, GenParam &param){
-    Variable data = param.dataStack.back();
+    Variable &data = param.dataStack.back();
     stringstream ss;
     switch (data.type) {
         case GLOBALVAR:
         case GLOBALREF:
             ss << "$t" << regCount;
-            param.tmpText.back() += "\tlw\t" + ss.str() + ",\t" + data.id + "\n";
+            if(data.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + ss.str() + ",\t" + data.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + ss.str() + ",\t" + data.id + "\n";
+            }
             ++regCount;
             data.id = ss.str();
         case REGISTER:
-            if(node->terms.at(0).type == OOPS){
-                param.tmpText.back() += "\tnot\t" + data.id + ",\t" + data.id + "\n";
-            }
             break;
         case LOCALVAR:
         case LOCALREF:
-            //dataStr = "(" + data.id + ")";
+            if(data.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + data.id + ",\t" + data.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + data.id + ",\t" + data.id + "\n";
+            }
             break;
         default:
+            return false;
             break;
     }
-
+    data.type = REGISTER;
+    if(node->terms.at(0).type == OOPS){
+        param.tmpText.back() += "\tnot\t" + data.id + ",\t" + data.id + "\n";
+    }else{
+        param.tmpText.back() += "\tsub\t" + data.id + ",\t$zero,\t" + data.id + "\n";
+    }
 	return true;
 }
 bool pro48(ASTNode *, GenParam &){
@@ -532,16 +590,74 @@ bool gen55(ASTNode *node, GenParam &){
 bool pro55(ASTNode *, GenParam &){
 	return true;
 }
-bool gen56(ASTNode *, GenParam &){
+bool gen56(ASTNode *node, GenParam &){
+    node->parent->terms.push_back(node->terms.at(0));
 	return true;
 }
-bool pro56(ASTNode *, GenParam &){
+bool pro56(ASTNode *, GenParam &param){
+    Variable &data = param.dataStack.back();
+    stringstream ss;
+    switch (data.type) {
+        case GLOBALVAR:
+        case GLOBALREF:
+            ss << "$t" << regCount;
+            if(data.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + ss.str() + ",\t" + data.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + ss.str() + ",\t" + data.id + "\n";
+            }
+            ++regCount;
+            data.id = ss.str();
+        case REGISTER:
+            break;
+        case LOCALVAR:
+        case LOCALREF:
+            if(data.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + data.id + ",\t" + data.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + data.id + ",\t" + data.id + "\n";
+            }
+            break;
+        default:
+            return false;
+            break;
+    }
+    data.type = REGISTER;
 	return true;
 }
-bool gen57(ASTNode *, GenParam &){
+bool gen57(ASTNode *node, GenParam &){
+    node->parent->terms.push_back(node->terms.at(0));
 	return true;
 }
-bool pro57(ASTNode *, GenParam &){
+bool pro57(ASTNode *, GenParam &param){
+    Variable &data = param.dataStack.back();
+    stringstream ss;
+    switch (data.type) {
+        case GLOBALVAR:
+        case GLOBALREF:
+            ss << "$t" << regCount;
+            if(data.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + ss.str() + ",\t" + data.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + ss.str() + ",\t" + data.id + "\n";
+            }
+            ++regCount;
+            data.id = ss.str();
+        case REGISTER:
+            break;
+        case LOCALVAR:
+        case LOCALREF:
+            if(data.unitSize == 4){
+                param.tmpText.back() += "\tlw\t" + data.id + ",\t" + data.id + "\n";
+            }else{
+                param.tmpText.back() += "\tlb\t" + data.id + ",\t" + data.id + "\n";
+            }
+            break;
+        default:
+            return false;
+            break;
+    }
+    data.type = REGISTER;
 	return true;
 }
 bool gen58(ASTNode *, GenParam &){
