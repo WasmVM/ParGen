@@ -42,12 +42,15 @@ public:
     bool isAccept;
 };
 
+typedef enum{GLOBALVAR, GLOBALREF, LOCALVAR, LOCALREF, REGISTER} VarType;
+
 class Variable{
 public:
     string id;
     int unitSize, totalSize;
     int offset;
     vector<int> paramSize;
+    VarType type;
 };
 
 class GenParam{
@@ -55,7 +58,7 @@ public:
     string dataSeg;
     string textSeg;
     string errMsg;
-    vector<Variable> varStack, gloStack, funList;
+    vector<Variable> varStack, gloStack, funList, dataStack;
     vector<unsigned int> varCounts;
     vector<string> tmpText;
 };

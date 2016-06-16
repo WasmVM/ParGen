@@ -1,6 +1,6 @@
 #include <genFunc.hpp>
 
-static int spTop = 0, blockLevel = 0;
+static int spTop = 0, blockLevel = 0, regCount = 0;
 
 bool gen1(ASTNode *, GenParam &){
 	return true;
@@ -25,11 +25,13 @@ bool gen3(ASTNode *node, GenParam &param){
             param.dataSeg += var.id + ":\t.byte\t0\n";
         }
         var.offset = 0;
+        var.type = GLOBALVAR;
         param.gloStack.push_back(var);
         param.varStack.pop_back();
     }else{  // local
         spTop += var.unitSize;
         var.offset = spTop;
+        var.type = LOCALVAR;
         param.varCounts.back() += 1;
     }
 	return true;
@@ -45,11 +47,13 @@ bool gen4(ASTNode *node, GenParam &param){
         ss << var.totalSize;
         param.dataSeg += var.id + ":\t.space\t" + ss.str() + "\n";
         var.offset = 0;
+        var.type = GLOBALREF;
         param.gloStack.push_back(var);
         param.varStack.pop_back();
     }else{  // local
         spTop += var.totalSize;
         var.offset = spTop;
+        var.type = LOCALREF;
         param.varCounts.back() += 1;
     }
 	return true;
@@ -91,7 +95,9 @@ bool gen6(ASTNode *, GenParam &param){
                               "\tsw\t$ra,\t0($sp)\n"
             + param.tmpText.back();
     if(spTop > 0){
-        param.textSeg += "\taddi\t$sp\t$sp\t" + spTop;
+        stringstream ss;
+        ss << spTop;
+        param.textSeg += "\taddi\t$sp,\t$sp,\t" + ss.str() + "\n";
         spTop = 0;
     }
     param.textSeg += "\tlw\t$ra,\t0($sp)\n"
@@ -148,6 +154,7 @@ bool gen13(ASTNode *node, GenParam &param){
     Variable &val = param.varStack.back();
     val.id = node->terms.at(0).value;
     val.totalSize = val.unitSize;
+    val.type = LOCALVAR;
     spTop += val.unitSize;
     val.offset = spTop;
     param.varCounts.back() += 1;
@@ -160,7 +167,8 @@ bool pro13(ASTNode *, GenParam &){
 bool gen14(ASTNode *node, GenParam &param){
     Variable &val = param.varStack.back();
     val.id = node->terms.at(0).value;
-    val.totalSize = -val.unitSize;
+    val.totalSize = val.unitSize;
+    val.type = LOCALREF;
     spTop += 4;
     val.offset = spTop;
     param.varCounts.back() += 1;
@@ -196,7 +204,10 @@ bool gen17(ASTNode *, GenParam &){
 bool pro17(ASTNode *, GenParam &){
 	return true;
 }
-bool gen18(ASTNode *node, GenParam &param){
+bool gen18(ASTNode *, GenParam &){
+    return true;
+}
+bool pro18(ASTNode *node, GenParam &param){
     if(blockLevel < 1){ //Function block
         Variable &val = param.varStack.front();
         val.id = node->parent->terms.at(2).value;
@@ -204,21 +215,35 @@ bool gen18(ASTNode *node, GenParam &param){
         param.varStack.erase(param.varStack.begin());
     }
     param.tmpText.push_back(string());
-    return true;
-}
-bool pro18(ASTNode *, GenParam &){
 	return true;
 }
 bool gen19(ASTNode *, GenParam &){
 	return true;
 }
-bool pro19(ASTNode *, GenParam &){
+bool pro19(ASTNode *node, GenParam &param){
+    if(blockLevel < 1){ //Function block
+        Variable &val = param.varStack.front();
+        val.id = node->parent->terms.at(2).value;
+        param.funList.push_back(val);
+        param.varStack.erase(param.varStack.begin());
+    }
+    ++blockLevel;
+    param.tmpText.push_back(string());
 	return true;
 }
 bool gen20(ASTNode *, GenParam &){
+    --blockLevel;
 	return true;
 }
-bool pro20(ASTNode *, GenParam &){
+bool pro20(ASTNode *node, GenParam &param){
+    if(blockLevel < 1){ //Function block
+        Variable &val = param.varStack.front();
+        val.id = node->parent->terms.at(2).value;
+        param.funList.push_back(val);
+        param.varStack.erase(param.varStack.begin());
+    }
+    ++blockLevel;
+    param.tmpText.push_back(string());
 	return true;
 }
 bool gen21(ASTNode *, GenParam &param){
@@ -260,6 +285,7 @@ bool pro25(ASTNode *, GenParam &){
 	return true;
 }
 bool gen26(ASTNode *, GenParam &){
+    regCount = 0;
 	return true;
 }
 bool pro26(ASTNode *, GenParam &){
@@ -391,7 +417,29 @@ bool gen47(ASTNode *, GenParam &){
 bool pro47(ASTNode *, GenParam &){
 	return true;
 }
-bool gen48(ASTNode *, GenParam &){
+bool gen48(ASTNode *node, GenParam &param){
+    Variable data = param.dataStack.back();
+    stringstream ss;
+    switch (data.type) {
+        case GLOBALVAR:
+        case GLOBALREF:
+            ss << "$t" << regCount;
+            param.tmpText.back() += "\tlw\t" + ss.str() + ",\t" + data.id + "\n";
+            ++regCount;
+            data.id = ss.str();
+        case REGISTER:
+            if(node->terms.at(0).type == OOPS){
+                param.tmpText.back() += "\tnot\t" + data.id + ",\t" + data.id + "\n";
+            }
+            break;
+        case LOCALVAR:
+        case LOCALREF:
+            //dataStr = "(" + data.id + ")";
+            break;
+        default:
+            break;
+    }
+
 	return true;
 }
 bool pro48(ASTNode *, GenParam &){
@@ -403,7 +451,40 @@ bool gen49(ASTNode *, GenParam &){
 bool pro49(ASTNode *, GenParam &){
 	return true;
 }
-bool gen50(ASTNode *, GenParam &){
+bool gen50(ASTNode *node, GenParam &param){
+    Variable var;
+    bool exist = false;
+    // Global
+    for(vector<Variable>::iterator it=param.gloStack.begin(); it!=param.gloStack.end(); ++it){
+        if(it->id == node->terms.at(0).value){
+            exist = true;
+            var = *it;
+            break;
+        }
+    }
+    // Local
+    if(!exist){
+        for(unsigned int i = param.varCounts.back(); i>0; --i){
+            vector<Variable>::iterator it = param.varStack.end()-i;
+            if(it->id == node->terms.at(0).value){
+                exist = true;
+                var = *it;
+                stringstream ss;
+                ss << "\taddi\t$t" << regCount << ",\t$sp,\t" << spTop - var.offset << "\n";
+                param.tmpText.back() += ss.str();
+                ss.str(string());
+                ss << "$t" << regCount;
+                var.id = ss.str();
+                ++regCount;
+                break;
+            }
+        }
+    }
+    if(!exist){
+        return false;
+    }else{
+        param.dataStack.push_back(var);
+    }
 	return true;
 }
 bool pro50(ASTNode *, GenParam &){
@@ -421,19 +502,31 @@ bool gen52(ASTNode *, GenParam &){
 bool pro52(ASTNode *, GenParam &){
 	return true;
 }
-bool gen53(ASTNode *, GenParam &){
+bool gen53(ASTNode *node, GenParam &param){
+    string &codeSeg = param.tmpText.back();
+    stringstream ss;
+    ss << "$t" <<regCount;
+    codeSeg += "\tli\t" + ss.str() + ",\t" + node->terms.at(0).value + "\n";
+    ++regCount;
+    Variable newReg;
+    newReg.id = ss.str();
+    newReg.unitSize = 4;
+    newReg.type = REGISTER;
+    param.dataStack.push_back(newReg);
 	return true;
 }
 bool pro53(ASTNode *, GenParam &){
 	return true;
 }
-bool gen54(ASTNode *, GenParam &){
+bool gen54(ASTNode *node, GenParam &){
+    node->parent->terms.push_back(node->terms.at(0));
 	return true;
 }
 bool pro54(ASTNode *, GenParam &){
 	return true;
 }
-bool gen55(ASTNode *, GenParam &){
+bool gen55(ASTNode *node, GenParam &){
+    node->parent->terms.push_back(node->terms.at(0));
 	return true;
 }
 bool pro55(ASTNode *, GenParam &){
@@ -509,11 +602,5 @@ bool gen67(ASTNode *, GenParam &){
 	return true;
 }
 bool pro67(ASTNode *, GenParam &){
-	return true;
-}
-bool gen68(ASTNode *, GenParam &){
-	return true;
-}
-bool pro68(ASTNode *, GenParam &){
 	return true;
 }

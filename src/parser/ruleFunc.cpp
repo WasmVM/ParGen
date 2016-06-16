@@ -11,7 +11,7 @@ bool reduce(ParserParam &param, TokenType target, TokenType *parts, int partSize
 			if(isTerm(symbolEnd->type)){
 				newNode->terms.push_back(*symbolEnd);
 			}else{
-                param.astStack.back()->parent = newNode;
+				param.astStack.back()->parent = newNode;
 				newNode->derives.push_front(param.astStack.back());
 				param.astStack.pop_back();
 			}
@@ -186,22 +186,22 @@ bool parserGoto(ParserParam &param){
 					nextState = 14;
 				break;
 				case 27:
-					nextState = 60;
+					nextState = 59;
 				break;
 				case 28:
-					nextState = 60;
+					nextState = 59;
 				break;
 				case 37:
-					nextState = 60;
+					nextState = 59;
 				break;
-				case 51:
-					nextState = 60;
+				case 50:
+					nextState = 59;
 				break;
-				case 53:
-					nextState = 60;
+				case 52:
+					nextState = 59;
 				break;
-				case 58:
-					nextState = 60;
+				case 57:
+					nextState = 59;
 				break;
 				default:
 					return false;
@@ -237,15 +237,6 @@ bool parserGoto(ParserParam &param){
 					nextState = 29;
 				break;
 				case 37:
-					nextState = 39;
-				break;
-				default:
-					return false;
-			}
-		break;
-		case SL_:
-			switch(state){
-				case 37:
 					nextState = 38;
 				break;
 				default:
@@ -263,14 +254,14 @@ bool parserGoto(ParserParam &param){
 				case 37:
 					nextState = 37;
 				break;
-				case 51:
-					nextState = 52;
+				case 50:
+					nextState = 51;
 				break;
-				case 53:
-					nextState = 54;
+				case 52:
+					nextState = 53;
 				break;
-				case 58:
-					nextState = 59;
+				case 57:
+					nextState = 58;
 				break;
 				default:
 					return false;
@@ -279,43 +270,43 @@ bool parserGoto(ParserParam &param){
 		case E:
 			switch(state){
 				case 27:
-					nextState = 41;
+					nextState = 40;
 				break;
 				case 28:
-					nextState = 41;
+					nextState = 40;
 				break;
 				case 37:
-					nextState = 41;
+					nextState = 40;
 				break;
-				case 43:
-					nextState = 44;
+				case 42:
+					nextState = 43;
 				break;
-				case 49:
-					nextState = 50;
+				case 48:
+					nextState = 49;
 				break;
-				case 51:
-					nextState = 41;
+				case 50:
+					nextState = 40;
 				break;
-				case 53:
-					nextState = 41;
+				case 52:
+					nextState = 40;
 				break;
-				case 56:
-					nextState = 57;
+				case 55:
+					nextState = 56;
 				break;
-				case 58:
-					nextState = 41;
+				case 57:
+					nextState = 40;
 				break;
-				case 68:
-					nextState = 69;
+				case 67:
+					nextState = 68;
 				break;
-				case 90:
-					nextState = 91;
+				case 89:
+					nextState = 90;
 				break;
-				case 94:
-					nextState = 95;
+				case 93:
+					nextState = 94;
 				break;
-				case 97:
-					nextState = 98;
+				case 96:
+					nextState = 97;
 				break;
 				default:
 					return false;
@@ -324,46 +315,46 @@ bool parserGoto(ParserParam &param){
 		case EE:
 			switch(state){
 				case 27:
-					nextState = 67;
+					nextState = 66;
 				break;
 				case 28:
-					nextState = 67;
+					nextState = 66;
 				break;
 				case 37:
-					nextState = 67;
+					nextState = 66;
 				break;
-				case 43:
-					nextState = 67;
+				case 42:
+					nextState = 66;
 				break;
-				case 49:
-					nextState = 67;
+				case 48:
+					nextState = 66;
 				break;
-				case 51:
-					nextState = 67;
+				case 50:
+					nextState = 66;
 				break;
-				case 53:
-					nextState = 67;
+				case 52:
+					nextState = 66;
 				break;
-				case 56:
-					nextState = 67;
+				case 55:
+					nextState = 66;
 				break;
-				case 58:
-					nextState = 67;
+				case 57:
+					nextState = 66;
 				break;
-				case 68:
-					nextState = 67;
+				case 67:
+					nextState = 66;
 				break;
-				case 71:
-					nextState = 72;
+				case 70:
+					nextState = 71;
 				break;
-				case 90:
-					nextState = 67;
+				case 89:
+					nextState = 66;
 				break;
-				case 94:
-					nextState = 67;
+				case 93:
+					nextState = 66;
 				break;
-				case 97:
-					nextState = 67;
+				case 96:
+					nextState = 66;
 				break;
 				default:
 					return false;
@@ -372,49 +363,49 @@ bool parserGoto(ParserParam &param){
 		case ED:
 			switch(state){
 				case 27:
-					nextState = 70;
+					nextState = 69;
 				break;
 				case 28:
-					nextState = 70;
+					nextState = 69;
 				break;
 				case 37:
-					nextState = 70;
+					nextState = 69;
 				break;
-				case 43:
-					nextState = 70;
+				case 42:
+					nextState = 69;
 				break;
-				case 49:
-					nextState = 70;
+				case 48:
+					nextState = 69;
 				break;
-				case 51:
-					nextState = 70;
+				case 50:
+					nextState = 69;
 				break;
-				case 53:
-					nextState = 70;
+				case 52:
+					nextState = 69;
 				break;
-				case 56:
-					nextState = 70;
+				case 55:
+					nextState = 69;
 				break;
-				case 58:
-					nextState = 70;
+				case 57:
+					nextState = 69;
 				break;
-				case 68:
-					nextState = 70;
+				case 67:
+					nextState = 69;
 				break;
-				case 71:
-					nextState = 70;
+				case 70:
+					nextState = 69;
 				break;
-				case 74:
-					nextState = 75;
+				case 73:
+					nextState = 74;
 				break;
-				case 90:
-					nextState = 70;
+				case 89:
+					nextState = 69;
 				break;
-				case 94:
-					nextState = 70;
+				case 93:
+					nextState = 69;
 				break;
-				case 97:
-					nextState = 70;
+				case 96:
+					nextState = 69;
 				break;
 				default:
 					return false;
@@ -423,52 +414,52 @@ bool parserGoto(ParserParam &param){
 		case EC:
 			switch(state){
 				case 27:
-					nextState = 73;
+					nextState = 72;
 				break;
 				case 28:
-					nextState = 73;
+					nextState = 72;
 				break;
 				case 37:
-					nextState = 73;
+					nextState = 72;
 				break;
-				case 43:
-					nextState = 73;
+				case 42:
+					nextState = 72;
 				break;
-				case 49:
-					nextState = 73;
+				case 48:
+					nextState = 72;
 				break;
-				case 51:
-					nextState = 73;
+				case 50:
+					nextState = 72;
 				break;
-				case 53:
-					nextState = 73;
+				case 52:
+					nextState = 72;
 				break;
-				case 56:
-					nextState = 73;
+				case 55:
+					nextState = 72;
 				break;
-				case 58:
-					nextState = 73;
+				case 57:
+					nextState = 72;
 				break;
-				case 68:
-					nextState = 73;
+				case 67:
+					nextState = 72;
 				break;
-				case 71:
-					nextState = 73;
+				case 70:
+					nextState = 72;
 				break;
-				case 74:
-					nextState = 73;
+				case 73:
+					nextState = 72;
 				break;
-				case 77:
-					nextState = 78;
+				case 76:
+					nextState = 77;
 				break;
-				case 90:
-					nextState = 73;
+				case 89:
+					nextState = 72;
 				break;
-				case 94:
-					nextState = 73;
+				case 93:
+					nextState = 72;
 				break;
-				case 97:
-					nextState = 73;
+				case 96:
+					nextState = 72;
 				break;
 				default:
 					return false;
@@ -477,58 +468,58 @@ bool parserGoto(ParserParam &param){
 		case EB:
 			switch(state){
 				case 27:
-					nextState = 76;
+					nextState = 75;
 				break;
 				case 28:
-					nextState = 76;
+					nextState = 75;
 				break;
 				case 37:
-					nextState = 76;
+					nextState = 75;
 				break;
-				case 43:
-					nextState = 76;
+				case 42:
+					nextState = 75;
 				break;
-				case 49:
-					nextState = 76;
+				case 48:
+					nextState = 75;
 				break;
-				case 51:
-					nextState = 76;
+				case 50:
+					nextState = 75;
 				break;
-				case 53:
-					nextState = 76;
+				case 52:
+					nextState = 75;
 				break;
-				case 56:
-					nextState = 76;
+				case 55:
+					nextState = 75;
 				break;
-				case 58:
-					nextState = 76;
+				case 57:
+					nextState = 75;
 				break;
-				case 68:
-					nextState = 76;
+				case 67:
+					nextState = 75;
 				break;
-				case 71:
-					nextState = 76;
+				case 70:
+					nextState = 75;
 				break;
-				case 74:
-					nextState = 76;
+				case 73:
+					nextState = 75;
 				break;
-				case 77:
-					nextState = 76;
+				case 76:
+					nextState = 75;
 				break;
-				case 80:
-					nextState = 81;
+				case 79:
+					nextState = 80;
 				break;
-				case 82:
-					nextState = 83;
+				case 81:
+					nextState = 82;
 				break;
-				case 90:
-					nextState = 76;
+				case 89:
+					nextState = 75;
 				break;
-				case 94:
-					nextState = 76;
+				case 93:
+					nextState = 75;
 				break;
-				case 97:
-					nextState = 76;
+				case 96:
+					nextState = 75;
 				break;
 				default:
 					return false;
@@ -537,61 +528,61 @@ bool parserGoto(ParserParam &param){
 		case EA:
 			switch(state){
 				case 27:
-					nextState = 79;
+					nextState = 78;
 				break;
 				case 28:
-					nextState = 79;
+					nextState = 78;
 				break;
 				case 37:
-					nextState = 79;
+					nextState = 78;
 				break;
-				case 43:
-					nextState = 79;
+				case 42:
+					nextState = 78;
 				break;
-				case 49:
-					nextState = 79;
+				case 48:
+					nextState = 78;
 				break;
-				case 51:
-					nextState = 79;
+				case 50:
+					nextState = 78;
 				break;
-				case 53:
-					nextState = 79;
+				case 52:
+					nextState = 78;
 				break;
-				case 56:
-					nextState = 79;
+				case 55:
+					nextState = 78;
 				break;
-				case 58:
-					nextState = 79;
+				case 57:
+					nextState = 78;
 				break;
-				case 68:
-					nextState = 79;
+				case 67:
+					nextState = 78;
 				break;
-				case 71:
-					nextState = 79;
+				case 70:
+					nextState = 78;
 				break;
-				case 74:
-					nextState = 79;
+				case 73:
+					nextState = 78;
 				break;
-				case 77:
-					nextState = 79;
+				case 76:
+					nextState = 78;
 				break;
-				case 80:
-					nextState = 79;
+				case 79:
+					nextState = 78;
 				break;
-				case 82:
-					nextState = 79;
+				case 81:
+					nextState = 78;
 				break;
-				case 85:
-					nextState = 86;
+				case 84:
+					nextState = 85;
 				break;
-				case 90:
-					nextState = 79;
+				case 89:
+					nextState = 78;
 				break;
-				case 94:
-					nextState = 79;
+				case 93:
+					nextState = 78;
 				break;
-				case 97:
-					nextState = 79;
+				case 96:
+					nextState = 78;
 				break;
 				default:
 					return false;
@@ -600,61 +591,61 @@ bool parserGoto(ParserParam &param){
 		case EU:
 			switch(state){
 				case 27:
-					nextState = 84;
+					nextState = 83;
 				break;
 				case 28:
-					nextState = 84;
+					nextState = 83;
 				break;
 				case 37:
-					nextState = 84;
+					nextState = 83;
 				break;
-				case 43:
-					nextState = 84;
+				case 42:
+					nextState = 83;
 				break;
-				case 49:
-					nextState = 84;
+				case 48:
+					nextState = 83;
 				break;
-				case 51:
-					nextState = 84;
+				case 50:
+					nextState = 83;
 				break;
-				case 53:
-					nextState = 84;
+				case 52:
+					nextState = 83;
 				break;
-				case 56:
-					nextState = 84;
+				case 55:
+					nextState = 83;
 				break;
-				case 58:
-					nextState = 84;
+				case 57:
+					nextState = 83;
 				break;
-				case 68:
-					nextState = 84;
+				case 67:
+					nextState = 83;
 				break;
-				case 71:
-					nextState = 84;
+				case 70:
+					nextState = 83;
 				break;
-				case 74:
-					nextState = 84;
+				case 73:
+					nextState = 83;
 				break;
-				case 77:
-					nextState = 84;
+				case 76:
+					nextState = 83;
 				break;
-				case 80:
-					nextState = 84;
+				case 79:
+					nextState = 83;
 				break;
-				case 82:
-					nextState = 84;
+				case 81:
+					nextState = 83;
 				break;
-				case 85:
-					nextState = 84;
+				case 84:
+					nextState = 83;
 				break;
-				case 90:
-					nextState = 84;
+				case 89:
+					nextState = 83;
 				break;
-				case 94:
-					nextState = 84;
+				case 93:
+					nextState = 83;
 				break;
-				case 97:
-					nextState = 84;
+				case 96:
+					nextState = 83;
 				break;
 				default:
 					return false;
@@ -663,70 +654,70 @@ bool parserGoto(ParserParam &param){
 		case DA:
 			switch(state){
 				case 27:
-					nextState = 87;
+					nextState = 86;
 				break;
 				case 28:
-					nextState = 87;
+					nextState = 86;
 				break;
 				case 37:
-					nextState = 87;
+					nextState = 86;
 				break;
-				case 43:
-					nextState = 87;
+				case 42:
+					nextState = 86;
 				break;
-				case 49:
-					nextState = 87;
+				case 48:
+					nextState = 86;
 				break;
-				case 51:
-					nextState = 87;
+				case 50:
+					nextState = 86;
 				break;
-				case 53:
-					nextState = 87;
+				case 52:
+					nextState = 86;
 				break;
-				case 56:
-					nextState = 87;
+				case 55:
+					nextState = 86;
 				break;
-				case 58:
-					nextState = 87;
+				case 57:
+					nextState = 86;
 				break;
-				case 61:
-					nextState = 62;
+				case 60:
+					nextState = 61;
 				break;
-				case 64:
-					nextState = 65;
+				case 63:
+					nextState = 64;
 				break;
-				case 68:
-					nextState = 87;
+				case 67:
+					nextState = 86;
 				break;
-				case 71:
-					nextState = 87;
+				case 70:
+					nextState = 86;
 				break;
-				case 74:
-					nextState = 87;
+				case 73:
+					nextState = 86;
 				break;
-				case 77:
-					nextState = 87;
+				case 76:
+					nextState = 86;
 				break;
-				case 80:
-					nextState = 87;
+				case 79:
+					nextState = 86;
 				break;
-				case 82:
-					nextState = 87;
+				case 81:
+					nextState = 86;
 				break;
-				case 85:
-					nextState = 87;
+				case 84:
+					nextState = 86;
 				break;
-				case 88:
-					nextState = 89;
+				case 87:
+					nextState = 88;
 				break;
-				case 90:
-					nextState = 87;
+				case 89:
+					nextState = 86;
 				break;
-				case 94:
-					nextState = 87;
+				case 93:
+					nextState = 86;
 				break;
-				case 97:
-					nextState = 87;
+				case 96:
+					nextState = 86;
 				break;
 				default:
 					return false;
@@ -735,61 +726,61 @@ bool parserGoto(ParserParam &param){
 		case UO:
 			switch(state){
 				case 27:
-					nextState = 88;
+					nextState = 87;
 				break;
 				case 28:
-					nextState = 88;
+					nextState = 87;
 				break;
 				case 37:
-					nextState = 88;
+					nextState = 87;
 				break;
-				case 43:
-					nextState = 88;
+				case 42:
+					nextState = 87;
 				break;
-				case 49:
-					nextState = 88;
+				case 48:
+					nextState = 87;
 				break;
-				case 51:
-					nextState = 88;
+				case 50:
+					nextState = 87;
 				break;
-				case 53:
-					nextState = 88;
+				case 52:
+					nextState = 87;
 				break;
-				case 56:
-					nextState = 88;
+				case 55:
+					nextState = 87;
 				break;
-				case 58:
-					nextState = 88;
+				case 57:
+					nextState = 87;
 				break;
-				case 68:
-					nextState = 88;
+				case 67:
+					nextState = 87;
 				break;
-				case 71:
-					nextState = 88;
+				case 70:
+					nextState = 87;
 				break;
-				case 74:
-					nextState = 88;
+				case 73:
+					nextState = 87;
 				break;
-				case 77:
-					nextState = 88;
+				case 76:
+					nextState = 87;
 				break;
-				case 80:
-					nextState = 88;
+				case 79:
+					nextState = 87;
 				break;
-				case 82:
-					nextState = 88;
+				case 81:
+					nextState = 87;
 				break;
-				case 85:
-					nextState = 88;
+				case 84:
+					nextState = 87;
 				break;
-				case 90:
-					nextState = 88;
+				case 89:
+					nextState = 87;
 				break;
-				case 94:
-					nextState = 88;
+				case 93:
+					nextState = 87;
 				break;
-				case 97:
-					nextState = 88;
+				case 96:
+					nextState = 87;
 				break;
 				default:
 					return false;
@@ -797,8 +788,8 @@ bool parserGoto(ParserParam &param){
 		break;
 		case BOA:
 			switch(state){
-				case 84:
-					nextState = 85;
+				case 83:
+					nextState = 84;
 				break;
 				default:
 					return false;
@@ -806,8 +797,8 @@ bool parserGoto(ParserParam &param){
 		break;
 		case BOB:
 			switch(state){
-				case 76:
-					nextState = 77;
+				case 75:
+					nextState = 76;
 				break;
 				default:
 					return false;
@@ -815,8 +806,8 @@ bool parserGoto(ParserParam &param){
 		break;
 		case BOC:
 			switch(state){
-				case 73:
-					nextState = 74;
+				case 72:
+					nextState = 73;
 				break;
 				default:
 					return false;
@@ -824,8 +815,8 @@ bool parserGoto(ParserParam &param){
 		break;
 		case BOD:
 			switch(state){
-				case 70:
-					nextState = 71;
+				case 69:
+					nextState = 70;
 				break;
 				default:
 					return false;
@@ -833,8 +824,8 @@ bool parserGoto(ParserParam &param){
 		break;
 		case BOE:
 			switch(state){
-				case 67:
-					nextState = 68;
+				case 66:
+					nextState = 67;
 				break;
 				default:
 					return false;
@@ -991,7 +982,7 @@ bool rule22(ParserParam &param){
 bool rule23(ParserParam &param){
 	TokenType *parts = new TokenType[2];
 	parts[0] = S;
-	parts[1] = SL_;
+	parts[1] = SL;
 	return reduce(param, SL, parts, 2, 23);
 }
 bool rule24(ParserParam &param){
@@ -1001,34 +992,29 @@ bool rule24(ParserParam &param){
 }
 bool rule25(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = SL;
-	return reduce(param, SL_, parts, 1, 25);
+	parts[0] = SEMI;
+	return reduce(param, S, parts, 1, 25);
 }
 bool rule26(ParserParam &param){
-	TokenType *parts = new TokenType[1];
-	parts[0] = SEMI;
-	return reduce(param, S, parts, 1, 26);
-}
-bool rule27(ParserParam &param){
 	TokenType *parts = new TokenType[2];
 	parts[0] = E;
 	parts[1] = SEMI;
-	return reduce(param, S, parts, 2, 27);
+	return reduce(param, S, parts, 2, 26);
 }
-bool rule28(ParserParam &param){
+bool rule27(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = RET;
 	parts[1] = E;
 	parts[2] = SEMI;
-	return reduce(param, S, parts, 3, 28);
+	return reduce(param, S, parts, 3, 27);
 }
-bool rule29(ParserParam &param){
+bool rule28(ParserParam &param){
 	TokenType *parts = new TokenType[2];
 	parts[0] = BREAK;
 	parts[1] = SEMI;
-	return reduce(param, S, parts, 2, 29);
+	return reduce(param, S, parts, 2, 28);
 }
-bool rule30(ParserParam &param){
+bool rule29(ParserParam &param){
 	TokenType *parts = new TokenType[7];
 	parts[0] = IF;
 	parts[1] = BRAC_SL;
@@ -1037,226 +1023,226 @@ bool rule30(ParserParam &param){
 	parts[4] = S;
 	parts[5] = ELSE;
 	parts[6] = S;
-	return reduce(param, S, parts, 7, 30);
+	return reduce(param, S, parts, 7, 29);
 }
-bool rule31(ParserParam &param){
+bool rule30(ParserParam &param){
 	TokenType *parts = new TokenType[5];
 	parts[0] = WHILE;
 	parts[1] = BRAC_SL;
 	parts[2] = E;
 	parts[3] = BRAC_SR;
 	parts[4] = S;
-	return reduce(param, S, parts, 5, 31);
+	return reduce(param, S, parts, 5, 30);
 }
-bool rule32(ParserParam &param){
+bool rule31(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = B;
-	return reduce(param, S, parts, 1, 32);
+	return reduce(param, S, parts, 1, 31);
+}
+bool rule32(ParserParam &param){
+	TokenType *parts = new TokenType[3];
+	parts[0] = PRINT;
+	parts[1] = DA;
+	parts[2] = SEMI;
+	return reduce(param, S, parts, 3, 32);
 }
 bool rule33(ParserParam &param){
 	TokenType *parts = new TokenType[3];
-	parts[0] = PRINT;
+	parts[0] = READ;
 	parts[1] = DA;
 	parts[2] = SEMI;
 	return reduce(param, S, parts, 3, 33);
 }
 bool rule34(ParserParam &param){
 	TokenType *parts = new TokenType[3];
-	parts[0] = READ;
-	parts[1] = DA;
-	parts[2] = SEMI;
-	return reduce(param, S, parts, 3, 34);
-}
-bool rule35(ParserParam &param){
-	TokenType *parts = new TokenType[3];
 	parts[0] = EE;
 	parts[1] = BOE;
 	parts[2] = E;
-	return reduce(param, E, parts, 3, 35);
+	return reduce(param, E, parts, 3, 34);
 }
-bool rule36(ParserParam &param){
+bool rule35(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = EE;
-	return reduce(param, E, parts, 1, 36);
+	return reduce(param, E, parts, 1, 35);
 }
-bool rule37(ParserParam &param){
+bool rule36(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = ED;
 	parts[1] = BOD;
 	parts[2] = EE;
-	return reduce(param, EE, parts, 3, 37);
+	return reduce(param, EE, parts, 3, 36);
 }
-bool rule38(ParserParam &param){
+bool rule37(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = ED;
-	return reduce(param, EE, parts, 1, 38);
+	return reduce(param, EE, parts, 1, 37);
 }
-bool rule39(ParserParam &param){
+bool rule38(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = EC;
 	parts[1] = BOC;
 	parts[2] = ED;
-	return reduce(param, ED, parts, 3, 39);
+	return reduce(param, ED, parts, 3, 38);
 }
-bool rule40(ParserParam &param){
+bool rule39(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = EC;
-	return reduce(param, ED, parts, 1, 40);
+	return reduce(param, ED, parts, 1, 39);
 }
-bool rule41(ParserParam &param){
+bool rule40(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = EB;
 	parts[1] = BOB;
 	parts[2] = EC;
-	return reduce(param, EC, parts, 3, 41);
+	return reduce(param, EC, parts, 3, 40);
 }
-bool rule42(ParserParam &param){
+bool rule41(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = EB;
-	return reduce(param, EC, parts, 1, 42);
+	return reduce(param, EC, parts, 1, 41);
 }
-bool rule43(ParserParam &param){
+bool rule42(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = EA;
 	parts[1] = MINUS;
 	parts[2] = EB;
-	return reduce(param, EB, parts, 3, 43);
+	return reduce(param, EB, parts, 3, 42);
 }
-bool rule44(ParserParam &param){
+bool rule43(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = EA;
 	parts[1] = PLUS;
 	parts[2] = EB;
-	return reduce(param, EB, parts, 3, 44);
+	return reduce(param, EB, parts, 3, 43);
 }
-bool rule45(ParserParam &param){
+bool rule44(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = EA;
-	return reduce(param, EB, parts, 1, 45);
+	return reduce(param, EB, parts, 1, 44);
 }
-bool rule46(ParserParam &param){
+bool rule45(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = EU;
 	parts[1] = BOA;
 	parts[2] = EA;
-	return reduce(param, EA, parts, 3, 46);
+	return reduce(param, EA, parts, 3, 45);
+}
+bool rule46(ParserParam &param){
+	TokenType *parts = new TokenType[1];
+	parts[0] = EU;
+	return reduce(param, EA, parts, 1, 46);
 }
 bool rule47(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = EU;
-	return reduce(param, EA, parts, 1, 47);
+	parts[0] = DA;
+	return reduce(param, EU, parts, 1, 47);
 }
 bool rule48(ParserParam &param){
-	TokenType *parts = new TokenType[1];
-	parts[0] = DA;
-	return reduce(param, EU, parts, 1, 48);
-}
-bool rule49(ParserParam &param){
 	TokenType *parts = new TokenType[2];
 	parts[0] = UO;
 	parts[1] = DA;
-	return reduce(param, EU, parts, 2, 49);
+	return reduce(param, EU, parts, 2, 48);
 }
-bool rule50(ParserParam &param){
+bool rule49(ParserParam &param){
 	TokenType *parts = new TokenType[3];
 	parts[0] = BRAC_SL;
 	parts[1] = E;
 	parts[2] = BRAC_SR;
-	return reduce(param, EU, parts, 3, 50);
+	return reduce(param, EU, parts, 3, 49);
 }
-bool rule51(ParserParam &param){
+bool rule50(ParserParam &param){
 	TokenType *parts = new TokenType[1];
 	parts[0] = ID;
-	return reduce(param, DA, parts, 1, 51);
+	return reduce(param, DA, parts, 1, 50);
 }
-bool rule52(ParserParam &param){
+bool rule51(ParserParam &param){
 	TokenType *parts = new TokenType[4];
 	parts[0] = ID;
 	parts[1] = BRAC_ML;
 	parts[2] = E;
 	parts[3] = BRAC_MR;
-	return reduce(param, DA, parts, 4, 52);
+	return reduce(param, DA, parts, 4, 51);
 }
-bool rule53(ParserParam &param){
+bool rule52(ParserParam &param){
 	TokenType *parts = new TokenType[4];
 	parts[0] = ID;
 	parts[1] = BRAC_SL;
 	parts[2] = E;
 	parts[3] = BRAC_SR;
-	return reduce(param, DA, parts, 4, 53);
+	return reduce(param, DA, parts, 4, 52);
+}
+bool rule53(ParserParam &param){
+	TokenType *parts = new TokenType[1];
+	parts[0] = NUM;
+	return reduce(param, DA, parts, 1, 53);
 }
 bool rule54(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = NUM;
-	return reduce(param, DA, parts, 1, 54);
+	parts[0] = OOPS;
+	return reduce(param, UO, parts, 1, 54);
 }
 bool rule55(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = OOPS;
+	parts[0] = MINUS;
 	return reduce(param, UO, parts, 1, 55);
 }
 bool rule56(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = MINUS;
-	return reduce(param, UO, parts, 1, 56);
+	parts[0] = MULT;
+	return reduce(param, BOA, parts, 1, 56);
 }
 bool rule57(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = MULT;
+	parts[0] = DIVI;
 	return reduce(param, BOA, parts, 1, 57);
 }
 bool rule58(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = DIVI;
-	return reduce(param, BOA, parts, 1, 58);
+	parts[0] = EQUA;
+	return reduce(param, BOB, parts, 1, 58);
 }
 bool rule59(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = EQUA;
+	parts[0] = NEQU;
 	return reduce(param, BOB, parts, 1, 59);
 }
 bool rule60(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = NEQU;
+	parts[0] = GREA;
 	return reduce(param, BOB, parts, 1, 60);
 }
 bool rule61(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = GREA;
+	parts[0] = GREQ;
 	return reduce(param, BOB, parts, 1, 61);
 }
 bool rule62(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = GREQ;
+	parts[0] = LSTH;
 	return reduce(param, BOB, parts, 1, 62);
 }
 bool rule63(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = LSTH;
+	parts[0] = LSEQ;
 	return reduce(param, BOB, parts, 1, 63);
 }
 bool rule64(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = LSEQ;
-	return reduce(param, BOB, parts, 1, 64);
+	parts[0] = AND;
+	return reduce(param, BOC, parts, 1, 64);
 }
 bool rule65(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = AND;
+	parts[0] = OR;
 	return reduce(param, BOC, parts, 1, 65);
 }
 bool rule66(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = OR;
-	return reduce(param, BOC, parts, 1, 66);
+	parts[0] = ASSI;
+	return reduce(param, BOD, parts, 1, 66);
 }
 bool rule67(ParserParam &param){
 	TokenType *parts = new TokenType[1];
-	parts[0] = ASSI;
-	return reduce(param, BOD, parts, 1, 67);
-}
-bool rule68(ParserParam &param){
-	TokenType *parts = new TokenType[1];
 	parts[0] = COMMA;
-	return reduce(param, BOE, parts, 1, 68);
+	return reduce(param, BOE, parts, 1, 67);
 }

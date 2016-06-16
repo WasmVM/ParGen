@@ -28,16 +28,16 @@ bool funcID(ParserParam &param, Token *tok){
 			if(!rule6(param)) return false;
 			break;
 		case 19:
-			if(!rule68(param)) return false;
+			if(!rule67(param)) return false;
 			break;
 		case 25:
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,93);
+			shift(param,tok,92);
 			break;
 		case 28:
-			shift(param,tok,93);
+			shift(param,tok,92);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -58,91 +58,94 @@ bool funcID(ParserParam &param, Token *tok){
 			if(!rule22(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,93);
+			shift(param,tok,92);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
 		case 42:
+			shift(param,tok,92);
+			break;
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 43:
-			shift(param,tok,93);
-			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 48:
+			shift(param,tok,92);
 			break;
-		case 49:
-			shift(param,tok,93);
+		case 50:
+			shift(param,tok,92);
 			break;
-		case 51:
-			shift(param,tok,93);
+		case 52:
+			shift(param,tok,92);
 			break;
 		case 53:
-			shift(param,tok,93);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 55:
+			shift(param,tok,92);
 			break;
-		case 56:
-			shift(param,tok,93);
+		case 57:
+			shift(param,tok,92);
 			break;
 		case 58:
-			shift(param,tok,93);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
 		case 60:
+			shift(param,tok,92);
+			break;
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 61:
-			shift(param,tok,93);
-			break;
 		case 63:
+			shift(param,tok,92);
+			break;
+		case 65:
 			if(!rule33(param)) return false;
 			break;
-		case 64:
-			shift(param,tok,93);
+		case 67:
+			shift(param,tok,92);
 			break;
-		case 66:
-			if(!rule34(param)) return false;
+		case 70:
+			shift(param,tok,92);
 			break;
-		case 68:
-			shift(param,tok,93);
+		case 73:
+			shift(param,tok,92);
 			break;
-		case 71:
-			shift(param,tok,93);
+		case 76:
+			shift(param,tok,92);
 			break;
-		case 74:
-			shift(param,tok,93);
+		case 79:
+			shift(param,tok,92);
 			break;
-		case 77:
-			shift(param,tok,93);
+		case 81:
+			shift(param,tok,92);
 			break;
-		case 80:
-			shift(param,tok,93);
+		case 84:
+			shift(param,tok,92);
 			break;
-		case 82:
-			shift(param,tok,93);
+		case 87:
+			shift(param,tok,92);
 			break;
-		case 85:
-			shift(param,tok,93);
+		case 89:
+			shift(param,tok,92);
 			break;
-		case 88:
-			shift(param,tok,93);
+		case 93:
+			shift(param,tok,92);
 			break;
-		case 90:
-			shift(param,tok,93);
+		case 96:
+			shift(param,tok,92);
 			break;
-		case 94:
-			shift(param,tok,93);
-			break;
-		case 97:
-			shift(param,tok,93);
+		case 100:
+			if(!rule54(param)) return false;
 			break;
 		case 101:
 			if(!rule55(param)) return false;
@@ -179,9 +182,6 @@ bool funcID(ParserParam &param, Token *tok){
 			break;
 		case 112:
 			if(!rule66(param)) return false;
-			break;
-		case 113:
-			if(!rule67(param)) return false;
 			break;
 		default:
 			return false;
@@ -219,10 +219,10 @@ bool funcSEMI(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,40);
+			shift(param,tok,39);
 			break;
 		case 28:
-			shift(param,tok,40);
+			shift(param,tok,39);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -237,118 +237,118 @@ bool funcSEMI(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,40);
+			shift(param,tok,39);
+			break;
+		case 39:
+			if(!rule25(param)) return false;
 			break;
 		case 40:
-			if(!rule26(param)) return false;
+			shift(param,tok,41);
 			break;
 		case 41:
-			shift(param,tok,42);
+			if(!rule26(param)) return false;
 			break;
-		case 42:
-			if(!rule27(param)) return false;
+		case 43:
+			shift(param,tok,44);
 			break;
 		case 44:
-			shift(param,tok,45);
+			if(!rule27(param)) return false;
 			break;
 		case 45:
-			if(!rule28(param)) return false;
+			shift(param,tok,46);
 			break;
 		case 46:
-			shift(param,tok,47);
+			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,39);
 			break;
-		case 51:
-			shift(param,tok,40);
+		case 52:
+			shift(param,tok,39);
 			break;
 		case 53:
-			shift(param,tok,40);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,39);
 			break;
 		case 58:
-			shift(param,tok,40);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
-			if(!rule32(param)) return false;
+		case 61:
+			shift(param,tok,62);
 			break;
 		case 62:
-			shift(param,tok,63);
+			if(!rule32(param)) return false;
 			break;
-		case 63:
-			if(!rule33(param)) return false;
+		case 64:
+			shift(param,tok,65);
 			break;
 		case 65:
-			shift(param,tok,66);
+			if(!rule33(param)) return false;
 			break;
 		case 66:
-			if(!rule34(param)) return false;
-			break;
-		case 67:
-			if(!rule36(param)) return false;
-			break;
-		case 69:
 			if(!rule35(param)) return false;
 			break;
-		case 70:
-			if(!rule38(param)) return false;
+		case 68:
+			if(!rule34(param)) return false;
 			break;
-		case 72:
+		case 69:
 			if(!rule37(param)) return false;
 			break;
-		case 73:
-			if(!rule40(param)) return false;
+		case 71:
+			if(!rule36(param)) return false;
 			break;
-		case 75:
+		case 72:
 			if(!rule39(param)) return false;
 			break;
-		case 76:
-			if(!rule42(param)) return false;
+		case 74:
+			if(!rule38(param)) return false;
 			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -380,16 +380,16 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 			if(!rule6(param)) return false;
 			break;
 		case 19:
-			if(!rule68(param)) return false;
+			if(!rule67(param)) return false;
 			break;
 		case 25:
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,90);
+			shift(param,tok,89);
 			break;
 		case 28:
-			shift(param,tok,90);
+			shift(param,tok,89);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -404,91 +404,94 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,90);
+			shift(param,tok,89);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
 		case 42:
+			shift(param,tok,89);
+			break;
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 43:
-			shift(param,tok,90);
-			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
 		case 47:
-			if(!rule29(param)) return false;
+			shift(param,tok,48);
 			break;
 		case 48:
-			shift(param,tok,49);
+			shift(param,tok,89);
 			break;
-		case 49:
-			shift(param,tok,90);
+		case 50:
+			shift(param,tok,89);
 			break;
-		case 51:
-			shift(param,tok,90);
+		case 52:
+			shift(param,tok,89);
 			break;
 		case 53:
-			shift(param,tok,90);
+			if(!rule29(param)) return false;
 			break;
 		case 54:
-			if(!rule30(param)) return false;
+			shift(param,tok,55);
 			break;
 		case 55:
-			shift(param,tok,56);
+			shift(param,tok,89);
 			break;
-		case 56:
-			shift(param,tok,90);
+		case 57:
+			shift(param,tok,89);
 			break;
 		case 58:
-			shift(param,tok,90);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
 			break;
-		case 66:
-			if(!rule34(param)) return false;
+		case 67:
+			shift(param,tok,89);
 			break;
-		case 68:
-			shift(param,tok,90);
+		case 70:
+			shift(param,tok,89);
 			break;
-		case 71:
-			shift(param,tok,90);
+		case 73:
+			shift(param,tok,89);
 			break;
-		case 74:
-			shift(param,tok,90);
+		case 76:
+			shift(param,tok,89);
 			break;
-		case 77:
-			shift(param,tok,90);
+		case 79:
+			shift(param,tok,89);
 			break;
-		case 80:
-			shift(param,tok,90);
+		case 81:
+			shift(param,tok,89);
 			break;
-		case 82:
-			shift(param,tok,90);
+		case 84:
+			shift(param,tok,89);
 			break;
-		case 85:
-			shift(param,tok,90);
+		case 89:
+			shift(param,tok,89);
 			break;
-		case 90:
-			shift(param,tok,90);
+		case 92:
+			shift(param,tok,96);
 			break;
 		case 93:
-			shift(param,tok,97);
+			shift(param,tok,89);
 			break;
-		case 94:
-			shift(param,tok,90);
+		case 96:
+			shift(param,tok,89);
 			break;
-		case 97:
-			shift(param,tok,90);
+		case 102:
+			if(!rule56(param)) return false;
 			break;
 		case 103:
 			if(!rule57(param)) return false;
@@ -519,9 +522,6 @@ bool funcBRAC_SL(ParserParam &param, Token *tok){
 			break;
 		case 112:
 			if(!rule66(param)) return false;
-			break;
-		case 113:
-			if(!rule67(param)) return false;
 			break;
 		default:
 			return false;
@@ -558,77 +558,77 @@ bool funcBRAC_SR(ParserParam &param, Token *tok){
 		case 26:
 			if(!rule16(param)) return false;
 			break;
-		case 50:
-			shift(param,tok,51);
+		case 49:
+			shift(param,tok,50);
 			break;
-		case 57:
-			shift(param,tok,58);
+		case 56:
+			shift(param,tok,57);
 			break;
-		case 67:
-			if(!rule36(param)) return false;
-			break;
-		case 69:
+		case 66:
 			if(!rule35(param)) return false;
 			break;
-		case 70:
-			if(!rule38(param)) return false;
+		case 68:
+			if(!rule34(param)) return false;
 			break;
-		case 72:
+		case 69:
 			if(!rule37(param)) return false;
 			break;
-		case 73:
-			if(!rule40(param)) return false;
+		case 71:
+			if(!rule36(param)) return false;
 			break;
-		case 75:
+		case 72:
 			if(!rule39(param)) return false;
 			break;
-		case 76:
-			if(!rule42(param)) return false;
+		case 74:
+			if(!rule38(param)) return false;
 			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
-			if(!rule49(param)) return false;
+		case 90:
+			shift(param,tok,91);
 			break;
 		case 91:
-			shift(param,tok,92);
+			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
-			if(!rule52(param)) return false;
+		case 97:
+			shift(param,tok,98);
 			break;
 		case 98:
-			shift(param,tok,99);
+			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -650,62 +650,62 @@ bool funcCOMMA(ParserParam &param, Token *tok){
 		case 26:
 			if(!rule16(param)) return false;
 			break;
-		case 67:
+		case 66:
 			shift(param,tok,19);
 			break;
-		case 70:
-			if(!rule38(param)) return false;
-			break;
-		case 72:
+		case 69:
 			if(!rule37(param)) return false;
 			break;
-		case 73:
-			if(!rule40(param)) return false;
+		case 71:
+			if(!rule36(param)) return false;
 			break;
-		case 75:
+		case 72:
 			if(!rule39(param)) return false;
 			break;
-		case 76:
-			if(!rule42(param)) return false;
+		case 74:
+			if(!rule38(param)) return false;
 			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -718,8 +718,8 @@ bool funcBRAC_ML(ParserParam &param, Token *tok){
 		case 6:
 			shift(param,tok,22);
 			break;
-		case 93:
-			shift(param,tok,94);
+		case 92:
+			shift(param,tok,93);
 			break;
 		default:
 			return false;
@@ -748,7 +748,7 @@ bool funcNUM(ParserParam &param, Token *tok){
 			if(!rule6(param)) return false;
 			break;
 		case 19:
-			if(!rule68(param)) return false;
+			if(!rule67(param)) return false;
 			break;
 		case 22:
 			shift(param,tok,23);
@@ -757,10 +757,10 @@ bool funcNUM(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,100);
+			shift(param,tok,99);
 			break;
 		case 28:
-			shift(param,tok,100);
+			shift(param,tok,99);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -775,91 +775,94 @@ bool funcNUM(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,100);
+			shift(param,tok,99);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
 		case 42:
+			shift(param,tok,99);
+			break;
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 43:
-			shift(param,tok,100);
-			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 48:
+			shift(param,tok,99);
 			break;
-		case 49:
-			shift(param,tok,100);
+		case 50:
+			shift(param,tok,99);
 			break;
-		case 51:
-			shift(param,tok,100);
+		case 52:
+			shift(param,tok,99);
 			break;
 		case 53:
-			shift(param,tok,100);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 55:
+			shift(param,tok,99);
 			break;
-		case 56:
-			shift(param,tok,100);
+		case 57:
+			shift(param,tok,99);
 			break;
 		case 58:
-			shift(param,tok,100);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
 		case 60:
+			shift(param,tok,99);
+			break;
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 61:
-			shift(param,tok,100);
-			break;
 		case 63:
+			shift(param,tok,99);
+			break;
+		case 65:
 			if(!rule33(param)) return false;
 			break;
-		case 64:
-			shift(param,tok,100);
+		case 67:
+			shift(param,tok,99);
 			break;
-		case 66:
-			if(!rule34(param)) return false;
+		case 70:
+			shift(param,tok,99);
 			break;
-		case 68:
-			shift(param,tok,100);
+		case 73:
+			shift(param,tok,99);
 			break;
-		case 71:
-			shift(param,tok,100);
+		case 76:
+			shift(param,tok,99);
 			break;
-		case 74:
-			shift(param,tok,100);
+		case 79:
+			shift(param,tok,99);
 			break;
-		case 77:
-			shift(param,tok,100);
+		case 81:
+			shift(param,tok,99);
 			break;
-		case 80:
-			shift(param,tok,100);
+		case 84:
+			shift(param,tok,99);
 			break;
-		case 82:
-			shift(param,tok,100);
+		case 87:
+			shift(param,tok,99);
 			break;
-		case 85:
-			shift(param,tok,100);
+		case 89:
+			shift(param,tok,99);
 			break;
-		case 88:
-			shift(param,tok,100);
+		case 93:
+			shift(param,tok,99);
 			break;
-		case 90:
-			shift(param,tok,100);
+		case 96:
+			shift(param,tok,99);
 			break;
-		case 94:
-			shift(param,tok,100);
-			break;
-		case 97:
-			shift(param,tok,100);
+		case 100:
+			if(!rule54(param)) return false;
 			break;
 		case 101:
 			if(!rule55(param)) return false;
@@ -897,9 +900,6 @@ bool funcNUM(ParserParam &param, Token *tok){
 		case 112:
 			if(!rule66(param)) return false;
 			break;
-		case 113:
-			if(!rule67(param)) return false;
-			break;
 		default:
 			return false;
 		break;
@@ -914,68 +914,68 @@ bool funcBRAC_MR(ParserParam &param, Token *tok){
 		case 23:
 			shift(param,tok,24);
 			break;
-		case 67:
-			if(!rule36(param)) return false;
-			break;
-		case 69:
+		case 66:
 			if(!rule35(param)) return false;
 			break;
-		case 70:
-			if(!rule38(param)) return false;
+		case 68:
+			if(!rule34(param)) return false;
 			break;
-		case 72:
+		case 69:
 			if(!rule37(param)) return false;
 			break;
-		case 73:
-			if(!rule40(param)) return false;
+		case 71:
+			if(!rule36(param)) return false;
 			break;
-		case 75:
+		case 72:
 			if(!rule39(param)) return false;
 			break;
-		case 76:
-			if(!rule42(param)) return false;
+		case 74:
+			if(!rule38(param)) return false;
 			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
-			if(!rule51(param)) return false;
+		case 94:
+			shift(param,tok,95);
 			break;
 		case 95:
-			shift(param,tok,96);
+			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -1033,41 +1033,41 @@ bool funcBRAC_LL(ParserParam &param, Token *tok){
 		case 37:
 			shift(param,tok,27);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,27);
 			break;
-		case 51:
+		case 52:
 			shift(param,tok,27);
 			break;
 		case 53:
-			shift(param,tok,27);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,27);
 			break;
 		case 58:
-			shift(param,tok,27);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1131,32 +1131,29 @@ bool funcBRAC_LR(ParserParam &param, Token *tok){
 		case 39:
 			if(!rule25(param)) return false;
 			break;
-		case 40:
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
+		case 53:
 			if(!rule29(param)) return false;
 			break;
-		case 54:
+		case 58:
 			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1288,10 +1285,10 @@ bool funcRET(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,43);
+			shift(param,tok,42);
 			break;
 		case 28:
-			shift(param,tok,43);
+			shift(param,tok,42);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1306,43 +1303,43 @@ bool funcRET(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,43);
+			shift(param,tok,42);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,42);
 			break;
-		case 51:
-			shift(param,tok,43);
+		case 52:
+			shift(param,tok,42);
 			break;
 		case 53:
-			shift(param,tok,43);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,42);
 			break;
 		case 58:
-			shift(param,tok,43);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1374,10 +1371,10 @@ bool funcBREAK(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,46);
+			shift(param,tok,45);
 			break;
 		case 28:
-			shift(param,tok,46);
+			shift(param,tok,45);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1392,43 +1389,43 @@ bool funcBREAK(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,46);
+			shift(param,tok,45);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,45);
 			break;
-		case 51:
-			shift(param,tok,46);
+		case 52:
+			shift(param,tok,45);
 			break;
 		case 53:
-			shift(param,tok,46);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,45);
 			break;
 		case 58:
-			shift(param,tok,46);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1460,10 +1457,10 @@ bool funcIF(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,48);
+			shift(param,tok,47);
 			break;
 		case 28:
-			shift(param,tok,48);
+			shift(param,tok,47);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1478,43 +1475,43 @@ bool funcIF(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,48);
+			shift(param,tok,47);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,47);
 			break;
-		case 51:
-			shift(param,tok,48);
+		case 52:
+			shift(param,tok,47);
 			break;
 		case 53:
-			shift(param,tok,48);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,47);
 			break;
 		case 58:
-			shift(param,tok,48);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1536,35 +1533,35 @@ bool funcELSE(ParserParam &param, Token *tok){
 		case 34:
 			if(!rule20(param)) return false;
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
+		case 51:
+			shift(param,tok,52);
+			break;
+		case 53:
 			if(!rule29(param)) return false;
 			break;
-		case 52:
-			shift(param,tok,53);
-			break;
-		case 54:
+		case 58:
 			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1596,10 +1593,10 @@ bool funcWHILE(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,55);
+			shift(param,tok,54);
 			break;
 		case 28:
-			shift(param,tok,55);
+			shift(param,tok,54);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1614,43 +1611,43 @@ bool funcWHILE(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,55);
+			shift(param,tok,54);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,54);
 			break;
-		case 51:
-			shift(param,tok,55);
+		case 52:
+			shift(param,tok,54);
 			break;
 		case 53:
-			shift(param,tok,55);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,54);
 			break;
 		case 58:
-			shift(param,tok,55);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1682,10 +1679,10 @@ bool funcPRINT(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,61);
+			shift(param,tok,60);
 			break;
 		case 28:
-			shift(param,tok,61);
+			shift(param,tok,60);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1700,43 +1697,43 @@ bool funcPRINT(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,61);
+			shift(param,tok,60);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,60);
 			break;
-		case 51:
-			shift(param,tok,61);
+		case 52:
+			shift(param,tok,60);
 			break;
 		case 53:
-			shift(param,tok,61);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,60);
 			break;
 		case 58:
-			shift(param,tok,61);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1768,10 +1765,10 @@ bool funcREAD(ParserParam &param, Token *tok){
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,64);
+			shift(param,tok,63);
 			break;
 		case 28:
-			shift(param,tok,64);
+			shift(param,tok,63);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1786,43 +1783,43 @@ bool funcREAD(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,64);
+			shift(param,tok,63);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
-		case 42:
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 50:
+			shift(param,tok,63);
 			break;
-		case 51:
-			shift(param,tok,64);
+		case 52:
+			shift(param,tok,63);
 			break;
 		case 53:
-			shift(param,tok,64);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 57:
+			shift(param,tok,63);
 			break;
 		case 58:
-			shift(param,tok,64);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
-			break;
-		case 66:
-			if(!rule34(param)) return false;
 			break;
 		default:
 			return false;
@@ -1851,16 +1848,16 @@ bool funcMINUS(ParserParam &param, Token *tok){
 			if(!rule6(param)) return false;
 			break;
 		case 19:
-			if(!rule68(param)) return false;
+			if(!rule67(param)) return false;
 			break;
 		case 25:
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,102);
+			shift(param,tok,101);
 			break;
 		case 28:
-			shift(param,tok,102);
+			shift(param,tok,101);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -1875,112 +1872,115 @@ bool funcMINUS(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,102);
+			shift(param,tok,101);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
 		case 42:
+			shift(param,tok,101);
+			break;
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 43:
-			shift(param,tok,102);
-			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 48:
+			shift(param,tok,101);
 			break;
-		case 49:
-			shift(param,tok,102);
+		case 50:
+			shift(param,tok,101);
 			break;
-		case 51:
-			shift(param,tok,102);
+		case 52:
+			shift(param,tok,101);
 			break;
 		case 53:
-			shift(param,tok,102);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 55:
+			shift(param,tok,101);
 			break;
-		case 56:
-			shift(param,tok,102);
+		case 57:
+			shift(param,tok,101);
 			break;
 		case 58:
-			shift(param,tok,102);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
 			break;
-		case 66:
-			if(!rule34(param)) return false;
+		case 67:
+			shift(param,tok,101);
 			break;
-		case 68:
-			shift(param,tok,102);
+		case 70:
+			shift(param,tok,101);
 			break;
-		case 71:
-			shift(param,tok,102);
+		case 73:
+			shift(param,tok,101);
 			break;
-		case 74:
-			shift(param,tok,102);
+		case 76:
+			shift(param,tok,101);
 			break;
-		case 77:
-			shift(param,tok,102);
+		case 78:
+			shift(param,tok,79);
 			break;
 		case 79:
-			shift(param,tok,80);
+			shift(param,tok,101);
 			break;
-		case 80:
-			shift(param,tok,102);
+		case 81:
+			shift(param,tok,101);
 			break;
-		case 82:
-			shift(param,tok,102);
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 85:
-			shift(param,tok,102);
-			break;
-		case 86:
+		case 83:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 84:
+			shift(param,tok,101);
+			break;
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
 		case 89:
-			if(!rule49(param)) return false;
+			shift(param,tok,101);
 			break;
-		case 90:
-			shift(param,tok,102);
+		case 91:
+			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
 		case 93:
+			shift(param,tok,101);
+			break;
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 94:
-			shift(param,tok,102);
-			break;
 		case 96:
-			if(!rule52(param)) return false;
+			shift(param,tok,101);
 			break;
-		case 97:
-			shift(param,tok,102);
+		case 98:
+			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
 			break;
-		case 100:
-			if(!rule54(param)) return false;
+		case 102:
+			if(!rule56(param)) return false;
 			break;
 		case 103:
 			if(!rule57(param)) return false;
@@ -2012,9 +2012,6 @@ bool funcMINUS(ParserParam &param, Token *tok){
 		case 112:
 			if(!rule66(param)) return false;
 			break;
-		case 113:
-			if(!rule67(param)) return false;
-			break;
 		default:
 			return false;
 		break;
@@ -2023,35 +2020,35 @@ bool funcMINUS(ParserParam &param, Token *tok){
 }
 bool funcPLUS(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 79:
-			shift(param,tok,82);
+		case 78:
+			shift(param,tok,81);
 			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
+		case 83:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2080,16 +2077,16 @@ bool funcOOPS(ParserParam &param, Token *tok){
 			if(!rule6(param)) return false;
 			break;
 		case 19:
-			if(!rule68(param)) return false;
+			if(!rule67(param)) return false;
 			break;
 		case 25:
 			if(!rule15(param)) return false;
 			break;
 		case 27:
-			shift(param,tok,101);
+			shift(param,tok,100);
 			break;
 		case 28:
-			shift(param,tok,101);
+			shift(param,tok,100);
 			break;
 		case 30:
 			if(!rule17(param)) return false;
@@ -2104,82 +2101,85 @@ bool funcOOPS(ParserParam &param, Token *tok){
 			if(!rule20(param)) return false;
 			break;
 		case 37:
-			shift(param,tok,101);
+			shift(param,tok,100);
 			break;
-		case 40:
+		case 39:
+			if(!rule25(param)) return false;
+			break;
+		case 41:
 			if(!rule26(param)) return false;
 			break;
 		case 42:
+			shift(param,tok,100);
+			break;
+		case 44:
 			if(!rule27(param)) return false;
 			break;
-		case 43:
-			shift(param,tok,101);
-			break;
-		case 45:
+		case 46:
 			if(!rule28(param)) return false;
 			break;
-		case 47:
-			if(!rule29(param)) return false;
+		case 48:
+			shift(param,tok,100);
 			break;
-		case 49:
-			shift(param,tok,101);
+		case 50:
+			shift(param,tok,100);
 			break;
-		case 51:
-			shift(param,tok,101);
+		case 52:
+			shift(param,tok,100);
 			break;
 		case 53:
-			shift(param,tok,101);
+			if(!rule29(param)) return false;
 			break;
-		case 54:
-			if(!rule30(param)) return false;
+		case 55:
+			shift(param,tok,100);
 			break;
-		case 56:
-			shift(param,tok,101);
+		case 57:
+			shift(param,tok,100);
 			break;
 		case 58:
-			shift(param,tok,101);
+			if(!rule30(param)) return false;
 			break;
 		case 59:
 			if(!rule31(param)) return false;
 			break;
-		case 60:
+		case 62:
 			if(!rule32(param)) return false;
 			break;
-		case 63:
+		case 65:
 			if(!rule33(param)) return false;
 			break;
-		case 66:
-			if(!rule34(param)) return false;
+		case 67:
+			shift(param,tok,100);
 			break;
-		case 68:
-			shift(param,tok,101);
+		case 70:
+			shift(param,tok,100);
 			break;
-		case 71:
-			shift(param,tok,101);
+		case 73:
+			shift(param,tok,100);
 			break;
-		case 74:
-			shift(param,tok,101);
+		case 76:
+			shift(param,tok,100);
 			break;
-		case 77:
-			shift(param,tok,101);
+		case 79:
+			shift(param,tok,100);
 			break;
-		case 80:
-			shift(param,tok,101);
+		case 81:
+			shift(param,tok,100);
 			break;
-		case 82:
-			shift(param,tok,101);
+		case 84:
+			shift(param,tok,100);
 			break;
-		case 85:
-			shift(param,tok,101);
+		case 89:
+			shift(param,tok,100);
 			break;
-		case 90:
-			shift(param,tok,101);
+		case 93:
+			shift(param,tok,100);
 			break;
-		case 94:
-			shift(param,tok,101);
+		case 96:
+			shift(param,tok,100);
 			break;
-		case 97:
-			shift(param,tok,101);
+		case 102:
+			if(!rule56(param)) return false;
 			break;
 		case 103:
 			if(!rule57(param)) return false;
@@ -2211,9 +2211,6 @@ bool funcOOPS(ParserParam &param, Token *tok){
 		case 112:
 			if(!rule66(param)) return false;
 			break;
-		case 113:
-			if(!rule67(param)) return false;
-			break;
 		default:
 			return false;
 		break;
@@ -2222,29 +2219,29 @@ bool funcOOPS(ParserParam &param, Token *tok){
 }
 bool funcMULT(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 84:
-			shift(param,tok,103);
+		case 83:
+			shift(param,tok,102);
 			break;
-		case 87:
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2254,29 +2251,29 @@ bool funcMULT(ParserParam &param, Token *tok){
 }
 bool funcDIVI(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 84:
-			shift(param,tok,104);
+		case 83:
+			shift(param,tok,103);
 			break;
-		case 87:
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2286,44 +2283,44 @@ bool funcDIVI(ParserParam &param, Token *tok){
 }
 bool funcEQUA(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 76:
-			shift(param,tok,105);
+		case 75:
+			shift(param,tok,104);
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 78:
+			if(!rule44(param)) return false;
 			break;
-		case 81:
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2333,44 +2330,44 @@ bool funcEQUA(ParserParam &param, Token *tok){
 }
 bool funcNEQU(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 76:
-			shift(param,tok,106);
+		case 75:
+			shift(param,tok,105);
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 78:
+			if(!rule44(param)) return false;
 			break;
-		case 81:
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2380,44 +2377,44 @@ bool funcNEQU(ParserParam &param, Token *tok){
 }
 bool funcGREA(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 76:
-			shift(param,tok,107);
+		case 75:
+			shift(param,tok,106);
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 78:
+			if(!rule44(param)) return false;
 			break;
-		case 81:
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2427,44 +2424,44 @@ bool funcGREA(ParserParam &param, Token *tok){
 }
 bool funcGREQ(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 76:
-			shift(param,tok,108);
+		case 75:
+			shift(param,tok,107);
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 78:
+			if(!rule44(param)) return false;
 			break;
-		case 81:
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2474,44 +2471,44 @@ bool funcGREQ(ParserParam &param, Token *tok){
 }
 bool funcLSTH(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 76:
-			shift(param,tok,109);
+		case 75:
+			shift(param,tok,108);
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 78:
+			if(!rule44(param)) return false;
 			break;
-		case 81:
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2521,44 +2518,44 @@ bool funcLSTH(ParserParam &param, Token *tok){
 }
 bool funcLSEQ(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 76:
-			shift(param,tok,110);
+		case 75:
+			shift(param,tok,109);
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 78:
+			if(!rule44(param)) return false;
 			break;
-		case 81:
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2568,50 +2565,50 @@ bool funcLSEQ(ParserParam &param, Token *tok){
 }
 bool funcAND(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 73:
-			shift(param,tok,111);
+		case 72:
+			shift(param,tok,110);
 			break;
-		case 76:
-			if(!rule42(param)) return false;
-			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2621,50 +2618,50 @@ bool funcAND(ParserParam &param, Token *tok){
 }
 bool funcOR(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 73:
-			shift(param,tok,112);
+		case 72:
+			shift(param,tok,111);
 			break;
-		case 76:
-			if(!rule42(param)) return false;
-			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
@@ -2674,56 +2671,56 @@ bool funcOR(ParserParam &param, Token *tok){
 }
 bool funcASSI(ParserParam &param, Token *tok){
 	switch(param.stack.back()){
-		case 70:
-			shift(param,tok,113);
+		case 69:
+			shift(param,tok,112);
 			break;
-		case 73:
-			if(!rule40(param)) return false;
-			break;
-		case 75:
+		case 72:
 			if(!rule39(param)) return false;
 			break;
-		case 76:
-			if(!rule42(param)) return false;
+		case 74:
+			if(!rule38(param)) return false;
 			break;
-		case 78:
+		case 75:
 			if(!rule41(param)) return false;
 			break;
-		case 79:
-			if(!rule45(param)) return false;
+		case 77:
+			if(!rule40(param)) return false;
 			break;
-		case 81:
+		case 78:
+			if(!rule44(param)) return false;
+			break;
+		case 80:
+			if(!rule42(param)) return false;
+			break;
+		case 82:
 			if(!rule43(param)) return false;
 			break;
 		case 83:
-			if(!rule44(param)) return false;
-			break;
-		case 84:
-			if(!rule47(param)) return false;
-			break;
-		case 86:
 			if(!rule46(param)) return false;
 			break;
-		case 87:
+		case 85:
+			if(!rule45(param)) return false;
+			break;
+		case 86:
+			if(!rule47(param)) return false;
+			break;
+		case 88:
 			if(!rule48(param)) return false;
 			break;
-		case 89:
+		case 91:
 			if(!rule49(param)) return false;
 			break;
 		case 92:
 			if(!rule50(param)) return false;
 			break;
-		case 93:
+		case 95:
 			if(!rule51(param)) return false;
 			break;
-		case 96:
+		case 98:
 			if(!rule52(param)) return false;
 			break;
 		case 99:
 			if(!rule53(param)) return false;
-			break;
-		case 100:
-			if(!rule54(param)) return false;
 			break;
 		default:
 			return false;
