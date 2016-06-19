@@ -350,6 +350,9 @@ bool funcSEMI(ParserParam &param, Token *tok){
 		case 99:
 			if(!rule53(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -621,6 +624,9 @@ bool funcBRAC_SR(ParserParam &param, Token *tok){
 		case 95:
 			if(!rule51(param)) return false;
 			break;
+		case 96:
+			shift(param,tok,113);
+			break;
 		case 97:
 			shift(param,tok,98);
 			break;
@@ -629,6 +635,9 @@ bool funcBRAC_SR(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -706,6 +715,9 @@ bool funcCOMMA(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -976,6 +988,9 @@ bool funcBRAC_MR(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2012,6 +2027,9 @@ bool funcMINUS(ParserParam &param, Token *tok){
 		case 112:
 			if(!rule66(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -2049,6 +2067,9 @@ bool funcPLUS(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2243,6 +2264,9 @@ bool funcMULT(ParserParam &param, Token *tok){
 		case 99:
 			if(!rule53(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -2274,6 +2298,9 @@ bool funcDIVI(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2322,6 +2349,9 @@ bool funcEQUA(ParserParam &param, Token *tok){
 		case 99:
 			if(!rule53(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -2368,6 +2398,9 @@ bool funcNEQU(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2416,6 +2449,9 @@ bool funcGREA(ParserParam &param, Token *tok){
 		case 99:
 			if(!rule53(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -2462,6 +2498,9 @@ bool funcGREQ(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2510,6 +2549,9 @@ bool funcLSTH(ParserParam &param, Token *tok){
 		case 99:
 			if(!rule53(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -2556,6 +2598,9 @@ bool funcLSEQ(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2610,6 +2655,9 @@ bool funcAND(ParserParam &param, Token *tok){
 		case 99:
 			if(!rule53(param)) return false;
 			break;
+		case 113:
+			if(!rule68(param)) return false;
+			break;
 		default:
 			return false;
 		break;
@@ -2662,6 +2710,9 @@ bool funcOR(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;
@@ -2721,6 +2772,9 @@ bool funcASSI(ParserParam &param, Token *tok){
 			break;
 		case 99:
 			if(!rule53(param)) return false;
+			break;
+		case 113:
+			if(!rule68(param)) return false;
 			break;
 		default:
 			return false;

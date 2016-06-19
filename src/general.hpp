@@ -59,7 +59,7 @@ public:
     string textSeg;
     string errMsg;
     vector<Variable> varStack, gloStack, funList, dataStack;
-    vector<unsigned int> varCounts;
+    vector<unsigned int> varCounts, spLasts;
     vector<string> tmpText;
 };
 

@@ -71,7 +71,7 @@ void Lexer::lex(){
 				}
 			}
 			// Keyword
-			if(regex_search(line,strmat,regex("^(int|char|return|if|else|while|break|print|read)[^\\w]",regex::ECMAScript))){
+            if(regex_search(line,strmat,regex("^(int|char|return|if|else|while|break|print|read)",regex::ECMAScript))){
 				if(strmat.position() == 0){
 					isMatch = true;
 					Token *newTok = new Token;
@@ -114,9 +114,9 @@ void Lexer::lex(){
 					}else if (newTok->value == ">="){
 						newTok->type = GREQ;
 					}else if (newTok->value == "<"){
-						newTok->type = GREA;
+                        newTok->type = LSTH;
 					}else if (newTok->value == ">"){
-						newTok->type = LSTH;
+                        newTok->type = GREA;
 					}else if (newTok->value == "&&"){
 						newTok->type = AND;
 					}else{

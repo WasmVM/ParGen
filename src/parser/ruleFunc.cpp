@@ -1246,3 +1246,10 @@ bool rule67(ParserParam &param){
 	parts[0] = COMMA;
 	return reduce(param, BOE, parts, 1, 67);
 }
+bool rule68(ParserParam &param){
+	TokenType *parts = new TokenType[3];
+	parts[0] = ID;
+	parts[1] = BRAC_SL;
+	parts[2] = BRAC_SR;
+	return reduce(param, DA, parts, 3, 68);
+}

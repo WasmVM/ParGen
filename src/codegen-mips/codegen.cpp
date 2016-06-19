@@ -25,6 +25,7 @@ void CodeGen::generate(ASTNode *tree, char *fileName)
                 "main:\n"
                 "\taddi\t$sp,\t$sp,\t-4\n"
                 "\tsw\t$ra,\t0($sp)\n"
+                "\taddi\t$sp,\t$sp,\t-4\n"
                 "\tjal\tidMain\n"
                 "\tlw\t$ra,\t0($sp)\n"
                 "\taddi\t$sp,\t$sp,\t4\n"

@@ -1,6 +1,7 @@
 #include <genFunc.hpp>
 
-static int spTop = 0, blockLevel = 0, regCount = 0;
+static int spTop = 0, blockLevel = 0, regCount = 0, ifCount = 0, whileCount = 0;
+static vector<int> ifStack, ifTogStack, whileStack, whileTogStack;
 
 bool gen1(ASTNode *, GenParam &){
 	return true;
@@ -370,28 +371,161 @@ bool gen27(ASTNode *, GenParam &param){
 bool pro27(ASTNode *, GenParam &){
 	return true;
 }
-bool gen28(ASTNode *, GenParam &){
+bool gen28(ASTNode *, GenParam &param){
+    // Clean
+    param.dataStack.clear();
+    regCount = 0;
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            ifTogStack.pop_back();
+            stringstream ss;
+            ss << ifStack.back();
+            if(ifTogStack.back() == 1){
+                param.tmpText.back() += "\tb\tIf" + ss.str() + "_end\n";
+                param.tmpText.back() += "If" + ss.str() + "_else:\n";
+            }else if(ifTogStack.back() == 2){
+                param.tmpText.back() += "If" + ss.str() + "_end:\n";
+            }
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
+    // Break;
+    stringstream ss;
+    ss << whileStack.back();
+    param.tmpText.back() += "\tb\tWhile" + ss.str() + "_end\n";
 	return true;
 }
 bool pro28(ASTNode *, GenParam &){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() >= 1){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
 	return true;
 }
-bool gen29(ASTNode *, GenParam &){
+bool gen29(ASTNode *, GenParam &param){
+    ifTogStack.pop_back();
+    ifStack.pop_back();
+    // Clean
+    param.dataStack.clear();
+    regCount = 0;
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            ifTogStack.pop_back();
+            stringstream ss;
+            ss << ifStack.back();
+            if(ifTogStack.back() == 1){
+                param.tmpText.back() += "\tb\tIf" + ss.str() + "_end\n";
+                param.tmpText.back() += "If" + ss.str() + "_else:\n";
+            }else if(ifTogStack.back() == 2){
+                param.tmpText.back() += "If" + ss.str() + "_end:\n";
+            }
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
 	return true;
 }
 bool pro29(ASTNode *, GenParam &){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() >= 1){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
+    ifTogStack.push_back(0);
+    ifStack.push_back(ifCount++);
 	return true;
 }
-bool gen30(ASTNode *, GenParam &){
+bool gen30(ASTNode *, GenParam &param){
+    // Clean
+    param.dataStack.clear();
+    regCount = 0;
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            ifTogStack.pop_back();
+            stringstream ss;
+            ss << ifStack.back();
+            if(ifTogStack.back() == 1){
+                param.tmpText.back() += "\tb\tIf" + ss.str() + "_end\n";
+                param.tmpText.back() += "If" + ss.str() + "_else:\n";
+            }else if(ifTogStack.back() == 2){
+                param.tmpText.back() += "If" + ss.str() + "_end:\n";
+            }
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
+    // While
+    stringstream ss;
+    ss << whileStack.back();
+    param.tmpText.back() += "\tb\tWhile" + ss.str() + "_begin\n";
+    param.tmpText.back() += "While" + ss.str() + "_end:\n";
+    whileTogStack.pop_back();
+    whileStack.pop_back();
 	return true;
 }
-bool pro30(ASTNode *, GenParam &){
+bool pro30(ASTNode *, GenParam &param){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() >= 1){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
+    // While
+    stringstream ss;
+    ss << whileCount;
+    param.tmpText.back() += "While" + ss.str() + "_begin:\n";
+    whileTogStack.push_back(0);
+    whileStack.push_back(whileCount++);
 	return true;
 }
-bool gen31(ASTNode *, GenParam &){
+bool gen31(ASTNode *, GenParam &param){
+    // Clean
+    param.dataStack.clear();
+    regCount = 0;
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            ifTogStack.pop_back();
+            stringstream ss;
+            ss << ifStack.back();
+            if(ifTogStack.back() == 1){
+                param.tmpText.back() += "\tb\tIf" + ss.str() + "_end\n";
+                param.tmpText.back() += "If" + ss.str() + "_else:\n";
+            }else if(ifTogStack.back() == 2){
+                param.tmpText.back() += "If" + ss.str() + "_end:\n";
+            }
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
 	return true;
 }
 bool pro31(ASTNode *, GenParam &param){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() >= 1){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
     // Clean
     param.dataStack.clear();
     regCount = 0;
@@ -432,9 +566,34 @@ bool gen32(ASTNode *, GenParam &param){
     // Clean
     param.dataStack.clear();
     regCount = 0;
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            ifTogStack.pop_back();
+            stringstream ss;
+            ss << ifStack.back();
+            if(ifTogStack.back() == 1){
+                param.tmpText.back() += "\tb\tIf" + ss.str() + "_end\n";
+                param.tmpText.back() += "If" + ss.str() + "_else:\n";
+            }else if(ifTogStack.back() == 2){
+                param.tmpText.back() += "If" + ss.str() + "_end:\n";
+            }
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
 	return true;
 }
 bool pro32(ASTNode *, GenParam &){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() >= 1){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
 	return true;
 }
 bool gen33(ASTNode *, GenParam &param){
@@ -465,9 +624,34 @@ bool gen33(ASTNode *, GenParam &param){
     // Clean
     param.dataStack.clear();
     regCount = 0;
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            ifTogStack.pop_back();
+            stringstream ss;
+            ss << ifStack.back();
+            if(ifTogStack.back() == 1){
+                param.tmpText.back() += "\tb\tIf" + ss.str() + "_end\n";
+                param.tmpText.back() += "If" + ss.str() + "_else:\n";
+            }else if(ifTogStack.back() == 2){
+                param.tmpText.back() += "If" + ss.str() + "_end:\n";
+            }
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
 	return true;
 }
 bool pro33(ASTNode *, GenParam &){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() >= 1){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
 	return true;
 }
 bool gen34(ASTNode *, GenParam &param){
@@ -502,10 +686,50 @@ bool gen34(ASTNode *, GenParam &param){
 bool pro34(ASTNode *, GenParam &){
 	return true;
 }
-bool gen35(ASTNode *, GenParam &){
+bool gen35(ASTNode *, GenParam &param){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == -1){
+            stringstream ss;
+            ss << ifStack.back();
+            param.tmpText.back() += "\tbeqz\t" + param.dataStack.back().id +",\tIf" + ss.str() + "_else\n";
+            ifTogStack.pop_back();
+            ++ifTogStack.back();
+        }else if(ifTogStack.back() < -1){
+            ++ifTogStack.back();
+        }
+    }
+    // While
+    if(whileTogStack.size() > 0){
+        if(whileTogStack.back() == -1){
+            stringstream ss;
+            ss << whileStack.back();
+            param.tmpText.back() += "\tbeqz\t" + param.dataStack.back().id +",\tWhile" + ss.str() + "_end\n";
+            whileTogStack.pop_back();
+            ++whileTogStack.back();
+        }else if(whileTogStack.back() < -1){
+            ++whileTogStack.back();
+        }
+    }
 	return true;
 }
 bool pro35(ASTNode *, GenParam &){
+    // If
+    if(ifTogStack.size() > 0){
+        if(ifTogStack.back() == 0){
+            ifTogStack.push_back(-1);
+        }else if(ifTogStack.back() < 0){
+            --ifTogStack.back();
+        }
+    }
+    // While
+    if(whileTogStack.size() > 0){
+        if(whileTogStack.back() == 0){
+            whileTogStack.push_back(-1);
+        }else if(whileTogStack.back() < 0){
+            --whileTogStack.back();
+        }
+    }
 	return true;
 }
 bool gen36(ASTNode *, GenParam &param){

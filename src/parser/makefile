@@ -12,4 +12,3 @@ all: build
 	$(CXX) $(CFLAGS) -c -o $@ $<
 
 build: $(foreach OBJ,$(OBJS),$(OBJ).o)
-	

@@ -72,4 +72,5 @@ bool rule64(ParserParam &param);
 bool rule65(ParserParam &param);
 bool rule66(ParserParam &param);
 bool rule67(ParserParam &param);
+bool rule68(ParserParam &param);
 #endif
