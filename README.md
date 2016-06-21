@@ -1,15 +1,21 @@
 # Arc
 A Rambling Compiler
 
-### Build
+### Compile
 
-Build Arc compiler
-    
-    make arc
-
-Build Luison compiler template generator
-    
-    make luison
+Go to "build" directory 
+	
+	cd build
+	
+Configure with CMake
+	
+	cmake ..
+	
+Compile with make
+	
+	make
+	
+###
     
 ### Usage
 
