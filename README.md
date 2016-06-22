@@ -1,6 +1,12 @@
 # Arc
 A Rambling Compiler
 
+### Prerequisite
+
+g++ >= 4.9
+
+cmake >= 2.8
+
 ### Compile
 
 Go to "build" directory 
