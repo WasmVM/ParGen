@@ -1,5 +1,5 @@
-#ifndef WASMVM_PP_UTIL_DEF
-#define WASMVM_PP_UTIL_DEF
+#ifndef Luison_UTIL_DEF
+#define Luison_UTIL_DEF
 
 #include <algorithm>
 #include <functional>
