@@ -2,9 +2,9 @@
 <pxml>
     <tokens namespace="TokenType">
         <head>
-            #include <string>
-            #include <cstddef>
-            #include <unordered_set>
+            #include &lt;string&gt;
+            #include &lt;cstddef&gt;
+            #include &lt;unordered_set&gt;
         </head>
         <token name="HeaderName" access="cast">
             <type>std::string</type>
@@ -31,7 +31,7 @@
         </token>
         <token name="NewLine" />
         <class name="PPToken">
-            <decl>std::unordered_set<std::string> expanded;</decl>
+            <decl>std::unordered_set&lt;std::string&gt; expanded;</decl>
             <decl>bool skipped = false;</decl>
         </class>
     </tokens>
