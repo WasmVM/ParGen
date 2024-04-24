@@ -1,0 +1,4 @@
+<!DOCTYPE pxml>
+<pxml namespace="WasmVM::PP">
+    <include src="token.pxml"/>
+</pxml>

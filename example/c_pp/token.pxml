@@ -1,0 +1,38 @@
+<!DOCTYPE pxml>
+<pxml>
+    <tokens namespace="TokenType">
+        <head>
+            #include <string>
+            #include <cstddef>
+            #include <unordered_set>
+        </head>
+        <token name="HeaderName" access="cast">
+            <type>std::string</type>
+        </token>
+        <token name="Identifier" access="cast">
+            <type>std::string</type>
+        </token>
+        <token name="Number" access="get">
+            <type>double</type>
+            <type>intmax_t</type>
+            <type>uintmax_t</type>
+        </token>
+        <token name="Character" access="get">
+            <type>int</type>
+            <type>wchar_t</type>
+            <type>char16_t</type>
+            <type>char32_t</type>
+        </token>
+        <token name="String" access="get">
+            <type>std::string</type>
+            <type>std::u8string</type>
+            <type>std::wstring</type>
+            <type>std::u16string</type>
+        </token>
+        <token name="NewLine" />
+        <class name="PPToken">
+            <decl>std::unordered_set<std::string> expanded;</decl>
+            <decl>bool skipped = false;</decl>
+        </class>
+    </tokens>
+</pxml>
