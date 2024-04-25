@@ -12,3 +12,4 @@ endif(CONSOLE_COLOR)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/src/include)
 add_subdirectory(src)
+

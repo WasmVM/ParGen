@@ -1,8 +1,8 @@
-add_library(pxml OBJECT
+add_library(luison
   Pxml.cpp
+  exception.cpp
 )
 
-add_library(luison
-  $<TARGET_OBJECTS:pxml>
-  exception.cpp
+add_dependencies(luison
+  pxml
 )
