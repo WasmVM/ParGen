@@ -39,14 +39,14 @@
 %token DOCTYPE EQUAL CLOSE INLINE
 %token <bool> BOOL
 %token <double> NUMBER
-%token <std::string> TAG TAIL STRING CHAR ID ENTITY SPACE
+%token <std::string> TAG TAIL STRING TEXT ID ENTITY SPACE
 %token END 0
 
 %%
 
 %start  pxml;
 
-pxml :  DOCTYPE spaces element spaces END   {std::cout << "pxml" << std::endl;}
+pxml :  DOCTYPE spaces element spaces END   {std::cout << "content.element" << std::endl;}
 
 content :   element {std::cout << "content.element" << std::endl;}
     |       text    {std::cout << "content.text" << std::endl;}
@@ -61,7 +61,7 @@ element :   TAG attr_list CLOSE body TAIL     {std::cout << "element.CLOSE" << s
 spaces :    spaces SPACE   {std::cout << "spaces.SPACE" << std::endl;}
     |       %empty          {std::cout << "spaces.EMPTY" << std::endl;}
 
-text :  CHAR    {std::cout << "text.CHAR" << std::endl;}
+text :  TEXT    {std::cout << "text.TEXT" << std::endl;}
     |   ENTITY  {std::cout << "text.ENTITY" << std::endl;}
     |   SPACE   {std::cout << "text.SPACE" << std::endl;}
 
