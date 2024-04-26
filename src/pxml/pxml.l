@@ -4,56 +4,57 @@
 
 #define YY_DECL yy::parser::symbol_type Lexer::lex()
 
-#define yyterminate() return yy::parser::make_END(location_t(pos));
+#define yyterminate() return yy::parser::make_END(location_t(pos))
 
 %}
 
 %option noyywrap c++ nounput noinput batch yylineno
 %option outfile="pxml_lexer.cpp"
 
-%x Tag TagName String StrEscape
+%x Tag String StrEscape TagTail
 
 %%
 
-\<!(?i:DOCTYPE).*\>             { std::cout << "DOCTYPE"; }
+\<!(?i:DOCTYPE).*\>     { pos.line += 1; pos.column = 1; return yy::parser::make_DOCTYPE(loc()); }
 
-<TagName>\/[[:alpha:]][[:alnum:]]*[ \t\v\r\n]*\>    { std::cout << "Tail " << YYText() << std::endl; BEGIN(INITIAL);}
-<TagName>[[:alpha:]][[:alnum:]]*                    { std::cout << "Tag " << YYText() << std::endl; BEGIN(Tag);}
+\<\/[[:alpha:]][[:alnum:]]*     { yymore(); BEGIN(TagTail); }
+<TagTail>[\n]                   { pos.line += 1; pos.column = 1; }
+<TagTail>[[:space:]\t\v\r]      {}
+<TagTail>\>                     { BEGIN(INITIAL); return yy::parser::make_TAIL(YYText(), loc()); }
 
-<Tag>[ \t\v\r\n]                {}
-<Tag>\/?\>                      { BEGIN(INITIAL); }
+\<[[:alnum:]]*                  { BEGIN(Tag); return yy::parser::make_TAG(YYText(), loc()); }
+<Tag>[\n]                       { pos.line += 1; pos.column = 1; }
+<Tag>[[:space:]\t\v\r]          {}
+<Tag>\/\>                       { BEGIN(INITIAL); return yy::parser::make_INLINE(loc());}
+<Tag>\>                         { BEGIN(INITIAL); return yy::parser::make_CLOSE(loc());}
 <Tag>\"                         { yymore(); BEGIN(String); }
-<Tag>=                          { std::cout << "Equal"<< std::endl; }
+<Tag>=                          { return yy::parser::make_EQUAL(loc()); }
 
-<Tag>("true"|"false")           { std::cout << "Bool " << YYText() << std::endl; }
-<Tag>[[:alpha:]][[:alnum:]]*    { std::cout << "ID " << YYText() << std::endl; }
-<Tag>[0-9\-]+(\.[0-9]*)?([eE][+\-]?[0-9]+)?  { std::cout << "Number " << YYText() << std::endl; }
+<Tag>("true"|"false")           { return yy::parser::make_BOOL(std::string(YYText()) == "true", loc()); }
+<Tag>[[:alpha:]][[:alnum:]]*    { return yy::parser::make_ID(YYText(), loc()); }
+<Tag>[0-9\-]+(\.[0-9]*)?([eE][+\-]?[0-9]+)?  { return yy::parser::make_NUMBER(std::stod(YYText()), loc()); }
 
 <String>\\                      { yymore(); BEGIN(StrEscape); }
-<String>\"                      { std::cout << "String " << YYText() << std::endl; BEGIN(Tag); }
+<String>\"                      { BEGIN(Tag); return yy::parser::make_STRING(YYText(), loc()); }
 <String>.                       { yymore(); }
 <StrEscape>.                    { yymore(); BEGIN(String); }
 
-\<                                  { BEGIN(TagName); }
-[ \t\v\r]+                          { std::cout << " "; }
-[\n]+                               { std::cout << std::endl; }
-&("amp"|"lt"|"gt"|"apos"|"quot");   { std::cout << "Entity " << YYText() << std::endl;}
-.                                   { std::cout << "Char " << YYText() << std::endl; }
+[\n]                                { pos.line += 1; pos.column = 1; return yy::parser::make_SPACE(YYText(), loc());}
+[[:space:]\t\v\r]+                  { return yy::parser::make_SPACE(YYText(), loc()); }
+&("amp"|"lt"|"gt"|"apos"|"quot");   { return yy::parser::make_ENTITY(YYText(), loc()); }
+<<EOF>>                             { yyterminate(); }
+.                                   { return yy::parser::make_CHAR(YYText(), loc()); }
 
 %%
 
-void Lexer::update_pos(){
-    pos.line = lineno();
+location_t Lexer::loc(){
+    position_t old = pos;
     pos.column += YYLeng();
+    return location_t(old, pos);
 }
 
-Lexer::Lexer(std::filesystem::path path) : yyFlexLexer(stream, std::cout){
+Lexer::Lexer(std::filesystem::path path, std::istream& stream) : yyFlexLexer(stream, std::cout){
     pos.path = path;
-    stream.open(path);
-}
-
-Lexer::~Lexer(){
-    stream.close();
 }
 
 int yyFlexLexer::yylex(){

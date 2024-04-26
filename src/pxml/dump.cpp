@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <iostream>
+#include <fstream>
+#include <exception.hpp>
 #include <Parser.hpp>
 
 int main(int argc, char* argv[]){
@@ -23,6 +25,10 @@ int main(int argc, char* argv[]){
     }
 
     PXML::Parser parser;
-    parser.parse(argv[1]);
+    try {
+        parser.parse(argv[1]);
+    }catch(Exception::Exception ex){
+        std::cerr << ex.what() << std::endl;
+    }
     return 0;
 }

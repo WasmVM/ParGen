@@ -1,16 +1,14 @@
 #ifndef Luison_pxml_Lexer_DEF
 #define Luison_pxml_Lexer_DEF
 
-#include <fstream>
+#include <iostream>
 #include <filesystem>
 
 struct Lexer : public yyFlexLexer {
-    Lexer(std::filesystem::path path);
-    ~Lexer();
+    Lexer(std::filesystem::path path, std::istream& stream);
     yy::parser::symbol_type lex();
-    void update_pos();
+    location_t loc();
 private:
-    std::ifstream stream;
     position_t pos;
 };
 

@@ -21,9 +21,11 @@
         std::filesystem::path path = "";
         size_t line = 1;
         size_t column = 1;
+        position_t operator+ (size_t);
     };
     struct location_t {
         location_t(position_t pos = position_t()) : begin(pos), end(pos){}
+        location_t(position_t begin, position_t end) : begin(begin), end(end){}
         position_t begin, end;
     };
 }
@@ -34,35 +36,44 @@
     #define yylex() lexer.lex()
 }
 
-%token DOCTYPE EQUAL
+%token DOCTYPE EQUAL CLOSE INLINE
 %token <bool> BOOL
 %token <double> NUMBER
-%token <std::string> TAG TAIL STRING CHAR ID
+%token <std::string> TAG TAIL STRING CHAR ID ENTITY SPACE
 %token END 0
 
 %%
 
-%start pxml;
+%start  pxml;
 
-pxml :  DOCTYPE element
+pxml :  DOCTYPE spaces element spaces END   {std::cout << "pxml" << std::endl;}
 
-body :  element
-    |   text
+content :   element {std::cout << "content.element" << std::endl;}
+    |       text    {std::cout << "content.text" << std::endl;}
 
-element :   TAG attr_list body TAIL
+body :  body content        {std::cout << "body.content" << std::endl;}
+    |   %empty              {std::cout << "body.EMPTY" << std::endl;}
 
-text : text CHAR
-    |   %empty
+element :   TAG attr_list CLOSE body TAIL     {std::cout << "element.CLOSE" << std::endl;}
+    |       TAG attr_list INLINE              {std::cout << "element.INLINE" << std::endl;}
 
-attr_list : attr_list attribute
-    |   %empty
 
-attribute : ID EQUAL value
-    |       ID
+spaces :    spaces SPACE   {std::cout << "spaces.SPACE" << std::endl;}
+    |       %empty          {std::cout << "spaces.EMPTY" << std::endl;}
 
-value : BOOL
-    |   NUMBER
-    |   STRING
+text :  CHAR    {std::cout << "text.CHAR" << std::endl;}
+    |   ENTITY  {std::cout << "text.ENTITY" << std::endl;}
+    |   SPACE   {std::cout << "text.SPACE" << std::endl;}
+
+attr_list : attr_list attribute {std::cout << "attr_list" << std::endl;}
+    |       %empty  {std::cout << "attr_list.EMPTY" << std::endl;}
+
+attribute : ID EQUAL value  {std::cout << "attribute.ID = value" << std::endl;}
+    |       ID  {std::cout << "attribute.ID" << std::endl;}
+
+value : BOOL    {std::cout << "value.Bool" << std::endl;}
+    |   NUMBER  {std::cout << "value.Number" << std::endl;}
+    |   STRING  {std::cout << "value.String" << std::endl;}
 
 %%
 
@@ -70,6 +81,12 @@ value : BOOL
 
 void yy::parser::error(location_t const& loc, std::string const& msg){
     std::stringstream ss;
-    ss << loc.begin.path.string() << ":" << loc.begin.line << ":" << loc.begin.column << " error: " << msg;
+    ss << loc.begin.path.filename().string() << ":" << loc.begin.line << ":" << loc.begin.column << " error: " << msg;
     throw Exception::Exception(ss.str());
+}
+
+position_t position_t::operator+ (size_t value){
+    position_t res(*this);
+    res.column += value;
+    return res;
 }

@@ -21,7 +21,9 @@
 using namespace PXML;
 
 void PXML::Parser::parse(std::filesystem::path pxml_file){
-    Lexer lexer(pxml_file);
+    std::ifstream stream(pxml_file);
+    Lexer lexer(pxml_file, stream);
     yy::parser parser(lexer, pxml);
     int res = parser();
+    stream.close();
 }
