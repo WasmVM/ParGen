@@ -6,6 +6,7 @@
 #include <variant>
 #include <vector>
 #include <unordered_map>
+#include <filesystem>
 
 namespace PXML {
 
@@ -15,6 +16,11 @@ struct Pxml : std::unordered_map<std::string, Value>{
     using Child = std::variant<std::string, Pxml>;
     std::string tag;
     std::vector<Child> children;
+};
+
+struct Parser {
+    void parse(std::filesystem::path pxml_file);
+    Pxml pxml;
 };
 
 } // namespace PXML

@@ -15,7 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <exception.hpp>
-#include <Parser.hpp>
+#include <Pxml.hpp>
 
 int main(int argc, char* argv[]){
 
@@ -24,8 +24,8 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-    PXML::Parser parser;
     try {
+        PXML::Parser parser;
         parser.parse(argv[1]);
     }catch(Exception::Exception ex){
         std::cerr << ex.what() << std::endl;

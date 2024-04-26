@@ -12,4 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <fstream>
 #include <Pxml.hpp>
+#include <pxml_parser.hpp>
+#include <Lexer.hpp>
+
+void PXML::Parser::parse(std::filesystem::path pxml_file){
+    // Parse pxml file
+    std::ifstream stream(pxml_file);
+    Lexer lexer(pxml_file, stream);
+    yy::parser parser(lexer, pxml);
+    int res = parser();
+    stream.close();
+    // Parse pxml tree to lexer & parser
+}
