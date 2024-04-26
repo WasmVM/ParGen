@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <fstream>
 #include <iostream>
 #include <Parser.hpp>
+#include <pxml_parser.hpp>
+#include <Lexer.hpp>
 
-int main(int argc, char* argv[]){
+using namespace PXML;
 
-    if(argc < 2){
-        std::cerr << "error: no input file" << std::endl;
-        return -1;
-    }
-
-    PXML::Parser parser;
-    parser.parse(argv[1]);
-    return 0;
+void PXML::Parser::parse(std::filesystem::path pxml_file){
+    Lexer lexer(pxml_file);
+    yy::parser parser(lexer, pxml);
+    int res = parser();
 }
