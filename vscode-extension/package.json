@@ -1,0 +1,40 @@
+{
+  "name": "parserxml",
+  "displayName": "ParserXML",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "repository": "https://github.com/LuisHsu/Luison",
+  "scripts": {
+    "build": "vsce package"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "parserxml",
+        "aliases": [
+          "ParserXML"
+        ],
+        "extensions": [
+          ".pxml"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "parserxml",
+        "scopeName": "source.pxml",
+        "path": "./syntaxes/parserxml.tmLanguage.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.2"
+  }
+}

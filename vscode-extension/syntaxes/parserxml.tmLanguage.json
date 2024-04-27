@@ -1,0 +1,89 @@
+{
+	"name": "ParserXML",
+	"patterns": [
+		{
+			"name": "support.constant",
+			"match": "<!(?i:DOCTYPE).*>"
+		},
+		{
+			"begin": "(<(?i:head|type|member))((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
+			"end": "(<\/(?i:head|type|member))((\\{%.*%\\}|[^>])*)(>)",
+			"beginCaptures" : {
+				"1": {"name": "entity.name.tag"},
+				"2": {"patterns": [
+					{"include": "#strings"},
+					{"include": "#bools"},
+					{"include": "#numbers"},
+					{"include": "#attribute"},
+					{"include": "#comment"}
+				]},
+				"5": {"name": "entity.name.tag"}
+			},
+			"endCaptures" : {
+				"1": {"name": "entity.name.tag"},
+				"2": {"patterns": [
+					{"include": "#comment"}
+				]},
+				"4": {"name": "entity.name.tag"}
+			},
+			"patterns": [
+				{"include": "source.cpp"}
+			]
+		},
+		{
+			"begin": "(<\\w+)((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
+			"end": "(<\/\\w+)((\\{%.*%\\}|[^>])*)(>)",
+			"beginCaptures" : {
+				"1": {"name": "entity.name.tag"},
+				"2": {"patterns": [
+					{"include": "#strings"},
+					{"include": "#bools"},
+					{"include": "#numbers"},
+					{"include": "#attribute"},
+					{"include": "#comment"}
+				]},
+				"5": {"name": "entity.name.tag"}
+			},
+			"endCaptures" : {
+				"1": {"name": "entity.name.tag"},
+				"2": {"patterns": [
+					{"include": "#comment"}
+				]},
+				"4": {"name": "entity.name.tag"}
+			},
+			"patterns": [
+				{"include": "$self"}
+			]
+		},
+		{
+			"name": "constant.character",
+			"match": "&(amp|lt|gt|apos|quot);"
+		},
+		{"include": "#comment"}
+	],
+	"repository": {
+		"comment": {
+			"name": "comment.block",
+			"begin": "{%",
+			"end": "%}"
+		},
+		"strings": {
+			"name": "string.quoted.double",
+			"begin": "\"",
+			"end": "\""
+		},
+		"bools": {
+			"name": "constant.language",
+			"match": "(true|false)"
+		},
+		"numbers": {
+			"name": "constant.numeric",
+			"match": "[0-9\\-]+(\\.[0-9]*)?([eE][+\\-]?[0-9]+)?"
+		},
+		"attribute": {
+			"name": "entity.other.attribute-name",
+			"match": "[a-zA-Z_][0-9a-zA-Z_]*"
+		}
+	},
+	"scopeName": "source.pxml"
+}
