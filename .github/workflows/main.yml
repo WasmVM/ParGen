@@ -20,24 +20,18 @@ jobs:
             c_compiler: gcc
             cpp_compiler: g++
             parallel: 6
-            pkg_manager: sudo apt-get update && sudo apt-get
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
             parallel: 6
-            pkg_manager: sudo apt-get update && sudo apt-get
           - os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
             parallel: 6
-            pkg_manager: brew update && brew
           - os: macos-14
             c_compiler: clang
             cpp_compiler: clang++
             parallel: 4
-            pkg_manager: brew update && brew
-          - os: windows-latest
-            pkg_manager: choco
         exclude:
           - os: macos-latest
             c_compiler: gcc
@@ -53,7 +47,10 @@ jobs:
       run: echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
     - name: Install Flex & bison
-      run: ${{ matrix.pkg_manager }} install flex bison
+      run: >
+        wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
+        tar -zxf flex-2.6.4.tar.gz
+        cd flex-2.6.4 && ./configure && sudo make installl
 
     - name: Configure CMake
       run: >

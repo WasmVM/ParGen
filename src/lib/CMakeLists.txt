@@ -8,14 +8,17 @@ BISON_TARGET(pxml_parser ${PROJECT_SOURCE_DIR}/src/pxml/pxml.y ${CMAKE_CURRENT_B
   DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/pxml_parser.hpp
 )
 
-FLEX_TARGET(pxml_lexer ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp)
-ADD_FLEX_BISON_DEPENDENCY(pxml_lexer pxml_parser)
+add_custom_command(OUTPUT pxml_lexer.cpp
+  COMMAND flex -o ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l 
+  DEPENDS pxml_parser
+)
+message(${FLEX_FOUND})
 
 add_library(pxml
   Pxml.cpp
   exception.cpp
   ${BISON_pxml_parser_OUTPUTS}
-  ${FLEX_pxml_lexer_OUTPUTS}
+  ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp
 )
 
 add_library(pargen
