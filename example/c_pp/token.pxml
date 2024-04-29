@@ -3,11 +3,11 @@
     {% token definition %}
     <tokens class="PPToken" namespace="TokenType">
         {% header file definitions %}
-        <head>
+        <header>
             #include \<string>;
             #include \<cstddef>;
             #include \<unordered_set>;
-        </head>
+        </header>
         {% tokens %}
         <token name="HeaderName" access="cast">
             <type>std::string</type>
