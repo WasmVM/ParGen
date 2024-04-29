@@ -109,7 +109,7 @@ attribute : ID EQUAL value  { $$.first = $1; $$.second = $3; }
 
 value : BOOL    { $$.emplace<bool>($1); }
     |   NUMBER  { $$.emplace<double>($1); }
-    |   STRING  { $$.emplace<std::string>($1); }
+    |   STRING  { $$.emplace<std::string>($1.substr(1, $1.size() - 2)); }
 
 %%
 

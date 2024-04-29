@@ -47,15 +47,23 @@ int main(int argc, const char* argv[]){
 
     // Run
     try{
-
         // Check pxml_file existance
         if(!args["pxml_file"]){
             throw Exception::Exception("no main pxml file");
         }
         std::filesystem::path pxml_file = std::get<std::string>(args["pxml_file"].value());
         // Create ParGen
-        Pargen::ParGen pargen(pxml_file);
-
+        Pargen::ParGen pargen;
+        pargen.includes.emplace_front(pxml_file.parent_path());
+        if(args["includes"]){
+            std::vector<std::string> includes = std::get<std::vector<std::string>>(args["includes"].value());
+            for(std::string inc : includes){
+                pargen.includes.emplace_back(inc);
+            }
+        }
+        // Init
+        pargen.init(pxml_file);
+        
     }catch(Exception::Exception &e){
         std::cerr << args.program.filename().string() << ": " COLOR_Error ": " << e.what() << std::endl;
         return -1;

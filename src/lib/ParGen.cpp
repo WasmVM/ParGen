@@ -14,11 +14,14 @@
 
 #include <ParGen.hpp>
 
+#include <iostream>
 #include <exception.hpp>
 
 using namespace Pargen;
 
-ParGen::ParGen(std::filesystem::path pxml_path){
+void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesystem::path>& includes, std::list<PXML::Pxml::Child>::iterator& pxml_pos);
+
+void ParGen::init(std::filesystem::path pxml_path){
     // Parse pxml file
     PXML::Parser pxml_parser;
     pxml_parser.parse(pxml_path);
@@ -37,16 +40,16 @@ ParGen::ParGen(std::filesystem::path pxml_path){
         }
     }
     // children
-    for(PXML::Pxml::Child child : pxml.children){
-        if(std::holds_alternative<std::string>(child)){
-            throw Exception::Exception("children of root <pxml> should be element");
-        }
-        PXML::Pxml& child_pxml = std::get<PXML::Pxml>(child);
-        if(child_pxml.tag == "include"){
-            
-        }else{
-            throw Exception::Exception("invalid element under <pxml>");
+    for(auto child_it = pxml.children.begin(); child_it != pxml.children.end(); ++child_it){
+        if(std::holds_alternative<PXML::Pxml>(*child_it)){
+            PXML::Pxml& child_pxml = std::get<PXML::Pxml>(*child_it);
+            if(child_pxml.tag == "include"){
+                elem_include(pxml, child_pxml, includes, child_it);
+            }else if(child_pxml.tag == "tokens"){
+                // TODO:
+            }else{
+                throw Exception::Exception("invalid element under <pxml>");
+            }
         }
     }
-
 }

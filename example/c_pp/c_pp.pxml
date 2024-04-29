@@ -1,6 +1,5 @@
 <!DOCTYPE pxml>
-<pxml namespace="WasmVM::PP" test>
-    <include src="token.pxml"/>
-    a
-    &amp;
+<pxml namespace="WasmVM::PP" >
+    {% token definition %}
+    <include src="token.pxml" />
 </pxml>

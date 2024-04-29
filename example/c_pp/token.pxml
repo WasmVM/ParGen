@@ -1,11 +1,14 @@
 <!DOCTYPE pxml>
 <pxml>
+    {% token definition %}
     <tokens class="PPToken" namespace="TokenType">
+        {% header file definitions %}
         <head>
-            #include &lt;string&gt;
-            #include &lt;cstddef&gt;
-            #include &lt;unordered_set&gt;
+            #include \<string>;
+            #include \<cstddef>;
+            #include \<unordered_set>;
         </head>
+        {% tokens %}
         <token name="HeaderName" access="cast">
             <type>std::string</type>
         </token>
@@ -30,8 +33,9 @@
             <type>std::u16string</type>
         </token>
         <token name="NewLine" />
+        {% Token class member %}
         <member>
-            std::unordered_set&lt;std::string&gt; expanded;
+            std::unordered_set\<std::string>; expanded;
             bool skipped = false;
         </member>
     </tokens>

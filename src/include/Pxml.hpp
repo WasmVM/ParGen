@@ -4,7 +4,7 @@
 #include <string>
 #include <optional>
 #include <variant>
-#include <vector>
+#include <list>
 #include <unordered_map>
 #include <filesystem>
 
@@ -15,7 +15,7 @@ using Value = std::variant<std::monostate, bool, std::string, double>;
 struct Pxml : std::unordered_map<std::string, Value>{
     using Child = std::variant<std::string, Pxml>;
     std::string tag;
-    std::vector<Child> children;
+    std::list<Child> children;
 };
 
 struct Parser {
