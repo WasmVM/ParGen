@@ -17,8 +17,8 @@
 #include "color.hpp"
 #include "CommandParser.hpp"
 
-#ifndef LUISON_VERSION
-#define LUISON_VERSION "dev"
+#ifndef PARGEN_VERSION
+#define PARGEN_VERSION "dev"
 #endif
 
 int main(int argc, const char* argv[]){
@@ -29,12 +29,12 @@ int main(int argc, const char* argv[]){
         CommandParser::Repeated("--includes", "Add directory to include files search list", 1, "-I"),
         CommandParser::Fixed("input_file", "Path of main PXML file", (unsigned int)-1)
     },
-        "luison-lex : Lexer generator of Luison"
+        "pargen : lexer and parser generator"
     );
 
     // Show version only
     if(args["version"]){
-        std::cout << "luison-lex version " << LUISON_VERSION << std::endl;
+        std::cout << "pargen version " << PARGEN_VERSION << std::endl;
         return 0;
     }
 

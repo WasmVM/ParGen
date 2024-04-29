@@ -1,10 +1,11 @@
-add_executable(luison-lex
+add_executable(pargen-exec
   lex.cpp
   CommandParser.cpp
 )
-target_link_libraries(luison-lex
-  luison
+target_link_libraries(pargen-exec
+  pargen
 )
-target_compile_definitions(luison-lex PUBLIC
-  LUISON_VERSION="${CMAKE_PROJECT_VERSION}"
+set_target_properties(pargen-exec PROPERTIES OUTPUT_NAME "pargen")
+target_compile_definitions(pargen PUBLIC
+  PARGEN_VERSION="${CMAKE_PROJECT_VERSION}"
 )

@@ -1,5 +1,5 @@
-#ifndef Luison_EXCEPTION_DEF
-#define Luison_EXCEPTION_DEF
+#ifndef ParGen_EXCEPTION_DEF
+#define ParGen_EXCEPTION_DEF
 
 #include <ostream>
 #include <exception>

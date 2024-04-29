@@ -1,5 +1,5 @@
-#ifndef LUISON_CommandParser_DEF
-#define LUISON_CommandParser_DEF
+#ifndef ParGen_CommandParser_DEF
+#define ParGen_CommandParser_DEF
 
 #include <string>
 #include <vector>

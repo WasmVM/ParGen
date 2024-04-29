@@ -1,5 +1,5 @@
-#ifndef LUISON_COLOR_DEF
-#define LUISON_COLOR_DEF
+#ifndef ParGen_COLOR_DEF
+#define ParGen_COLOR_DEF
 
 #ifdef CONSOLE_COLOR
     #define COLOR_Warning "\033[1;33mwarning\033[0m"

@@ -11,7 +11,7 @@ add_custom_command(OUTPUT pxml_lexer.cpp
   DEPENDS ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l pxml_parser.cpp
 )
 
-add_library(luison
+add_library(pargen
   Pxml.cpp
   exception.cpp
   pxml_parser.cpp

@@ -6,7 +6,7 @@
   "engines": {
     "vscode": "^1.88.0"
   },
-  "repository": "https://github.com/LuisHsu/Luison",
+  "repository": "https://github.com/LuisHsu/ParGen",
   "scripts": {
     "build": "vsce package"
   },

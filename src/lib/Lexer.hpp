@@ -1,5 +1,5 @@
-#ifndef Luison_pxml_Lexer_DEF
-#define Luison_pxml_Lexer_DEF
+#ifndef ParGen_pxml_Lexer_DEF
+#define ParGen_pxml_Lexer_DEF
 
 #include <iostream>
 #include <filesystem>

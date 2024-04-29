@@ -1,5 +1,5 @@
-#ifndef Luison_UTIL_DEF
-#define Luison_UTIL_DEF
+#ifndef ParGen_UTIL_DEF
+#define ParGen_UTIL_DEF
 
 #include <algorithm>
 #include <functional>

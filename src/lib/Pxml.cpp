@@ -16,6 +16,7 @@
 #include <Pxml.hpp>
 #include <pxml_parser.hpp>
 #include <Lexer.hpp>
+#include <exception.hpp>
 
 void PXML::Parser::parse(std::filesystem::path pxml_file){
     // Parse pxml file
@@ -24,6 +25,12 @@ void PXML::Parser::parse(std::filesystem::path pxml_file){
     yy::parser parser(lexer, pxml);
     parser();
     stream.close();
+
     // Parse pxml tree
-    
+    if(pxml.tag != "pxml"){
+        throw Exception::Exception("the root element should be <pxml>");
+    }
+    for(Pxml::Child child : pxml.children){
+        
+    }
 }
