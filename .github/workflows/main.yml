@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
+        os: [ubuntu-latest, macos-latest, macos-14]
         build_type: [Release]
         c_compiler: [gcc, clang]
         include:
@@ -50,7 +50,7 @@ jobs:
       run: |
         wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
         tar -zxf flex-2.6.4.tar.gz
-        cd flex-2.6.4 && ./configure && sudo make installl
+        cd flex-2.6.4 && ./configure && sudo make install
 
     - name: Configure CMake
       run: >
@@ -63,6 +63,3 @@ jobs:
     - name: Build
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} -j ${{matrix.parallel}}
 
-    # - name: Test
-    #   working-directory: ${{ steps.strings.outputs.build-output-dir }}
-    #   run: ctest --output-on-failure --build-config ${{ matrix.build_type }}
