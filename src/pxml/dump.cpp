@@ -14,8 +14,64 @@
 
 #include <iostream>
 #include <fstream>
+#include <variant>
 #include <exception.hpp>
+#include <Util.hpp>
 #include <Pxml.hpp>
+
+using namespace PXML;
+
+struct indent {
+    static size_t level;
+    indent& operator++() {
+        level += 1;
+        return *this;
+    }
+    indent& operator--() {
+        if(level > 0){
+            level -= 1;
+        }
+        return *this;
+    }
+};
+size_t indent::level = 0;
+
+std::ostream& operator<< (std::ostream& os, indent in) {
+    return os << std::string(2 * in.level, ' ');
+}
+
+std::ostream& operator<< (std::ostream& os, Pxml& pxml){
+    os << "<" << pxml.tag;
+    for(auto attribute : pxml){
+        os << " " << attribute.first;
+        std::visit(overloaded {
+            [&](bool& value){
+                os << "=" << (value ? "true" : "false");
+            },
+            [&](std::string& value){
+                os << "=" << value;
+            },
+            [&](double& value){
+                os << "=" << value;
+            },
+            [](auto&){}
+        }, attribute.second);
+    }
+    if(pxml.children.empty()){
+        return os << " />";
+    }
+    os << ">";
+    ++indent();
+    for(Pxml::Child child : pxml.children){
+        std::visit(overloaded {
+            [&](auto& value){
+                os << value;
+            }
+        }, child);
+    }
+    --indent();
+    return os << "</" << pxml.tag << ">";
+}
 
 int main(int argc, char* argv[]){
 
@@ -27,6 +83,8 @@ int main(int argc, char* argv[]){
     try {
         PXML::Parser parser;
         parser.parse(argv[1]);
+
+        std::cout << parser.pxml << std::endl;
     }catch(Exception::Exception ex){
         std::cerr << ex.what() << std::endl;
     }

@@ -24,13 +24,13 @@
 <Comment>[\n]                   { pos.line += 1; pos.column = 1; }
 <Comment>[[:space:]\t\v\r]+     { loc(); }
 
-\<\/[[:alpha:]][[:alnum:]]+     { yymore(); BEGIN(TagTail); }
+\<\/[[:alpha:]][[:alnum:]]*     { yymore(); BEGIN(TagTail); }
 <TagTail>\{\%                   { loc(); yy_push_state(Comment); }
 <TagTail>[\n]                   { pos.line += 1; pos.column = 1; }
 <TagTail>[[:space:]\t\v\r]+     { loc(); }
 <TagTail>\>                     { BEGIN(INITIAL); return yy::parser::make_TAIL(YYText(), loc()); }
 
-\<[[:alnum:]]+                  { BEGIN(Tag); return yy::parser::make_TAG(YYText(), loc()); }
+\<[[:alnum:]]+                  { BEGIN(Tag); return yy::parser::make_TAG(std::string(YYText()).substr(1), loc()); }
 <Tag>\{\%                       { loc(); yy_push_state(Comment); }
 <Tag>[\n]                       { pos.line += 1; pos.column = 1; }
 <Tag>[[:space:]\t\v\r]+         { loc(); }

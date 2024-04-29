@@ -11,6 +11,8 @@
 %parse-param { Lexer& lexer }{ PXML::Pxml& pxml }
 
 %code requires {
+    #include <list>
+    #include <utility>
     #include <filesystem>
     #include <Pxml.hpp>
 #ifndef yyFlexLexerOnce
@@ -42,38 +44,72 @@
 %token <std::string> TAG TAIL STRING TEXT ID ENTITY SPACE
 %token END 0
 
+%type <PXML::Pxml> element
+%type <PXML::Value> value
+%type <std::string> text
+%type <PXML::Pxml::Child> content
+%type <std::list<PXML::Pxml::Child>> body
+%type <std::pair<std::string, PXML::Value>> attribute
+%type <std::list<std::pair<std::string, PXML::Value>>> attr_list
+
 %%
 
 %start  pxml;
 
-pxml :  DOCTYPE spaces element spaces END   {std::cout << "content.element" << std::endl;}
+pxml :  DOCTYPE spaces element spaces END   { pxml = $3; }
 
-content :   element {std::cout << "content.element" << std::endl;}
-    |       text    {std::cout << "content.text" << std::endl;}
+content :   element { $$ = $1; }
+    |       text    { $$ = $1; }
 
-body :  body content        {std::cout << "body.content" << std::endl;}
-    |   %empty              {std::cout << "body.EMPTY" << std::endl;}
+body :  body content        { $1.emplace_back($2); $$ = $1; }
+    |   %empty              {}
 
-element :   TAG attr_list CLOSE body TAIL     {std::cout << "element.CLOSE" << std::endl;}
-    |       TAG attr_list INLINE              {std::cout << "element.INLINE" << std::endl;}
+element :   TAG attr_list CLOSE body TAIL
+        {
+            $$.tag = $1;
+            for(auto attr_pair : $2){
+                $$[attr_pair.first] = attr_pair.second;
+            }
+            $$.children.insert($$.children.end(), $4.begin(), $4.end());
+        }
+    |       TAG attr_list INLINE
+        {
+            $$.tag = $1;
+            for(auto attr_pair : $2){
+                $$[attr_pair.first] = attr_pair.second;
+            }
+        }
 
 
-spaces :    spaces SPACE   {std::cout << "spaces.SPACE" << std::endl;}
-    |       %empty          {std::cout << "spaces.EMPTY" << std::endl;}
+spaces :    spaces SPACE
+    |       %empty
 
-text :  TEXT    {std::cout << "text.TEXT" << std::endl;}
-    |   ENTITY  {std::cout << "text.ENTITY" << std::endl;}
-    |   SPACE   {std::cout << "text.SPACE" << std::endl;}
+text :  TEXT    { $$ = $1; }
+    |   SPACE   { $$ = $1; }
+    |   ENTITY  
+        {
+            if($1 == "&amp;"){
+                $$ = "&";
+            }else if($1 == "&lt;"){
+                $$ = "<";
+            }else if($1 == "&gt;"){
+                $$ = ">";
+            }else if($1 == "&apos;"){
+                $$ = "'";
+            }else if($1 == "&quot;"){
+                $$ = "\"";
+            }
+        }
 
-attr_list : attr_list attribute {std::cout << "attr_list" << std::endl;}
-    |       %empty  {std::cout << "attr_list.EMPTY" << std::endl;}
+attr_list : attr_list attribute { $1.emplace_back($2); $$ = $1; }
+    |       %empty {}
 
-attribute : ID EQUAL value  {std::cout << "attribute.ID = value" << std::endl;}
-    |       ID  {std::cout << "attribute.ID" << std::endl;}
+attribute : ID EQUAL value  { $$.first = $1; $$.second = $3; }
+    |       ID  { $$.first = $1; }
 
-value : BOOL    {std::cout << "value.Bool" << std::endl;}
-    |   NUMBER  {std::cout << "value.Number" << std::endl;}
-    |   STRING  {std::cout << "value.String" << std::endl;}
+value : BOOL    { $$.emplace<bool>($1); }
+    |   NUMBER  { $$.emplace<double>($1); }
+    |   STRING  { $$.emplace<std::string>($1); }
 
 %%
 

@@ -22,7 +22,8 @@ void PXML::Parser::parse(std::filesystem::path pxml_file){
     std::ifstream stream(pxml_file);
     Lexer lexer(pxml_file, stream);
     yy::parser parser(lexer, pxml);
-    int res = parser();
+    parser();
     stream.close();
-    // Parse pxml tree to lexer & parser
+    // Parse pxml tree
+    
 }
