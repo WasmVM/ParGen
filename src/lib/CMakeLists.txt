@@ -1,21 +1,21 @@
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_custom_command(OUTPUT pxml_parser.cpp
-  COMMAND bison --header=${CMAKE_CURRENT_BINARY_DIR}/pxml_parser.hpp --output=${CMAKE_CURRENT_BINARY_DIR}/pxml_parser.cpp ${PROJECT_SOURCE_DIR}/src/pxml/pxml.y
-  DEPENDS ${PROJECT_SOURCE_DIR}/src/pxml/pxml.y
+find_package(BISON)
+find_package(FLEX)
+
+BISON_TARGET(pxml_parser ${PROJECT_SOURCE_DIR}/src/pxml/pxml.y ${CMAKE_CURRENT_BINARY_DIR}/pxml_parser.cpp
+  DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/pxml_parser.hpp
 )
 
-add_custom_command(OUTPUT pxml_lexer.cpp
-  COMMAND flex ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l
-  DEPENDS ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l pxml_parser.cpp
-)
+FLEX_TARGET(pxml_lexer ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp)
+ADD_FLEX_BISON_DEPENDENCY(pxml_lexer pxml_parser)
 
 add_library(pxml
   Pxml.cpp
   exception.cpp
-  pxml_parser.cpp
-  pxml_lexer.cpp
+  ${BISON_pxml_parser_OUTPUTS}
+  ${FLEX_pxml_lexer_OUTPUTS}
 )
 
 add_library(pargen

@@ -19,10 +19,10 @@
 
 \{\%                { loc(); yy_push_state(Comment); }                        
 <Comment>\%\}       { loc(); yy_pop_state(); }
-<Comment>[^%]+      { loc(); }
-<Comment>%          { loc(); }
 <Comment>[\n]                   { pos.line += 1; pos.column = 1; }
 <Comment>[[:space:]\t\v\r]+     { loc(); }
+<Comment>[^%]+      { loc(); }
+<Comment>%          { loc(); }
 
 \<\/[[:alpha:]][[:alnum:]]*     { yymore(); BEGIN(TagTail); }
 <TagTail>\{\%                   { loc(); yy_push_state(Comment); }
