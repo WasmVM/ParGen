@@ -12,7 +12,6 @@ add_custom_command(OUTPUT pxml_lexer.cpp
   COMMAND flex -o ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l 
   DEPENDS pxml_parser
 )
-message(${FLEX_FOUND})
 
 add_library(pxml
   Pxml.cpp
