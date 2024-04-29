@@ -18,6 +18,12 @@
 #include <Lexer.hpp>
 #include <exception.hpp>
 
+using namespace PXML;
+
+static void parse_include(PXML::Parser& pxml_parser, PXML::Pxml& pxml){
+    
+}
+
 void PXML::Parser::parse(std::filesystem::path pxml_file){
     // Parse pxml file
     std::ifstream stream(pxml_file);
@@ -25,12 +31,4 @@ void PXML::Parser::parse(std::filesystem::path pxml_file){
     yy::parser parser(lexer, pxml);
     parser();
     stream.close();
-
-    // Parse pxml tree
-    if(pxml.tag != "pxml"){
-        throw Exception::Exception("the root element should be <pxml>");
-    }
-    for(Pxml::Child child : pxml.children){
-        
-    }
 }

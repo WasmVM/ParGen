@@ -16,6 +16,7 @@
 #include <exception.hpp>
 #include "color.hpp"
 #include "CommandParser.hpp"
+#include <ParGen.hpp>
 
 #ifndef PARGEN_VERSION
 #define PARGEN_VERSION "dev"
@@ -26,8 +27,9 @@ int main(int argc, const char* argv[]){
     // Parse argv
     CommandParser args(argc, argv, {
         CommandParser::Optional("--version", "Show version", "-v"),
+        CommandParser::Optional("--namespace", "Override namespace of generated objects", 1, "-n"),
         CommandParser::Repeated("--includes", "Add directory to include files search list", 1, "-I"),
-        CommandParser::Fixed("input_file", "Path of main PXML file", (unsigned int)-1)
+        CommandParser::Fixed("pxml_file", "Path of main PXML file")
     },
         "pargen : lexer and parser generator"
     );
@@ -43,7 +45,16 @@ int main(int argc, const char* argv[]){
         std::cerr << COLOR_Warning ": " << message << std::endl;
     });
 
+    // Run
     try{
+
+        // Check pxml_file existance
+        if(!args["pxml_file"]){
+            throw Exception::Exception("no main pxml file");
+        }
+        std::filesystem::path pxml_file = std::get<std::string>(args["pxml_file"].value());
+        // Create ParGen
+        Pargen::ParGen pargen(pxml_file);
 
     }catch(Exception::Exception &e){
         std::cerr << args.program.filename().string() << ": " COLOR_Error ": " << e.what() << std::endl;
