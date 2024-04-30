@@ -1,12 +1,12 @@
 <!DOCTYPE pxml>
 <pxml>
     {% token definition %}
-    <tokens class="PPToken" namespace="TokenType">
+    <tokens class="PPToken" namespace="TokenType" headerFile="PPToken.hpp">
         {% header file definitions %}
-        <header>
-            #include \<string>;
-            #include \<cstddef>;
-            #include \<unordered_set>;
+        <header indent=0 position="top">
+            #include \<string>
+            #include \<cstddef>
+            #include \<unordered_set>
         </header>
         {% tokens %}
         <token name="HeaderName" access="cast">

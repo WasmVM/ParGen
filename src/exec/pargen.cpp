@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <iostream>
+#include <fstream>
 #include <exception.hpp>
 #include "color.hpp"
 #include "CommandParser.hpp"
@@ -63,6 +64,12 @@ int main(int argc, const char* argv[]){
         }
         // Init
         pargen.init(pxml_file);
+        // Generate token header
+        {
+            std::ofstream header_out(pargen.tokens.header_path, std::ios::trunc);
+            pargen.tokens.generate_header(header_out);
+            header_out.close();
+        }
         
     }catch(Exception::Exception &e){
         std::cerr << args.program.filename().string() << ": " COLOR_Error ": " << e.what() << std::endl;

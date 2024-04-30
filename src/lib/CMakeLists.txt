@@ -23,4 +23,5 @@ add_library(pxml
 add_library(pargen
   ParGen.cpp
   elements.cpp
+  tokens.cpp
 )

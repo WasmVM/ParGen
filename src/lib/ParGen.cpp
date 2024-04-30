@@ -20,6 +20,7 @@
 using namespace Pargen;
 
 void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesystem::path>& includes, std::list<PXML::Pxml::Child>::iterator& pxml_pos);
+void elem_tokens(ParGen& pargen, PXML::Pxml& pxml);
 
 void ParGen::init(std::filesystem::path pxml_path){
     // Parse pxml file
@@ -46,7 +47,7 @@ void ParGen::init(std::filesystem::path pxml_path){
             if(child_pxml.tag == "include"){
                 elem_include(pxml, child_pxml, includes, child_it);
             }else if(child_pxml.tag == "tokens"){
-                // TODO:
+                elem_tokens(*this, child_pxml);
             }else{
                 throw Exception::Exception("invalid element under <pxml>");
             }

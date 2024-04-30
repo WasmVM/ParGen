@@ -61,7 +61,15 @@ pxml :  DOCTYPE spaces element spaces END   { pxml = $3; }
 content :   element { $$ = $1; }
     |       text    { $$ = $1; }
 
-body :  body content        { $1.emplace_back($2); $$ = $1; }
+body :  body content
+        { 
+            if(!$1.empty() && std::holds_alternative<std::string>($1.back()) && std::holds_alternative<std::string>($2)){
+                std::get<std::string>($1.back()) += std::get<std::string>($2);
+            }else{
+                $1.emplace_back($2);
+            }
+            $$ = $1;
+        }
     |   %empty              {}
 
 element :   TAG attr_list CLOSE body TAIL
