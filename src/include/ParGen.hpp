@@ -13,7 +13,7 @@ struct Token {
     std::string name;
     std::vector<std::string> types;
     std::vector<std::string> members;
-    std::vector<std::string> funcs;
+    std::vector<std::string> functions;
 };
 
 struct ParGen;
@@ -27,6 +27,7 @@ struct Tokens : public std::list<Token> {
     std::string prologue;
     std::string epilogue;
     std::vector<std::string> members;
+    std::vector<std::string> functions;
 
     Tokens(ParGen& parent) : parent(parent){}
     void generate_header(std::ostream& output);

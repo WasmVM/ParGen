@@ -78,3 +78,7 @@ Define tokens
 
 * sourceFile : Path of output token source file
     - default : ``Token.cpp``
+
+**Children**
+
+``<header>``, ``<token>``, ``<member>``, ``<function>``, ``<source>``

@@ -104,21 +104,21 @@ std::pair<bool, std::string> elem_header(PXML::Pxml& pxml){
     return {insert_top, content};
 }
 
-std::string elem_func(PXML::Pxml& pxml){
+std::string elem_function(PXML::Pxml& pxml){
     // attributes
     int indent = 4;
     for(auto attribute : pxml){
         if(attribute.first == "indent"){
             indent = std::get<double>(attribute.second);
         }else{
-            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <func>");
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <function>");
         }
     }
     // Content
     std::string content;
     for(PXML::Pxml::Child child : pxml.children){
         if(std::holds_alternative<PXML::Pxml>(child)){
-            throw Exception::Exception("only texts are allowed in <func>");
+            throw Exception::Exception("only texts are allowed in <function>");
         }
         content += std::get<std::string>(child);
     }
@@ -187,8 +187,8 @@ Token elem_token(ParGen& pargen, PXML::Pxml& pxml){
                 token.types.emplace_back(elem_type(child_pxml));
             }else if(child_pxml.tag == "member"){
                 token.members.emplace_back(elem_member(child_pxml));
-            }else if(child_pxml.tag == "func"){
-                token.funcs.emplace_back(elem_func(child_pxml));
+            }else if(child_pxml.tag == "function"){
+                token.functions.emplace_back(elem_function(child_pxml));
             }else{
                 throw Exception::Exception("invalid element under <token>");
             }
@@ -229,8 +229,8 @@ void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
                 tokens.members.emplace_back(elem_member(child_pxml));
             }else if(child_pxml.tag == "source"){
                 // TODO:
-            }else if(child_pxml.tag == "func"){
-                // TODO:
+            }else if(child_pxml.tag == "function"){
+                tokens.functions.emplace_back(elem_function(child_pxml));
             }else{
                 throw Exception::Exception("invalid element under <tokens>");
             }

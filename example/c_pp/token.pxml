@@ -1,7 +1,7 @@
 <!DOCTYPE pxml>
 <pxml>
     {% token definition %}
-    <tokens class="PPToken" namespace="TokenType" headerFile="PPToken.hpp">
+    <tokens class="PPToken" namespace="TokenType" headerFile="PPToken.hpp" sourceFile="PPToken.cpp">
         {% header file definitions %}
         <header indent=0 position="top">
             #include \<string>
@@ -17,10 +17,10 @@
         </token>
         <token name="Number">
             <type>std::string</type>
-            <func>
+            <function>
                 template\<typename T>
                 T get();
-            </func>
+            </function>
         </token>
         <token name="Character">
             <type>int</type>
