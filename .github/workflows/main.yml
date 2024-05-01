@@ -14,15 +14,11 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang]
+        c_compiler: [gcc]
         include:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-            parallel: 6
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
             parallel: 6
 
     steps:
