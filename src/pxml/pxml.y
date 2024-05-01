@@ -74,6 +74,9 @@ body :  body content
 
 element :   TAG attr_list CLOSE body TAIL
         {
+            if($1 != $5){
+                error(@5, "tag not match");
+            }
             $$.tag = $1;
             for(auto attr_pair : $2){
                 $$[attr_pair.first] = attr_pair.second;

@@ -9,24 +9,26 @@
             #include \<unordered_set>
         </header>
         {% tokens %}
-        <token name="HeaderName" access="cast">
+        <token name="HeaderName">
             <type>std::string</type>
         </token>
-        <token name="Identifier" access="cast">
+        <token name="Identifier">
             <type>std::string</type>
         </token>
-        <token name="Number" access="get">
-            <type>double</type>
-            <type>intmax_t</type>
-            <type>uintmax_t</type>
+        <token name="Number">
+            <type>std::string</type>
+            <func indent=4>
+                template\<typename T>
+                T get();
+            </func>
         </token>
-        <token name="Character" access="get">
+        <token name="Character">
             <type>int</type>
             <type>wchar_t</type>
             <type>char16_t</type>
             <type>char32_t</type>
         </token>
-        <token name="String" access="get">
+        <token name="String">
             <type>std::string</type>
             <type>std::u8string</type>
             <type>std::wstring</type>
@@ -34,7 +36,7 @@
         </token>
         <token name="NewLine" />
         {% Token class member %}
-        <member>
+        <member indent=4>
             std::unordered_set\<std::string>; expanded;
             bool skipped = false;
         </member>

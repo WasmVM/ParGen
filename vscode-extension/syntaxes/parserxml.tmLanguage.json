@@ -6,8 +6,8 @@
 			"match": "<!(?i:DOCTYPE).*>"
 		},
 		{
-			"begin": "(<(?i:header|type|member|source))((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
-			"end": "(<\/(?i:header|type|member|source))((\\{%.*%\\}|[^>])*)(>)",
+			"begin": "(<(?i:header|type|member|source|func))((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
+			"end": "(<\/(?i:header|type|member|source|func))((\\{%.*%\\}|[^>])*)(>)",
 			"beginCaptures" : {
 				"1": {"name": "entity.name.tag"},
 				"2": {"patterns": [

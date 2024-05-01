@@ -15,20 +15,26 @@
 
 %%
 
-\<!(?i:DOCTYPE).*\> { pos.line += 1; pos.column = 1; return yy::parser::make_DOCTYPE(loc()); }
+\<!(?i:DOCTYPE).+\> { pos.line += 1; pos.column = 1; return yy::parser::make_DOCTYPE(loc()); }
 
-\{\%                { loc(); yy_push_state(Comment); }                        
-<Comment>\%\}       { loc(); yy_pop_state(); }
-<Comment>[\n]                   { pos.line += 1; pos.column = 1; }
+\{\%                { loc(); yy_push_state(Comment); }   
+<Comment>[\n]       { pos.line += 1; pos.column = 1; }
 <Comment>[[:space:]\t\v\r]+     { loc(); }
-<Comment>[^%]+      { loc(); }
-<Comment>%          { loc(); }
+<Comment>[^%\{\}]+  { loc(); }
+<Comment>\{\%       { loc(); yy_push_state(Comment); }   
+<Comment>\%\}       { loc(); yy_pop_state(); }
+<Comment>[%\{\}]    { loc(); }
 
 \<\/[[:alpha:]][[:alnum:]]*     { yymore(); BEGIN(TagTail); }
 <TagTail>\{\%                   { loc(); yy_push_state(Comment); }
 <TagTail>[\n]                   { pos.line += 1; pos.column = 1; }
 <TagTail>[[:space:]\t\v\r]+     { loc(); }
-<TagTail>\>                     { BEGIN(INITIAL); return yy::parser::make_TAIL(YYText(), loc()); }
+<TagTail>\>                     {
+                                    BEGIN(INITIAL);
+                                    std::string tag(YYText());
+                                    tag = tag.substr(2, tag.size() - 3);
+                                    return yy::parser::make_TAIL(tag, loc());
+                                }
 
 \<[[:alnum:]]+                  { BEGIN(Tag); return yy::parser::make_TAG(std::string(YYText()).substr(1), loc()); }
 <Tag>\{\%                       { loc(); yy_push_state(Comment); }
