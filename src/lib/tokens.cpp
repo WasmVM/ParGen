@@ -28,11 +28,67 @@ void Pargen::Tokens::generate_header(std::ostream& os){
         os << "#define ParGen_" << guard << "_guard" << std::endl;
     }
     os << prologue << std::endl;
-    // start namespace
-    os << "namespace " << name_space << " {\n" << std::endl;
+    os << "#include <iostream>" << std::endl;
+    os << "#include <filesystem>" << std::endl;
+    os << "#include <variant>" << std::endl;
+
+    // pargen namespace
+    os << "\nnamespace " << parent.name_space << " {\n" << std::endl;
+
+    // Position
+    os << "struct Position {" << std::endl;
+    os << "    std::filesystem::path path;" << std::endl;
+    os << "    size_t line;" << std::endl;
+    os << "    size_t column;" << std::endl;
+    os << "};"<< std::endl;
+    os << "std::ostream& operator<< (std::ostream&, Position&);"<< std::endl;
+
+    // token namespace
+    os << "\nnamespace " << name_space << " {\n" << std::endl;
+
+    // Tokens
+    std::string token_base = "std::variant<\n";
+    for(Token& token : *this){
+        // Declaration;
+        os << "struct " << token.name << " ";
+        token_base += "  " + name_space + "::" + token.name + ",\n";
+        if(token.types.size() == 1){
+            os << ": public " << token.types[0] << " ";
+        }else if(token.types.size() > 1){
+            os << ": public std::variant<";
+            for(size_t i = 0; i < token.types.size(); ++i){
+                if(i > 0){
+                    os << ", ";
+                }
+                os << token.types[i];
+            }
+            os << "> ";
+        }
+        os << "{";
+        // Members
+        for(std::string& member : token.members){
+            os << member << std::endl;
+        }
+        // Funcs
+        for(std::string& func : token.funcs){
+            os << func << std::endl;
+        }
+        // close
+        os << "};\n" << std::endl;
+    }
+    token_base = token_base.substr(0, token_base.size() - 2) + "\n>";
 
     // close namespace
-    os << "} // namespace " << name_space << std::endl;
+    os << "} // namespace " << name_space << "\n" << std::endl;
+
+    // Token class
+    os << "struct " << class_name << " : public " << token_base << " {" << std::endl;
+    os << "    Position pos;" << std::endl;
+    os << "};\n" << std::endl;
+
+    // close namespace
+    os << "} // namespace " << parent.name_space << std::endl;
+
     // epilogue
     os << epilogue << std::endl;
     os << "#endif " << std::endl;

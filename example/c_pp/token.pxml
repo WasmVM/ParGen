@@ -17,7 +17,7 @@
         </token>
         <token name="Number">
             <type>std::string</type>
-            <func indent=4>
+            <func>
                 template\<typename T>
                 T get();
             </func>

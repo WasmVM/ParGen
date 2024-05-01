@@ -16,9 +16,25 @@
 
 #include <filesystem>
 #include <regex>
+#include <utility>
 #include <exception.hpp>
 
 using namespace Pargen;
+
+static std::string handle_indent(int indent, std::string content){
+    if(indent >= 0){
+        // measure indent
+        size_t space_pos = content.find_first_not_of(" \t\n\r\v");
+        if(space_pos != 0){
+            std::string spaces = content.substr(0, space_pos);
+            content = std::regex_replace(content, std::regex(spaces), "\n" + std::string(indent, ' '));
+        }else{
+            content = "\n" + std::string(indent, ' ') + content;
+        }
+        content = content.substr(0, content.find_last_not_of(" \t\n\r\v") + 1);
+    }
+    return content;
+}
 
 void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesystem::path>& includes, std::list<PXML::Pxml::Child>::iterator& pxml_pos){
     // attributes
@@ -49,7 +65,8 @@ void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesyste
     parent.children.insert(std::next(pxml_pos), pxml_parser.pxml.children.begin(), pxml_parser.pxml.children.end());
 }
 
-void elem_header(std::string& prologue, std::string& epilogue, PXML::Pxml& pxml){
+// (insert_top, content)
+std::pair<bool, std::string> elem_header(PXML::Pxml& pxml){
     // attributes
     bool insert_top = true;
     int indent = -1;
@@ -84,25 +101,112 @@ void elem_header(std::string& prologue, std::string& epilogue, PXML::Pxml& pxml)
         std::string spaces = content.substr(0, space_pos);
         content = std::regex_replace(content, std::regex(spaces), "\n" + std::string(indent, ' '));
     }
-    // Insert
-    if(insert_top){
-        prologue += content;
-    }else{
-        epilogue += content;
-    }
+    return {insert_top, content};
 }
 
-void elem_tokens(ParGen& pargen, PXML::Pxml& pxml){
+std::string elem_func(PXML::Pxml& pxml){
+    // attributes
+    int indent = 4;
+    for(auto attribute : pxml){
+        if(attribute.first == "indent"){
+            indent = std::get<double>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <func>");
+        }
+    }
+    // Content
+    std::string content;
+    for(PXML::Pxml::Child child : pxml.children){
+        if(std::holds_alternative<PXML::Pxml>(child)){
+            throw Exception::Exception("only texts are allowed in <func>");
+        }
+        content += std::get<std::string>(child);
+    }
+    return handle_indent(indent, content);
+}
+
+std::string elem_member(PXML::Pxml& pxml){
+    // attributes
+    int indent = 4;
+    for(auto attribute : pxml){
+        if(attribute.first == "indent"){
+            indent = std::get<double>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <member>");
+        }
+    }
+    // Content
+    std::string content;
+    for(PXML::Pxml::Child child : pxml.children){
+        if(std::holds_alternative<PXML::Pxml>(child)){
+            throw Exception::Exception("only texts are allowed in <member>");
+        }
+        content += std::get<std::string>(child);
+    }
+    // Fix indent
+    return handle_indent(indent, content);
+}
+
+std::string elem_type(PXML::Pxml& pxml){
+    std::string type_str;
+    // attributes
+    for(auto attribute : pxml){
+        throw Exception::Exception("unknown attribute '" + attribute.first + "' in <type>");
+    }
+    // children
+    for(PXML::Pxml::Child& child : pxml.children){
+        if(std::holds_alternative<PXML::Pxml>(child)){
+            throw Exception::Exception("invalid element under <type>");
+        }else{
+            type_str += std::get<std::string>(child);
+        }
+    }
+    // Trim spaces
+    type_str = std::regex_replace(type_str, std::regex("(^\\s+|\\s+$)"), "");
+    type_str = std::regex_replace(type_str, std::regex("\\s+"), " ");
+    return type_str;
+}
+
+Token elem_token(ParGen& pargen, PXML::Pxml& pxml){
+    Token token;
+    // attributes
+    for(auto attribute : pxml){
+        if(attribute.first == "name"){
+            token.name = std::get<std::string>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <token>");
+        }
+    }
+    // children
+    for(auto child_it = pxml.children.begin(); child_it != pxml.children.end(); ++child_it){
+        if(std::holds_alternative<PXML::Pxml>(*child_it)){
+            PXML::Pxml& child_pxml = std::get<PXML::Pxml>(*child_it);
+            if(child_pxml.tag == "include"){
+                elem_include(pxml, child_pxml, pargen.includes, child_it);
+            }else if(child_pxml.tag == "type"){
+                token.types.emplace_back(elem_type(child_pxml));
+            }else if(child_pxml.tag == "member"){
+                token.members.emplace_back(elem_member(child_pxml));
+            }else if(child_pxml.tag == "func"){
+                token.funcs.emplace_back(elem_func(child_pxml));
+            }else{
+                throw Exception::Exception("invalid element under <token>");
+            }
+        }
+    }
+    return token;
+}
+
+void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
     // attributes
     for(auto attribute : pxml){
         if(attribute.first == "class"){
-            pargen.tokens.class_name = std::get<std::string>(attribute.second);
+            tokens.class_name = std::get<std::string>(attribute.second);
         }else if(attribute.first == "namespace"){
-            pargen.tokens.name_space = std::get<std::string>(attribute.second);
+            tokens.name_space = std::get<std::string>(attribute.second);
         }else if(attribute.first == "headerFile"){
-            pargen.tokens.header_path = std::get<std::string>(attribute.second);
-        }
-        else{
+            tokens.header_path = std::get<std::string>(attribute.second);
+        }else{
             throw Exception::Exception("unknown attribute '" + attribute.first + "' in <tokens>");
         }
     }
@@ -113,12 +217,19 @@ void elem_tokens(ParGen& pargen, PXML::Pxml& pxml){
             if(child_pxml.tag == "include"){
                 elem_include(pxml, child_pxml, pargen.includes, child_it);
             }else if(child_pxml.tag == "header"){
-                elem_header(pargen.tokens.prologue, pargen.tokens.epilogue, child_pxml);
+                auto header_pair = elem_header(child_pxml);
+                if(header_pair.first){
+                    tokens.prologue += header_pair.second;
+                }else{
+                    tokens.epilogue += header_pair.second;
+                }
             }else if(child_pxml.tag == "token"){
-                // TODO:
+                tokens.emplace_back(elem_token(pargen, child_pxml));
             }else if(child_pxml.tag == "member"){
-                // TODO:
+                tokens.members.emplace_back(elem_member(child_pxml));
             }else if(child_pxml.tag == "source"){
+                // TODO:
+            }else if(child_pxml.tag == "func"){
                 // TODO:
             }else{
                 throw Exception::Exception("invalid element under <tokens>");

@@ -10,25 +10,37 @@
 namespace Pargen {
 
 struct Token {
-    enum AccessType {GET, CAST};
-    AccessType access;
     std::string name;
+    std::vector<std::string> types;
+    std::vector<std::string> members;
+    std::vector<std::string> funcs;
 };
 
+struct ParGen;
+
 struct Tokens : public std::list<Token> {
-    std::string class_name;
-    std::string name_space;
+
+    std::string class_name = "Token";
+    std::string name_space = "Pargen::Tokens";
     std::filesystem::path header_path = "Token.hpp";
+    std::filesystem::path source_path = "Token.cpp";
     std::string prologue;
     std::string epilogue;
+    std::vector<std::string> members;
+
+    Tokens(ParGen& parent) : parent(parent){}
     void generate_header(std::ostream& output);
+
+private:
+    ParGen& parent;
 };
 
 struct ParGen {
     
+    ParGen() : tokens(*this){}
     void init(std::filesystem::path pxml_path);
 
-    std::string name_space;
+    std::string name_space = "Pargen";
     std::list<std::filesystem::path> includes;
     Tokens tokens;
 };
