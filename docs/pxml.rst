@@ -49,7 +49,11 @@ The root element of PXML document
 **Attributes**
 
 * namespace : The outmost namespace for generated lexer/parser
-    - default : ``Pargen``
+    - default : ``"Pargen"``
+
+**Children**
+
+Any tags and texts except for ``<pxml>``
 
 <include>
 ---------
@@ -61,24 +65,116 @@ Include other PXML document to this document
 * src : ``[Required]`` Path of included document
 
 <tokens>
----------
+--------
 
 Define tokens
 
 **Attributes**
 
 * class : Token class name
-    - default : ``Token``
+    - default : ``"Token"``
 
 * namespace : Namespace of token types
-    - default : ``Tokens``
+    - default : ``"Tokens"``
 
 * headerFile : Path of output token header file
-    - default : ``Token.hpp``
+    - default : ``"Token.hpp"``
 
 * sourceFile : Path of output token source file
-    - default : ``Token.cpp``
+    - default : ``"Token.cpp"``
 
 **Children**
 
 ``<header>``, ``<token>``, ``<member>``, ``<function>``, ``<source>``
+
+<token>
+-------
+
+Define token
+
+**Attributes**
+
+* name : ``[Required]`` Token name
+
+**Children**
+
+``<type>``, ``<member>``, ``<function>``
+
+<header>
+--------
+
+C++ codes appending into header file
+
+**Attributes**
+
+* position : Appending position, ``"top"`` or ``"bottom"``
+    - default : ``"top"``
+
+* indent : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
+
+**Children**
+
+C++ codes
+
+<source>
+--------
+
+C++ codes appending into source file
+
+**Attributes**
+
+* position : Appending position, ``"top"`` or ``"bottom"``
+    - default : ``"top"``
+
+* indent : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
+
+**Children**
+
+C++ codes
+
+<member>
+--------
+
+Definition of class member
+
+**Attributes**
+
+* indent : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
+
+**Children**
+
+C++ class member definition
+
+<function>
+----------
+
+Definition of class member function
+
+**Attributes**
+
+* indent : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
+
+**Children**
+
+C++ function definition
+
+<type>
+---------
+
+Indicate a C++ type
+
+**Children**
+
+C++ type
