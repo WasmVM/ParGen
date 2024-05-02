@@ -1,13 +1,15 @@
 <!DOCTYPE pxml>
 <pxml>
-    {% token definition %}
+    {% PPToken class %}
     <tokens class="PPToken" namespace="TokenType" headerFile="PPToken.hpp" sourceFile="PPToken.cpp">
-        {% header file definitions %}
+        
+        {% header file %}
         <header indent=0 position="top">
             #include \<string>
             #include \<cstddef>
             #include \<unordered_set>
         </header>
+        
         {% tokens %}
         <token name="HeaderName">
             <type>std::string</type>
@@ -35,9 +37,10 @@
             <type>std::u16string</type>
         </token>
         <token name="NewLine" />
-        {% Token class member %}
+        
+        {% PPToken class member %}
         <member indent=4>
-            std::unordered_set\<std::string>; expanded;
+            std::unordered_set\<std::string> expanded;
             bool skipped = false;
         </member>
     </tokens>

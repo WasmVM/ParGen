@@ -104,6 +104,45 @@ std::pair<bool, std::string> elem_header(PXML::Pxml& pxml){
     return {insert_top, content};
 }
 
+// (insert_top, content)
+std::pair<bool, std::string> elem_source(PXML::Pxml& pxml){
+    // attributes
+    bool insert_top = true;
+    int indent = -1;
+    for(auto attribute : pxml){
+        if(attribute.first == "position"){
+            std::string position = std::get<std::string>(attribute.second);
+            if(position == "top"){
+                insert_top = true;
+            }else if(position == "bottom"){
+                insert_top = false;
+            }else{
+                throw Exception::Exception("invalid position in <source>");
+            }
+        }else if(attribute.first == "indent"){
+            indent = std::get<double>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <source>");
+        }
+    }
+    // Content
+    std::string content;
+    for(PXML::Pxml::Child child : pxml.children){
+        if(std::holds_alternative<PXML::Pxml>(child)){
+            throw Exception::Exception("only texts are allowed in <source>");
+        }
+        content += std::get<std::string>(child);
+    }
+    // Fix indent
+    if(indent >= 0){
+        // measure indent
+        size_t space_pos = content.find_first_not_of(" \t\n\r\v");
+        std::string spaces = content.substr(0, space_pos);
+        content = std::regex_replace(content, std::regex(spaces), "\n" + std::string(indent, ' '));
+    }
+    return {insert_top, content};
+}
+
 std::string elem_function(PXML::Pxml& pxml){
     // attributes
     int indent = 4;
@@ -206,6 +245,8 @@ void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
             tokens.name_space = std::get<std::string>(attribute.second);
         }else if(attribute.first == "headerFile"){
             tokens.header_path = std::get<std::string>(attribute.second);
+        }else if(attribute.first == "sourceFile"){
+            tokens.source_path = std::get<std::string>(attribute.second);
         }else{
             throw Exception::Exception("unknown attribute '" + attribute.first + "' in <tokens>");
         }
@@ -219,16 +260,21 @@ void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
             }else if(child_pxml.tag == "header"){
                 auto header_pair = elem_header(child_pxml);
                 if(header_pair.first){
-                    tokens.prologue += header_pair.second;
+                    tokens.header_prologue += header_pair.second;
                 }else{
-                    tokens.epilogue += header_pair.second;
+                    tokens.header_epilogue += header_pair.second;
                 }
             }else if(child_pxml.tag == "token"){
                 tokens.emplace_back(elem_token(pargen, child_pxml));
             }else if(child_pxml.tag == "member"){
                 tokens.members.emplace_back(elem_member(child_pxml));
             }else if(child_pxml.tag == "source"){
-                // TODO:
+                auto source_pair = elem_source(child_pxml);
+                if(source_pair.first){
+                    tokens.source_prologue += source_pair.second;
+                }else{
+                    tokens.source_epilogue += source_pair.second;
+                }
             }else if(child_pxml.tag == "function"){
                 tokens.functions.emplace_back(elem_function(child_pxml));
             }else{

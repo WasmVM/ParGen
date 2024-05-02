@@ -6,8 +6,8 @@ An XML-like markup language for ParGen definitions.
 .. contents::
     :local:
 
-Basic syntax
-============
+Format
+======
 
 * File extention: ``.pxml``
 * The 1st line of pxml file should be ``<!DOCTYPE pxml>``
@@ -38,11 +38,8 @@ Example:
         </tokens>
     </pxml>
 
-Tags
-====
-
 <pxml>
-------
+======
 
 The root element of PXML document
 
@@ -56,7 +53,7 @@ The root element of PXML document
 Any tags and texts except for ``<pxml>``
 
 <include>
----------
+=========
 
 Include other PXML document to this document
 
@@ -65,7 +62,7 @@ Include other PXML document to this document
 * src : ``[Required]`` Path of included document
 
 <tokens>
---------
+========
 
 Define tokens
 
@@ -85,10 +82,10 @@ Define tokens
 
 **Children**
 
-``<header>``, ``<token>``, ``<member>``, ``<function>``, ``<source>``
+``<header>``, ``<token>``, ``<member>``, ``<function>``, ``<source>``, ``<include>``
 
 <token>
--------
+=======
 
 Define token
 
@@ -98,10 +95,10 @@ Define token
 
 **Children**
 
-``<type>``, ``<member>``, ``<function>``
+``<type>``, ``<member>``, ``<function>``, ``<include>``
 
 <header>
---------
+========
 
 C++ codes appending into header file
 
@@ -120,7 +117,7 @@ C++ codes appending into header file
 C++ codes
 
 <source>
---------
+========
 
 C++ codes appending into source file
 
@@ -139,7 +136,7 @@ C++ codes appending into source file
 C++ codes
 
 <member>
---------
+========
 
 Definition of class member
 
@@ -155,7 +152,7 @@ Definition of class member
 C++ class member definition
 
 <function>
-----------
+==========
 
 Definition of class member function
 
@@ -171,7 +168,7 @@ Definition of class member function
 C++ function definition
 
 <type>
----------
+======
 
 Indicate a C++ type
 

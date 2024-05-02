@@ -2,6 +2,7 @@
 #define ParGen_ParGen_DEF
 
 #include <string>
+#include <utility>
 #include <list>
 #include <iostream>
 #include <filesystem>
@@ -24,13 +25,16 @@ struct Tokens : public std::list<Token> {
     std::string name_space = "Pargen::Tokens";
     std::filesystem::path header_path = "Token.hpp";
     std::filesystem::path source_path = "Token.cpp";
-    std::string prologue;
-    std::string epilogue;
+    std::string header_prologue;
+    std::string header_epilogue;
+    std::string source_prologue;
+    std::string source_epilogue;
     std::vector<std::string> members;
     std::vector<std::string> functions;
 
     Tokens(ParGen& parent) : parent(parent){}
     void generate_header(std::ostream& output);
+    void generate_source(std::ostream& output);
 
 private:
     ParGen& parent;

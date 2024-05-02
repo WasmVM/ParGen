@@ -70,6 +70,12 @@ int main(int argc, const char* argv[]){
             pargen.tokens.generate_header(header_out);
             header_out.close();
         }
+        // Generate token source
+        {
+            std::ofstream source_out(pargen.tokens.source_path, std::ios::trunc);
+            pargen.tokens.generate_source(source_out);
+            source_out.close();
+        }
         
     }catch(Exception::Exception &e){
         std::cerr << args.program.filename().string() << ": " COLOR_Error ": " << e.what() << std::endl;
