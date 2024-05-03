@@ -18,6 +18,7 @@
 #include <regex>
 #include <utility>
 #include <exception.hpp>
+#include <Util.hpp>
 
 using namespace Pargen;
 
@@ -201,9 +202,8 @@ std::string elem_type(PXML::Pxml& pxml){
         }
     }
     // Trim spaces
-    type_str = std::regex_replace(type_str, std::regex("(^\\s+|\\s+$)"), "");
     type_str = std::regex_replace(type_str, std::regex("\\s+"), " ");
-    return type_str;
+    return strip(type_str);
 }
 
 Token elem_token(ParGen& pargen, PXML::Pxml& pxml){

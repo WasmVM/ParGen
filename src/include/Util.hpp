@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <string>
 
 template <size_t N>
 struct conststr {
@@ -22,5 +23,7 @@ struct conststr {
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+std::string strip(std::string str, bool lead = true, bool trail = true);
 
 #endif

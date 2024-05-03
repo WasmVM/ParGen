@@ -1,0 +1,77 @@
+<!DOCTYPE pxml>
+<pxml namespace="PXML">
+    {% PxmlToken %}
+    <tokens headerFile="PxmlToken.hpp" sourceFile="PxmlToken.cpp">
+        {% header file %}
+        <header indent=0 position="top">
+            #include \<string>
+        </header>
+        {% tokens %}
+        <token name="Doctype" />
+        <token name="Equal" />
+        <token name="Close" />
+        <token name="Inline" />
+        <token name="Bool">
+            <type>bool</type>
+        </token>
+        <token name="Number">
+            <type>double</type>
+        </token>
+        <token name="Tag">
+            <type>std::string</type>
+        </token>
+        <token name="Tail">
+            <type>std::string</type>
+        </token>
+        <token name="String">
+            <type>std::string</type>
+        </token>
+        <token name="Text">
+            <type>std::string</type>
+        </token>
+        <token name="ID">
+            <type>std::string</type>
+        </token>
+        <token name="Entity">
+            <type>std::string</type>
+        </token>
+        <token name="Space">
+            <type>std::string</type>
+        </token>
+    </tokens>
+
+    <lexer class="PxmlLexer" newLine="\n">
+        <rule pattern="<!DOCTYPE pxml>">
+            return Doctype();
+        </rule>
+        <rule id="start-comment" pattern="{%" push="comment" />
+        <state name="comment">
+            <use id="start-comment" />
+            <rule pattern="%}" pop />
+            <rule pattern="." />
+        </state>
+        <rule pattern="\<">
+        </rule>
+
+        <rule pattern="</[a-zA-Z_]\w*" push="tail" />
+        <state name="tail">
+            <use id="start-comment" />
+            <rule pattern=">" pop >
+                return Tail($$.substr(2, $$.size() - 3));
+            </rule>
+            <rule pattern="\s+" />
+        </state>
+        <rule pattern="<[a-zA-Z_]\w*" push="tag">
+        </rule>
+        <state name="tag">
+            <use id="start-comment" />
+            <rule pattern=">" pop >
+                return Tail($$.substr(2, $$.size() - 3));
+            </rule>
+            <rule pattern="\s+" />
+        </state>
+        <rule pattern="\s+">
+            return Space($$);
+        </rule>
+    </lexer>
+</pxml>

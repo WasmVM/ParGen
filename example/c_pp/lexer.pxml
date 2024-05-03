@@ -1,13 +1,11 @@
 <!DOCTYPE pxml>
 <pxml>
     <lexer class="Lexer">
-        <rule pattern="">
-
-        </rule>
-        <state>
-            <rule pattern="">
-
-            </rule>
+        <rule pattern="//.*" />
+        <rule id="start-comment" pattern="/\*" push="comment" />
+        <state name="comment">
+            <rule pattern="\*/" pop />
+            <rule pattern="." />
         </state>
     </lexer>
 </pxml>

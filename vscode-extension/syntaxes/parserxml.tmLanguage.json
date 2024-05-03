@@ -6,8 +6,8 @@
 			"match": "<!(?i:DOCTYPE).*>"
 		},
 		{
-			"begin": "(<(?i:header|type|member|source|function))((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
-			"end": "(<\/(?i:header|type|member|source|function))((\\{%.*%\\}|[^>])*)(>)",
+			"begin": "(<(?i:header|type|member|source|function|rule))((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
+			"end": "(<\/\\w+)((\\{%.*%\\}|[^>])*)(>)",
 			"beginCaptures" : {
 				"1": {"name": "entity.name.tag"},
 				"2": {"patterns": [
@@ -27,6 +27,7 @@
 				"4": {"name": "entity.name.tag"}
 			},
 			"patterns": [
+				{"include": "$self"},
 				{"include": "source.cpp"}
 			]
 		},

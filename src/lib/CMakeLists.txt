@@ -18,6 +18,7 @@ add_library(pxml
   exception.cpp
   ${BISON_pxml_parser_OUTPUTS}
   ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp
+  Util.cpp
 )
 
 add_library(pargen
