@@ -39,39 +39,77 @@
             <type>std::string</type>
         </token>
     </tokens>
-
-    <lexer class="PxmlLexer" newLine="\n">
+    {% Lexer %}
+    <lexer class="PxmlLexer" newLine="\n" headerFile="PxmlLexer.hpp" sourceFile="PxmlLexer.cpp">
+        {% DOCTYPE %}
         <rule pattern="<!DOCTYPE pxml>">
             return Doctype();
         </rule>
-        <rule id="start-comment" pattern="{%" push="comment" />
+        {% Comment %}
+        <rule id="Comment" pattern="{%" push="comment" />
         <state name="comment">
-            <use id="start-comment" />
+            <use id="Comment" />
             <rule pattern="%}" pop />
             <rule pattern="." />
         </state>
+        {% escape \< %}
         <rule pattern="\<">
+            return Text($$.substr(1));
         </rule>
-
-        <rule pattern="</[a-zA-Z_]\w*" push="tail" />
+        {% tail %}
+        <rule pattern="</[a-zA-Z_]\w*" more push="tail" />
         <state name="tail">
-            <use id="start-comment" />
+            <use id="Comment" />
             <rule pattern=">" pop >
                 return Tail($$.substr(2, $$.size() - 3));
             </rule>
             <rule pattern="\s+" />
         </state>
+        {% tag %}
         <rule pattern="<[a-zA-Z_]\w*" push="tag">
+            return Tag($$.substr(1));
         </rule>
         <state name="tag">
-            <use id="start-comment" />
+            <use id="Comment" />
+            <rule pattern="/\s*>" pop >
+                return Inline();
+            </rule>
             <rule pattern=">" pop >
-                return Tail($$.substr(2, $$.size() - 3));
+                return Close();
+            </rule>
+            <rule pattern="\"" push="string" />
+            <rule pattern="=">
+                return Equal();
+            </rule>
+            <rule pattern="(true|false)" push="string">
+                return Bool();
+            </rule>
+            <rule pattern="[a-zA-Z_]\w*">
+                return ID($$);
+            </rule>
+            <rule pattern="[+\-][0-9]+(\.[0-9]*)?([eE][+\-]?[0-9]+)?">
+                return Number(std::stod($$));
             </rule>
             <rule pattern="\s+" />
         </state>
+        {% string %}
+        <state name="string">
+            <rule pattern="\\." more />
+            <rule pattern="\"">
+                return String($$.substr(0, $$.size() - 1));
+            </rule>
+        </state>
+        {% entity %}
+        <rule pattern="&(amp|lt|gt|apos|quot);">
+            return Entity($$);
+        </rule>
+        {% space %}
         <rule pattern="\s+">
             return Space($$);
+        </rule>
+        {% text %}
+        <rule pattern="[^<]+">
+            return Text($$);
         </rule>
     </lexer>
 </pxml>

@@ -6,7 +6,25 @@
 			"match": "<!(?i:DOCTYPE).*>"
 		},
 		{
-			"begin": "(<(?i:header|type|member|source|function|rule))((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
+			"name": "source.cpp",
+			"match": "\\\\<"
+		},
+		{
+			"match": "(<\\w+)((\"(\\\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/\\s*>)",
+			"captures" : {
+				"1": {"name": "entity.name.tag"},
+				"2": {"patterns": [
+					{"include": "#strings"},
+					{"include": "#bools"},
+					{"include": "#numbers"},
+					{"include": "#attribute"},
+					{"include": "#comment"}
+				]},
+				"5": {"name": "entity.name.tag"}
+			}
+		},
+		{
+			"begin": "(<(?i:header|type|member|source|function|rule))((\"(\\\\\"|[^\"])*\"|\\{%.*%\\}|[^>/\"])*)(>)",
 			"end": "(<\/\\w+)((\\{%.*%\\}|[^>])*)(>)",
 			"beginCaptures" : {
 				"1": {"name": "entity.name.tag"},
@@ -27,12 +45,16 @@
 				"4": {"name": "entity.name.tag"}
 			},
 			"patterns": [
-				{"include": "$self"},
+				{
+					"name": "keyword.operator.comparison.cpp",
+					"match": "\\\\<"
+				},
 				{"include": "source.cpp"}
+				
 			]
 		},
 		{
-			"begin": "(<\\w+)((\"(\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(\/?\\s*>)",
+			"begin": "(<\\w+)((\"(\\\\\"|[^\"])*\"|\\{%.*%\\}|[^>/])*)(>)",
 			"end": "(<\/\\w+)((\\{%.*%\\}|[^>])*)(>)",
 			"beginCaptures" : {
 				"1": {"name": "entity.name.tag"},
@@ -70,8 +92,7 @@
 		},
 		"strings": {
 			"name": "string.quoted.double",
-			"begin": "\"",
-			"end": "\""
+			"match": "\"(\\\\.|[^\\\\\"])*\""
 		},
 		"bools": {
 			"name": "constant.language",

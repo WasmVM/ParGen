@@ -45,7 +45,7 @@ The root element of PXML document
 
 **Attributes**
 
-* namespace : The outmost namespace for generated lexer/parser
+* namespace <string> : The outmost namespace for generated lexer/parser
     - default : ``"Pargen"``
 
 **Children**
@@ -59,7 +59,7 @@ Include other PXML document to this document
 
 **Attributes**
 
-* src : ``[Required]`` Path of included document
+* src <string> : ``[Required]`` Path of included document
 
 <tokens>
 ========
@@ -68,16 +68,16 @@ Define tokens
 
 **Attributes**
 
-* class : Token class name
+* class <string> : Token class name
     - default : ``"Token"``
 
-* namespace : Namespace of token types
+* namespace <string> : Namespace of token types
     - default : ``"Tokens"``
 
-* headerFile : Path of output token header file
+* headerFile <string> : Path of output token header file
     - default : ``"Token.hpp"``
 
-* sourceFile : Path of output token source file
+* sourceFile <string> : Path of output token source file
     - default : ``"Token.cpp"``
 
 **Children**
@@ -91,7 +91,7 @@ Define token
 
 **Attributes**
 
-* name : ``[Required]`` Token name
+* name <string> : ``[Required]`` Token name
 
 **Children**
 
@@ -104,10 +104,10 @@ C++ codes appending into header file
 
 **Attributes**
 
-* position : Appending position, ``"top"`` or ``"bottom"``
+* position <"top"|"bottom">: Appending position
     - default : ``"top"``
 
-* indent : Code indention
+* indent <number>: Code indention
     - default : ``4``
     - ``0`` : no indention
     - negative value : keep same indention as pxml file (like HTML `<pre>`)
@@ -123,10 +123,10 @@ C++ codes appending into source file
 
 **Attributes**
 
-* position : Appending position, ``"top"`` or ``"bottom"``
+* position <string> : Appending position, ``"top"`` or ``"bottom"``
     - default : ``"top"``
 
-* indent : Code indention
+* indent <number> : Code indention
     - default : ``4``
     - ``0`` : no indention
     - negative value : keep same indention as pxml file (like HTML `<pre>`)
@@ -142,7 +142,7 @@ Definition of class member
 
 **Attributes**
 
-* indent : Code indention
+* indent <number> : Code indention
     - default : ``4``
     - ``0`` : no indention
     - negative value : keep same indention as pxml file (like HTML `<pre>`)
@@ -158,7 +158,7 @@ Definition of class member function
 
 **Attributes**
 
-* indent : Code indention
+* indent <number> : Code indention
     - default : ``4``
     - ``0`` : no indention
     - negative value : keep same indention as pxml file (like HTML `<pre>`)
@@ -175,3 +175,98 @@ Indicate a C++ type
 **Children**
 
 C++ type
+
+<lexer>
+======
+
+Define lexer
+
+**Attributes**
+
+* class <string> : Token class name
+    - default : ``"Token"``
+
+* namespace <string> : Namespace of token types
+    - default : ``"Tokens"``
+
+* headerFile <string> : Path of output token header file
+    - default : ``"Token.hpp"``
+
+* sourceFile <string> : Path of output token source file
+    - default : ``"Token.cpp"``
+
+**Children**
+
+``<rule>``, ``<state>``, ``<include>``
+
+<rule>
+======
+
+Define a rule in lexer
+
+**Attributes**
+
+* id <string> : A unique id for <use>, can only be lower/upper case alphabetic, digits and _
+
+* pattern <string> : ``[Required]`` Token match pattern
+
+* push <string> : State name to push into stack
+
+* pop : Pop current state from stack
+
+* more : Consume the matched text for further $$
+
+* indent <number> : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
+
+If both push and pop specified, stack will pop current state then push new state.
+
+**Children**
+
+C++ codes that may return a token.
+
+The following replacement variables can be used in the codes:
+
+* $$ : The matched text, from current pattern and previous ``more``
+
+* $1...N : The submatch text in group N
+
+    Example
+
+        pattern: s(ae*(b+)c)d
+
+        input: saeebbbbcd
+        
+        $$: saeebbbbcd
+        
+        $1: aeebbbbc
+        
+        $2: bbbb
+
+* @@ : The location of matched text
+
+* @1...N : The location of submatch text in group N
+
+<state>
+======
+
+Define a state in lexer
+
+**Attributes**
+
+* name <string> : ``[Required]`` State name
+
+**Children**
+
+``<rule>``, ``<include>``, ``<use>``
+
+<use>
+======
+
+Use a rule in lexer
+
+**Attributes**
+
+* id <string> : ``[Required]`` The rule name to use

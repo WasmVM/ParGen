@@ -236,6 +236,96 @@ Token elem_token(ParGen& pargen, PXML::Pxml& pxml){
     return token;
 }
 
+Rule elem_rule(ParGen& pargen, PXML::Pxml& pxml){
+    Rule rule;
+    // attributes
+    int indent = 4;
+    for(auto attribute : pxml){
+        if(attribute.first == "id"){
+            rule.id = std::get<std::string>(attribute.second);
+        }else if(attribute.first == "pattern"){
+            rule.pattern = std::get<std::string>(attribute.second);
+        }else if(attribute.first == "push"){
+            rule.push = std::get<std::string>(attribute.second);
+        }else if(attribute.first == "indent"){
+            indent = std::get<double>(attribute.second);
+        }else if(attribute.first == "pop"){
+            if(std::holds_alternative<std::monostate>(attribute.second)){
+                rule.pop = true;
+            }else{
+                rule.pop = std::get<bool>(attribute.second);
+            }
+            rule.pop = true;
+        }else if(attribute.first == "more"){
+            if(std::holds_alternative<std::monostate>(attribute.second)){
+                rule.more = true;
+            }else{
+                rule.more = std::get<bool>(attribute.second);
+            }
+            rule.more = true;
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <rule>");
+        }
+    }
+    // Content
+    for(PXML::Pxml::Child child : pxml.children){
+        if(std::holds_alternative<PXML::Pxml>(child)){
+            throw Exception::Exception("only texts are allowed in <rule>");
+        }
+        rule.content += std::get<std::string>(child);
+    }
+    rule.content = handle_indent(indent, rule.content);
+    return rule;
+}
+
+Use elem_use(PXML::Pxml& pxml){
+    Use use;
+    // attributes
+    for(auto attribute : pxml){
+        if(attribute.first == "id"){
+            use.id = std::get<std::string>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <use>");
+        }
+    }
+    // Content
+    if(!pxml.children.empty()){
+        throw Exception::Exception("<use> should no have children");
+    }
+    return use;
+}
+
+State elem_state(ParGen& pargen, PXML::Pxml& pxml){
+    State state;
+    // attributes
+    int indent = 4;
+    for(auto attribute : pxml){
+        if(attribute.first == "name"){
+            state.name = std::get<std::string>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <state>");
+        }
+    }
+    // Content
+    for(auto child_it = pxml.children.begin(); child_it != pxml.children.end(); ++child_it){
+        if(std::holds_alternative<PXML::Pxml>(*child_it)){
+            PXML::Pxml& child_pxml = std::get<PXML::Pxml>(*child_it);
+            if(child_pxml.tag == "include"){
+                elem_include(pxml, child_pxml, pargen.includes, child_it);
+            }else if(child_pxml.tag == "rule"){
+                state.emplace_back(elem_rule(pargen, child_pxml));
+            }else if(child_pxml.tag == "state"){
+                state.emplace_back(elem_state(pargen, child_pxml));
+            }else if(child_pxml.tag == "use"){
+                state.emplace_back(elem_use(child_pxml));
+            }else{
+                throw Exception::Exception("invalid element under <lexer>");
+            }
+        }
+    }
+    return state;
+}
+
 void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
     // attributes
     for(auto attribute : pxml){
@@ -279,6 +369,38 @@ void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
                 tokens.functions.emplace_back(elem_function(child_pxml));
             }else{
                 throw Exception::Exception("invalid element under <tokens>");
+            }
+        }
+    }
+}
+
+void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
+    // attributes
+    for(auto attribute : pxml){
+        if(attribute.first == "class"){
+            lexer.class_name = std::get<std::string>(attribute.second);
+        }else if(attribute.first == "newLine"){
+            lexer.new_line = std::regex(std::get<std::string>(attribute.second));
+        }else if(attribute.first == "headerFile"){
+            lexer.header_path = std::get<std::string>(attribute.second);
+        }else if(attribute.first == "sourceFile"){
+            lexer.source_path = std::get<std::string>(attribute.second);
+        }else{
+            throw Exception::Exception("unknown attribute '" + attribute.first + "' in <lexer>");
+        }
+    }
+    // children
+    for(auto child_it = pxml.children.begin(); child_it != pxml.children.end(); ++child_it){
+        if(std::holds_alternative<PXML::Pxml>(*child_it)){
+            PXML::Pxml& child_pxml = std::get<PXML::Pxml>(*child_it);
+            if(child_pxml.tag == "include"){
+                elem_include(pxml, child_pxml, pargen.includes, child_it);
+            }else if(child_pxml.tag == "rule"){
+                lexer.emplace_back(elem_rule(pargen, child_pxml));
+            }else if(child_pxml.tag == "state"){
+                lexer.emplace_back(elem_state(pargen, child_pxml));
+            }else{
+                throw Exception::Exception("invalid element under <lexer>");
             }
         }
     }

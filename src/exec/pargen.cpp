@@ -62,8 +62,8 @@ int main(int argc, const char* argv[]){
                 pargen.includes.emplace_back(inc);
             }
         }
-        // Init
-        pargen.init(pxml_file);
+        // Load pxml
+        pargen.load(pxml_file);
         // Generate token header
         {
             std::ofstream header_out(pargen.tokens.header_path, std::ios::trunc);

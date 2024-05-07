@@ -21,8 +21,9 @@ using namespace Pargen;
 
 void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesystem::path>& includes, std::list<PXML::Pxml::Child>::iterator& pxml_pos);
 void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml);
+void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml);
 
-void ParGen::init(std::filesystem::path pxml_path){
+void ParGen::load(std::filesystem::path pxml_path){
     // Parse pxml file
     PXML::Parser pxml_parser;
     pxml_parser.parse(pxml_path);
@@ -48,6 +49,8 @@ void ParGen::init(std::filesystem::path pxml_path){
                 elem_include(pxml, child_pxml, includes, child_it);
             }else if(child_pxml.tag == "tokens"){
                 elem_tokens(*this, tokens, child_pxml);
+            }else if(child_pxml.tag == "lexer"){
+                elem_lexer(*this, lexer, child_pxml);
             }else{
                 throw Exception::Exception("invalid element under <pxml>");
             }
