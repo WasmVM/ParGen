@@ -23,3 +23,46 @@ std::string strip(std::string str, bool lead, bool trail){
         return str.substr(lead_pos);
     }
 }
+
+std::string append_func_name(std::string func, std::string name_space){
+    // Trim leading & trailing spaces
+    func = strip(func);
+    // Decouple function signature
+    {
+        std::string param;
+        for(size_t i = func.size() - 1, level = 0; i > 0; --i){
+            if(func[i] == ')'){
+                level += 1;
+            }else if(func[i] == '('){
+                level -= 1;
+                if(level == 0){
+                    param = func.substr(i);
+                    func = strip(func.substr(0, i + 1));
+                }
+            }
+        }
+        std::string name = func.substr(func.find_last_of(" \t\n\r\v") + 1);
+        func = func.substr(0, func.find_last_of(" \t\n\r\v"));
+        if(func.starts_with("template")){
+            func = func.substr(8);
+            // Get template declaration
+            std::string template_args;
+            for(size_t i = 0, level = 0; i < func.size(); ++i){
+                if(func[i] == '<'){
+                    level += 1;
+                }else if(func[i] == '>'){
+                    level -= 1;
+                    if(level == 0){
+                        template_args = func.substr(0, i + 1);
+                        func = func.substr(i + 1);
+                        break;
+                    }
+                }
+            }
+            func = strip(func, true, false);
+            return "template<> " + func + " " + name_space + "::" + name + template_args + param;
+        }else{
+            return func + name_space + "::" + name + param;
+        }
+    }
+}

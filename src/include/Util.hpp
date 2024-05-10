@@ -25,5 +25,6 @@ template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 std::string strip(std::string str, bool lead = true, bool trail = true);
+std::string append_func_name(std::string func, std::string name_space);
 
 #endif

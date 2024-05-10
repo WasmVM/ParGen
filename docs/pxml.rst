@@ -197,7 +197,7 @@ Define lexer
 
 **Children**
 
-``<rule>``, ``<state>``, ``<include>``
+``<rule>``, ``<state>``, ``<include>``, ``<header>``, ``<member>``, ``<function>``, ``<source>``
 
 <rule>
 ======
@@ -208,7 +208,88 @@ Define a rule in lexer
 
 * id <string> : A unique id for <use>, can only be lower/upper case alphabetic, digits and _
 
-* pattern <string> : ``[Required]`` Token match pattern
+* pattern <string> : ``[Required]`` Token match pattern, support the following grammar:
+
+    Characters:
+
+        - alphabetic: a-z, A-Z
+
+        - underscore: _
+
+        - space
+
+        - punctuators: ``~``, `````, ``!``, ``@``, ``#``, ``%``, ``&``, ``=``, ``:``, ``"``, ``'``, ``<``, ``>``, ``/``
+
+        - digits: 0-9
+
+        - escape characters:
+
+            + ``\t`` : horizontal tab
+
+            + ``\r`` : return
+
+            + ``\v`` : vertical tab
+
+            + ``\f`` : line feed
+
+            + ``\n`` : new line
+
+            + hexadecimal character : like ``\0a``, should be 2 digits
+
+            + ``\\``, ``\?``, ``\^``, ``\$``, ``\(``, ``\)``, ``\*``, ``\+``, ``\-``, ``\{``, ``\}``, ``\|``, ``\.``, ``\,`` : punctuators
+
+        - character class:
+
+            + ``\d`` : [0-9]
+
+            + ``\D`` : NOT [0-9]
+
+            + ``\w`` : [0-9a-zA-Z]
+
+            + ``\W`` : NOT [0-9a-zA-Z]
+
+            + ``\s`` : [ \\t\\r\\v\\f\\n]
+
+            + ``\S`` : NOT [ \\t\\r\\v\\f\\n]
+        
+            + ``\a`` : [a-zA-Z\_]
+
+            + ``\A`` : NOT [a-zA-Z\_]
+        
+    Ranges
+            
+        - range: like ``[0-9]``
+
+        - exclusive: ``[^0-9]`` means NOT 0-9
+
+    OR operation: 
+
+        Example:
+        
+        ``(lhs|rhs)``: ``lhs`` or ``rhs``
+
+    Group: 
+
+        Example:
+        
+        ``(lhs)?``: one or zero ``lhs``
+
+    Repeat: 
+
+        - ``?``: one or zero times
+
+        - ``+``: one or more times
+
+        - ``*``: zero or more times
+
+        - ``{N}``: ``N`` times (``N`` is an integer)
+
+        - ``{N,}``: ``N`` or more times (``N`` is an integer)
+
+        - ``{N, M}``: ``N`` to ``M`` times (``N``, ``M`` are integers)
+
+    Wildcard:
+        - ``.``: any supported character
 
 * push <string> : State name to push into stack
 

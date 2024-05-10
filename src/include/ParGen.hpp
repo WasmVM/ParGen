@@ -62,11 +62,19 @@ private:
 struct Lexer : public std::list<std::variant<Rule, State>>{
 
     std::string class_name = "Lexer";
-    std::regex new_line;
+    std::string new_line;
     std::filesystem::path header_path = "Lexer.hpp";
     std::filesystem::path source_path = "Lexer.cpp";
+    std::string header_prologue;
+    std::string header_epilogue;
+    std::string source_prologue;
+    std::string source_epilogue;
+    std::vector<std::string> members;
+    std::vector<std::string> functions;
 
     Lexer(ParGen& parent) : new_line("\\n"), parent(parent) {}
+    void generate_header(std::ostream& output);
+    void generate_source(std::ostream& output);
 
 private:
     ParGen& parent;

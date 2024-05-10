@@ -1,7 +1,7 @@
 <!DOCTYPE pxml>
 <pxml namespace="PXML">
     {% PxmlToken %}
-    <tokens headerFile="PxmlToken.hpp" sourceFile="PxmlToken.cpp">
+    <tokens namespace="Tokens" headerFile="PxmlToken.hpp" sourceFile="PxmlToken.cpp">
         {% header file %}
         <header indent=0 position="top">
             #include \<string>

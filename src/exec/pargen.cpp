@@ -64,16 +64,22 @@ int main(int argc, const char* argv[]){
         }
         // Load pxml
         pargen.load(pxml_file);
-        // Generate token header
-        {
+        // Generate token files
+        if(!pargen.tokens.empty()){
             std::ofstream header_out(pargen.tokens.header_path, std::ios::trunc);
             pargen.tokens.generate_header(header_out);
             header_out.close();
-        }
-        // Generate token source
-        {
             std::ofstream source_out(pargen.tokens.source_path, std::ios::trunc);
             pargen.tokens.generate_source(source_out);
+            source_out.close();
+        }
+        // Generate lexer files
+        if(!pargen.lexer.empty()){
+            std::ofstream header_out(pargen.lexer.header_path, std::ios::trunc);
+            pargen.lexer.generate_header(header_out);
+            header_out.close();
+            std::ofstream source_out(pargen.lexer.source_path, std::ios::trunc);
+            pargen.lexer.generate_source(source_out);
             source_out.close();
         }
         

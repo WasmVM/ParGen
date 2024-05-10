@@ -380,7 +380,7 @@ void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
         if(attribute.first == "class"){
             lexer.class_name = std::get<std::string>(attribute.second);
         }else if(attribute.first == "newLine"){
-            lexer.new_line = std::regex(std::get<std::string>(attribute.second));
+            lexer.new_line = std::get<std::string>(attribute.second);
         }else if(attribute.first == "headerFile"){
             lexer.header_path = std::get<std::string>(attribute.second);
         }else if(attribute.first == "sourceFile"){
@@ -395,6 +395,24 @@ void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
             PXML::Pxml& child_pxml = std::get<PXML::Pxml>(*child_it);
             if(child_pxml.tag == "include"){
                 elem_include(pxml, child_pxml, pargen.includes, child_it);
+            }else if(child_pxml.tag == "header"){
+                auto header_pair = elem_header(child_pxml);
+                if(header_pair.first){
+                    lexer.header_prologue += header_pair.second;
+                }else{
+                    lexer.header_epilogue += header_pair.second;
+                }
+            }else if(child_pxml.tag == "member"){
+                lexer.members.emplace_back(elem_member(child_pxml));
+            }else if(child_pxml.tag == "source"){
+                auto source_pair = elem_source(child_pxml);
+                if(source_pair.first){
+                    lexer.source_prologue += source_pair.second;
+                }else{
+                    lexer.source_epilogue += source_pair.second;
+                }
+            }else if(child_pxml.tag == "function"){
+                lexer.functions.emplace_back(elem_function(child_pxml));
             }else if(child_pxml.tag == "rule"){
                 lexer.emplace_back(elem_rule(pargen, child_pxml));
             }else if(child_pxml.tag == "state"){
