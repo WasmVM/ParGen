@@ -17,6 +17,12 @@
 #include <exception.hpp>
 
 #include <list>
+#include <queue>
+#include <stack>
+#include <optional>
+#include <variant>
+#include <cctype>
+#include <fstream>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -24,7 +30,7 @@ using namespace Pargen;
 
 struct Autometa {
 
-    Autometa(std::list<std::variant<Pargen::Rule, Pargen::State>>& rules);
+    Autometa(Lexer& lexer);
 
     struct Action {
         enum Flags : uint8_t {
@@ -49,7 +55,6 @@ struct Autometa {
     std::list<State> states;
     std::unordered_map<std::string, std::list<State>::iterator> state_map;
     std::list<Action> actions;
-
 };
 
 static void collect_rule(std::list<std::variant<Rule, Use, State>>& state, std::unordered_map<std::string, Rule>& rule_map){
@@ -110,29 +115,370 @@ static void resolve_use(std::list<std::variant<Rule, State>>& rules){
     }
 }
 
-struct Node {
-    bool negate;
-    std::unordered_set<char> characters;
-    size_t min = 1, max = 1;
-    std::list<Node> childs;
+enum class CharClass {
+    Number, NotNumber,
+    Alphabet, NotAlphabet,
+    Alnum, NotAlnum,
+    Space, NotSpace,
 };
 
-std::optional<> parse_pattern(std::string& pattern){
-    Node root;
-    Node* cur = nullptr;
+struct Node {
+    enum Type {Char, Group};
+    const Type type;
+    size_t min = 1, max = 1;
+    Node* next = nullptr;
+    int id;
+    Node(Type type) : type(type){
+        static int serial = 0;
+        id = serial++;
+    }
+    virtual ~Node(){
+        if(next != nullptr){
+            delete next;
+        }
+    }
+};
 
+struct CharNode : public Node{
+    bool negate = false;
+    std::vector<std::variant<char, CharClass>> characters;
+    CharNode() : Node(Node::Char){}
+};
+
+struct GroupNode : public Node{
+    std::list<Node*> children;
+    GroupNode() : Node(Node::Group){}
+    ~GroupNode(){
+        if(next != nullptr){
+            delete next;
+        }
+        for(Node* child : children){
+            if(child != nullptr){
+                delete child;
+            }
+        }
+    }
+};
+
+std::ostream& operator<< (std::ostream& os, Node* root){
+    std::queue<Node*> queue;
+    std::unordered_set<Node*> pushed;
+    queue.push(root);
+    pushed.emplace(root);
+    while(!queue.empty()){
+        Node* node = queue.front();
+        queue.pop();
+        os << "n" << node->id << " [label=\"";
+        switch(node->type){
+            case Node::Char:{
+                CharNode* char_node = (CharNode*)node;
+                if(char_node->negate){
+                    if(char_node->characters.empty()){
+                        os << "any ";
+                    }else{
+                        os << "not ";
+                    }
+                }
+                for(auto var : char_node->characters){
+                    std::visit(overloaded {
+                        [&](char ch){
+                            if(ch == '\\'){
+                                os << "'\\\\' ";
+                            }else{
+                                os << "'" << ch << "' ";
+                            }
+                        },
+                        [&](CharClass cl){
+                            switch(cl){
+                                case CharClass::Number:
+                                    os << "num ";
+                                break;
+                                case CharClass::NotNumber:
+                                    os << "not-num ";
+                                break;
+                                case CharClass::Alphabet:
+                                    os << "alpha ";
+                                break;
+                                case CharClass::NotAlphabet:
+                                    os << "not-alpha ";
+                                break;
+                                case CharClass::Alnum:
+                                    os << "alnum ";
+                                break;
+                                case CharClass::NotAlnum:
+                                    os << "not-alnum ";
+                                break;
+                                case CharClass::Space:
+                                    os << "space ";
+                                break;
+                                case CharClass::NotSpace:
+                                    os << "non-space ";
+                                break;
+                            }
+                        },
+                    }, var);
+                }
+                os << "{" << node->min << "," << node->max << "}\"];" << std::endl;
+            }break;
+            case Node::Group:{
+                os << " {" << node->min << "," << node->max << "}\"];" << std::endl;
+                GroupNode* group_node = (GroupNode*)node;
+                for(Node* child: group_node->children){
+                    queue.push(child);
+                    pushed.emplace(child);
+                    os << "n" << node->id << " -> " << "n" << child->id << " [style=dashed];" << std::endl;
+                }
+            }break;
+        }
+        if(node->next != nullptr){
+            os << "n" << node->id << " -> " << "n" << node->next->id << ";" << std::endl;
+        }
+        if(node->next != nullptr && !pushed.contains(node->next)){
+            queue.push(node->next);
+            pushed.emplace(node->next);
+        }
+    }
+    return os;
+}
+
+static std::vector<std::variant<char, CharClass>> escape_sequence(std::string::iterator& it, const std::string::iterator& end){
+    std::vector<std::variant<char, CharClass>> characters;
+    char ch = *(++it);
+    switch(ch){
+        case 'x':
+            if(it != end && std::next(it) != end){
+                std::string hex;
+                hex += *(++it); 
+                hex += *(++it);
+                if(std::isxdigit(hex[0]) && std::isxdigit(hex[1])){
+                    characters.emplace_back((char)std::stoi(hex, nullptr, 16));
+                }else{
+                    throw Exception::Exception("expected 2 hex digits for hex escape in pattern");
+                }
+            }else{
+                throw Exception::Exception("too few characters for hex escape in pattern");
+            }
+        break;
+        case 't':
+            characters.emplace_back('\t');
+        break;
+        case 'r':
+            characters.emplace_back('\r');
+        break;
+        case 'v':
+            characters.emplace_back('\v');
+        break;
+        case 'f':
+            characters.emplace_back('\f');
+        break;
+        case 'n':
+            characters.emplace_back('\n');
+        break;
+        case 'd':
+            characters.emplace_back(CharClass::Number);
+        break;
+        case 'D':
+            characters.emplace_back(CharClass::NotNumber);
+        break;
+        case 's':
+            characters.emplace_back(CharClass::Space);
+        break;
+        case 'S':
+            characters.emplace_back(CharClass::NotSpace);
+        break;
+        case 'w':
+            characters.emplace_back(CharClass::Alnum);
+        break;
+        case 'W':
+            characters.emplace_back(CharClass::NotAlnum);
+        break;
+        case 'a':
+            characters.emplace_back(CharClass::Alphabet);
+        break;
+        case 'A':
+            characters.emplace_back(CharClass::NotAlphabet);
+        break;
+        default:
+            characters.emplace_back(ch);
+    }
+    return characters;
+}
+
+Node* parse_pattern(std::string& pattern){
+    std::stack<GroupNode*> groups;
+    Node* root = nullptr;
+    Node* current = nullptr;
+    Node** next = &root;
+    size_t level = 0;
+    for(auto it = pattern.begin(); it != pattern.end(); ++it){
+        switch(*it){
+            case '[':{
+                std::vector<std::variant<char, CharClass>> characters;
+                bool negate = false;
+                if(it != pattern.end()){
+                    if(*(std::next(it)) == '^'){
+                        negate = true;
+                        ++it;
+                    }
+                    ++it;
+                }
+                while((it != pattern.end()) && (*it != ']')){
+                    if(*it == '\\'){
+                        if(std::next(it) == pattern.end()){
+                            throw Exception::Exception("expected character after '\\' in pattern");
+                        }else{
+                            std::vector<std::variant<char, CharClass>> escapes = escape_sequence(it, pattern.end());
+                            characters.insert(characters.end(), escapes.begin(), escapes.end());
+                        }
+                    }else if(*it == '-'){
+                        if(std::next(it) == pattern.end()){
+                            throw Exception::Exception("expected character after '-' in pattern");
+                        }else if(characters.empty()){
+                            throw Exception::Exception("expected character before '-' in pattern");
+                        }else if(std::holds_alternative<char>(characters.back())){
+                            ++it;
+                            for(char ch = std::get<char>(characters.back()) + 1; ch <= *it; ++ch){
+                                characters.emplace_back(ch);
+                            }
+                        }
+                    }else{
+                        characters.emplace_back(*it);
+                    }
+                    ++it;
+                }
+                if(characters.empty()){
+                    throw Exception::Exception("empty [] in pattern");
+                }
+                CharNode* node = new CharNode;
+                node->characters = characters;
+                node->negate = negate;
+                current = node;
+                *next = node;
+                next = &(node->next);
+            }break;
+            case '\\':{
+                if(it != pattern.end()){
+                    std::vector<std::variant<char, CharClass>> characters = escape_sequence(it, pattern.end());
+                    CharNode* node = new CharNode;
+                    node->characters = characters;
+                    current = node;
+                    *next = node;
+                    next = &(node->next);
+                }else{
+                    throw Exception::Exception("expected a character after '\\' in pattern");
+                }
+            }break;
+            case '{':{
+                if(current == nullptr){
+                    throw Exception::Exception("pattern or group can't begin with '{'");
+                }
+                std::string str = "";
+                while(std::isdigit(*(++it))){
+                    str += *it;
+                }
+                current->min = std::stoi(str);
+                if(*it == ','){
+                    str = "0";
+                    while(std::isdigit(*(++it))){
+                        str += *it;
+                    }
+                    current->max = std::stoi(str);
+                }else{
+                    current->max = current->min;
+                }
+                if(*it != '}'){
+                    throw Exception::Exception("'{' is not close with '}' in pattern");
+                }
+            }break;
+            case '+':{
+                if(current == nullptr){
+                    throw Exception::Exception("pattern or group can't begin with '+'");
+                }
+                current->min = 1;
+                current->max = 0;
+            }break;
+            case '*':{
+                if(current == nullptr){
+                    throw Exception::Exception("pattern or group can't begin with '*'");
+                }
+                current->min = 0;
+                current->max = 0;
+            }break;
+            case '?':{
+                if(current == nullptr){
+                    throw Exception::Exception("pattern or group can't begin with '?'");
+                }
+                current->min = 0;
+                current->max = 1;
+            }break;
+            case '(':{
+                GroupNode* node = new GroupNode;
+                *next = node;
+                groups.push(node);
+                node->children.emplace_back(nullptr);
+                current = nullptr;
+                next = &(node->children.back());
+                level += 1;
+            }break;
+            case ')':{
+                if(level == 0){
+                    throw Exception::Exception("')' without previous '('");
+                }
+                current = groups.top();
+                next = &(groups.top()->next);
+                groups.pop();
+                level -= 1;
+            }break;
+            case '|':{
+                if(groups.empty()){
+                    if(current == nullptr){
+                        throw Exception::Exception("pattern or group can't begin with '|'");
+                    }
+                    GroupNode* node = new GroupNode;
+                    node->children.emplace_back(root);
+                    root = node;
+                    groups.push(node);
+                }
+                groups.top()->children.emplace_back(nullptr);
+                current = nullptr;
+                next = &(groups.top()->children.back());
+            }break;
+            case '.':{
+                CharNode* node = new CharNode;
+                node->negate = true;
+                current = node;
+                *next = node;
+                next = &(node->next);
+            }break;
+            default:{
+                CharNode* node = new CharNode;
+                node->characters.emplace_back(*it);
+                current = node;
+                *next = node;
+                next = &(node->next);
+            }break;
+        }
+    }
     return root;
 }
 
 std::list<Autometa::State> create_states(Pargen::Rule& rule){
+    static int rule_id = 0;
     std::list<Autometa::State> states;
-    //Node root = parse_pattern(rule.pattern);
+    Node* root = parse_pattern(rule.pattern);
+    // dump
+    std::ofstream fout("rule" + std::to_string(rule_id++) + ".dot");
+    fout << "digraph {" << std::endl;
+    fout << root << std::endl;
+    fout << "}" << std::endl;
+    fout.close();
+
     return states;
 }
 
-Autometa::Autometa(std::list<std::variant<Pargen::Rule, Pargen::State>>& rules){
-    resolve_use(rules);
-    for(std::variant<Pargen::Rule, Pargen::State>& elem : rules){
+Autometa::Autometa(Lexer& lexer){
+    resolve_use(lexer);
+    for(std::variant<Pargen::Rule, Pargen::State>& elem : lexer){
         std::visit(overloaded {
             [&](Pargen::Rule& rule){
                 std::list<Autometa::State> new_states = create_states(rule);

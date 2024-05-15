@@ -234,7 +234,7 @@ Define a rule in lexer
 
             + ``\n`` : new line
 
-            + hexadecimal character : like ``\0a``, should be 2 digits
+            + hexadecimal character : like ``\x0a``, should be 2 digits
 
             + ``\\``, ``\?``, ``\^``, ``\$``, ``\(``, ``\)``, ``\*``, ``\+``, ``\-``, ``\{``, ``\}``, ``\|``, ``\.``, ``\,`` : punctuators
 

@@ -41,23 +41,24 @@
     </tokens>
     {% Lexer %}
     <lexer class="PxmlLexer" newLine="\n" headerFile="PxmlLexer.hpp" sourceFile="PxmlLexer.cpp">
+        <rule pattern="(true|false)" />
         {% DOCTYPE %}
         <rule pattern="<!DOCTYPE pxml>">
             return Doctype();
         </rule>
         {% Comment %}
-        <rule id="Comment" pattern="{%" push="comment" />
+        <rule id="Comment" pattern="\{%" push="comment" />
         <state name="comment">
             <use id="Comment" />
-            <rule pattern="%}" pop />
+            <rule pattern="%\}" pop />
             <rule pattern="." />
         </state>
         {% escape \< %}
-        <rule pattern="\<">
+        <rule pattern="\\<">
             return Text($$.substr(1));
         </rule>
         {% tail %}
-        <rule pattern="</[a-zA-Z_]\w*" more push="tail" />
+        <rule pattern="</\a\w*" more push="tail" />
         <state name="tail">
             <use id="Comment" />
             <rule pattern=">" pop >
@@ -66,7 +67,7 @@
             <rule pattern="\s+" />
         </state>
         {% tag %}
-        <rule pattern="<[a-zA-Z_]\w*" push="tag">
+        <rule pattern="<\a\w*" push="tag">
             return Tag($$.substr(1));
         </rule>
         <state name="tag">
@@ -84,7 +85,7 @@
             <rule pattern="(true|false)" push="string">
                 return Bool();
             </rule>
-            <rule pattern="[a-zA-Z_]\w*">
+            <rule pattern="\a\w*">
                 return ID($$);
             </rule>
             <rule pattern="[+\-][0-9]+(\.[0-9]*)?([eE][+\-]?[0-9]+)?">
@@ -94,7 +95,8 @@
         </state>
         {% string %}
         <state name="string">
-            <rule pattern="\\." more />
+            <rule pattern="[^\"]" more />
+            <rule pattern="\\\"" more />
             <rule pattern="\"">
                 return String($$.substr(0, $$.size() - 1));
             </rule>
