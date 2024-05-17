@@ -9,7 +9,7 @@
 #include <cstdlib>
 
 #include <Util.hpp>
-#include <color.hpp>
+#include "color.hpp"
 
 static void help(std::filesystem::path program, std::string desc,
     std::vector<CommandParser::Opt> options

@@ -6,8 +6,10 @@
 #include <optional>
 #include <functional>
 #include <utility>
+#include <filesystem>
 
 #include <Util.hpp>
+#include <ParGen.hpp>
 
 namespace Exception{
 
@@ -29,6 +31,14 @@ namespace Exception{
         };
     private:
         static std::optional<std::function<void(std::string)>> handler;
+    };
+
+    struct SyntaxError : public Exception {
+        std::filesystem::path filename;
+        size_t line;
+        size_t column;
+        SyntaxError(std::string msg, std::filesystem::path filename, size_t line, size_t column) : 
+            Exception(msg), filename(filename), line(line), column(column){}
     };
 }
 

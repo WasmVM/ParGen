@@ -15,9 +15,9 @@
 #include <iostream>
 #include <fstream>
 #include <exception.hpp>
+#include <ParGen.hpp>
 #include "color.hpp"
 #include "CommandParser.hpp"
-#include <ParGen.hpp>
 
 #ifndef PARGEN_VERSION
 #define PARGEN_VERSION "dev"
@@ -83,8 +83,12 @@ int main(int argc, const char* argv[]){
             source_out.close();
         }
         
-    }catch(Exception::Exception &e){
-        std::cerr << args.program.filename().string() << ": " COLOR_Error ": " << e.what() << std::endl;
+    }catch(Exception::SyntaxError& err){
+        std::cerr << err.filename.string() << ":" << err.line << ":" << err.column
+            << " " COLOR_Error ": " << err.what() << std::endl;
+        return -2;
+    }catch(Exception::Exception &err){
+        std::cerr << args.program.filename().string() << " " COLOR_Error ": " << err.what() << std::endl;
         return -1;
     }
     return 0;
