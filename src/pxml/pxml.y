@@ -5,7 +5,7 @@
 %define api.token.constructor
 %define api.value.type variant
 %locations
-%define api.location.type {location_t}
+%define api.filename.type {std::filesystem::path}
 %define parse.error detailed
 %define parse.lac full
 %parse-param { Lexer& lexer }{ PXML::Pxml& pxml }
@@ -15,21 +15,11 @@
     #include <utility>
     #include <filesystem>
     #include <Pxml.hpp>
+    #include <color.hpp>
 #ifndef yyFlexLexerOnce
     #include <FlexLexer.h>
 #endif
     struct Lexer;
-    struct position_t {
-        std::filesystem::path path = "";
-        size_t line = 1;
-        size_t column = 1;
-        position_t operator+ (size_t);
-    };
-    struct location_t {
-        location_t(position_t pos = position_t()) : begin(pos), end(pos){}
-        location_t(position_t begin, position_t end) : begin(begin), end(end){}
-        position_t begin, end;
-    };
 }
 
 %code {
@@ -56,7 +46,13 @@
 
 %start  pxml;
 
-pxml :  DOCTYPE spaces element spaces END   { pxml = $3; }
+pxml :  DOCTYPE spaces element spaces END
+    {
+        if($3.tag != "pxml"){
+            error(@3, "the root element should be <pxml>");
+        }
+        pxml = $3;
+    }
 
 content :   element { $$ = $1; }
     |       text    { $$ = $1; }
@@ -126,14 +122,8 @@ value : BOOL    { $$.emplace<bool>($1); }
 
 #include <sstream>
 
-void yy::parser::error(location_t const& loc, std::string const& msg){
+void yy::parser::error(yy::location const& loc, std::string const& msg){
     std::stringstream ss;
-    ss << loc.begin.path.filename().string() << ":" << loc.begin.line << ":" << loc.begin.column << " error: " << msg;
-    throw Exception::Exception(ss.str());
-}
-
-position_t position_t::operator+ (size_t value){
-    position_t res(*this);
-    res.column += value;
-    return res;
+    ss << loc.begin.filename->filename().string() << ":" << loc.begin.line << ":" << loc.begin.column << " " COLOR_Error ": " << msg;
+    throw Exception::SyntaxError(ss.str());
 }

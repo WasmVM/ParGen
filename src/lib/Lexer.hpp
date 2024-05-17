@@ -3,13 +3,15 @@
 
 #include <iostream>
 #include <filesystem>
+#include <location.hh>
 
 struct Lexer : public yyFlexLexer {
-    Lexer(std::filesystem::path path, std::istream& stream);
+    Lexer(std::filesystem::path filename, std::istream& stream) : yyFlexLexer(stream, std::cout){
+        loc.initialize(new std::filesystem::path(filename));
+    };
     yy::parser::symbol_type lex();
-    location_t loc();
 private:
-    position_t pos;
+    yy::location loc;
 };
 
 #endif
