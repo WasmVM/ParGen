@@ -23,18 +23,17 @@
 
 \<!(?i:DOCTYPE).+\> { return yy::parser::make_DOCTYPE(loc); }
 
-\{\%                { loc.step(); yy_push_state(Comment); }   
+\{\%                { yy_push_state(Comment); loc.step(); }   
 <Comment>[\n]       { loc.lines(); loc.step(); }
-<Comment>[[:space:]\t\v\r]+     {}
-<Comment>[^%\{\}]+  {}
-<Comment>\{\%       { yy_push_state(Comment); }   
-<Comment>\%\}       { yy_pop_state(); }
-<Comment>[%\{\}]    {}
+<Comment>[ \t\v\r]+ { loc.step(); }
+<Comment>[^%\{\}]+  { loc.step(); }
+<Comment>\{\%       { yy_push_state(Comment); loc.step(); }   
+<Comment>\%\}       { yy_pop_state(); loc.step(); }
+<Comment>[%\{\}]
 
-\<\/[[:alpha:]][[:alnum:]]*     { yymore(); BEGIN(TagTail); }
-<TagTail>\{\%                   { yy_push_state(Comment); }
+\<\/[[:alpha:]][[:alnum:]]*     { yymore(); BEGIN(TagTail); loc.step(); }
 <TagTail>[\n]                   { loc.lines(); loc.step(); }
-<TagTail>[[:space:]\t\v\r]+     {}
+<TagTail>[ \t\v\r]+             { loc.step(); }
 <TagTail>\>                     {
                                     BEGIN(INITIAL);
                                     std::string tag(YYText());
@@ -43,25 +42,24 @@
                                 }
 
 \<[[:alnum:]]+                  { BEGIN(Tag); return yy::parser::make_TAG(std::string(YYText()).substr(1), loc); }
-<Tag>\{\%                       { yy_push_state(Comment); }
 <Tag>[\n]                       { loc.lines(); loc.step(); }
-<Tag>[[:space:]\t\v\r]+         {}
+<Tag>[ \t\v\r]+                 { loc.step(); }
 <Tag>\/\>                       { BEGIN(INITIAL); return yy::parser::make_INLINE(loc);}
 <Tag>\>                         { BEGIN(INITIAL); return yy::parser::make_CLOSE(loc);}
-<Tag>\"                         { yymore(); BEGIN(String); }
+<Tag>\"                         { yymore(); BEGIN(String); loc.step(); }
 <Tag>=                          { return yy::parser::make_EQUAL(loc); }
 
 <Tag>("true"|"false")           { return yy::parser::make_BOOL(std::string(YYText()) == "true", loc); }
 <Tag>[[:alpha:]][[:alnum:]]*    { return yy::parser::make_ID(YYText(), loc); }
 <Tag>[0-9\-]+(\.[0-9]*)?([eE][+\-]?[0-9]+)?  { return yy::parser::make_NUMBER(std::stod(YYText()), loc); }
 
-<String>\\                      { yymore(); BEGIN(StrEscape); }
+<String>\\                      { yymore(); BEGIN(StrEscape); loc.step(); }
 <String>\"                      { BEGIN(Tag); return yy::parser::make_STRING(YYText(), loc); }
-<String>[^\\\"]+                { yymore(); }
-<StrEscape>.                    { yymore(); BEGIN(String); }
+<String>[^\\\"]+                { yymore(); loc.step(); }
+<StrEscape>.                    { yymore(); BEGIN(String); loc.step(); }
 
 [\n]                                { loc.lines(); loc.step(); return yy::parser::make_SPACE(YYText(), loc);}
-[[:space:]\t\v\r]+                  { return yy::parser::make_SPACE(YYText(), loc); }
+[ \t\v\r]+                          { return yy::parser::make_SPACE(YYText(), loc); }
 &("amp"|"lt"|"gt"|"apos"|"quot");   { return yy::parser::make_ENTITY(YYText(), loc); }
 <<EOF>>                             { yyterminate(); }
 \\\<                                { return yy::parser::make_TEXT("<", loc); }

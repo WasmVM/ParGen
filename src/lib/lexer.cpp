@@ -401,13 +401,17 @@ struct Autometa {
     std::deque<Action> actions;
 };
 
-struct NFAState {
+struct FiniteState {
     using Edge = std::pair<std::optional<CharType>, size_t>;
     bool final = false;
     std::list<Edge> edges;
 };
 
-static void convert_to_nfa(Node* root, std::deque<NFAState>& nfa){
+static void create_nfa(Node* root, std::deque<FiniteState>& nfa){
+    bool initial = nfa.empty();
+    if(initial){
+        nfa.resize(1);
+    }
     Node* cur = root;
     while(cur != nullptr){
         size_t start_id = nfa.size() - 1;
@@ -415,10 +419,10 @@ static void convert_to_nfa(Node* root, std::deque<NFAState>& nfa){
         switch(cur->type){
             case Node::Char:{
                 CharNode* node = (CharNode*)cur;
-                std::list<NFAState*> accepted;
+                std::list<FiniteState*> accepted;
                 for(size_t m = 0; m < std::max(std::max(node->min, (size_t)1), node->max); ++m){
-                    NFAState& back = nfa.back();
-                    back.edges.emplace_back(NFAState::Edge{node->char_type, nfa.size()});
+                    FiniteState& back = nfa.back();
+                    back.edges.emplace_back(FiniteState::Edge{node->char_type, nfa.size()});
                     nfa.emplace_back();
                     if(m >= node->min){
                         accepted.emplace_back(&back);
@@ -426,20 +430,54 @@ static void convert_to_nfa(Node* root, std::deque<NFAState>& nfa){
                 }
                 end_id = nfa.size() - 1;
                 if(node->max == 0){
-                    nfa.back().edges.emplace_back(NFAState::Edge{node->char_type, end_id});
+                    nfa.back().edges.emplace_back(FiniteState::Edge{node->char_type, end_id});
                 }
-                for(NFAState* state : accepted){
-                    state->edges.emplace_back(NFAState::Edge{std::nullopt, end_id});
+                for(FiniteState* state : accepted){
+                    state->edges.emplace_back(FiniteState::Edge{std::nullopt, end_id});
                 }
             }break;
             case Node::Group:{
                 GroupNode* node = (GroupNode*)cur;
                 if(!node->children.empty()){
-
+                    std::list<FiniteState*> accepted;
+                    size_t last_start = nfa.size() - 1;
+                    for(size_t m = 0; m < std::max(std::max(node->min, (size_t)1), node->max); ++m){
+                        FiniteState* start = &nfa.back();
+                        last_start = nfa.size() - 1;
+                        if(node->children.size() == 1){
+                            create_nfa(node->children.front(), nfa);
+                        }else{
+                            std::list<FiniteState*> child_ends;
+                            for(Node* child : node->children){
+                                start->edges.emplace_back(FiniteState::Edge{std::nullopt, nfa.size()});
+                                nfa.emplace_back();
+                                create_nfa(child, nfa);
+                                child_ends.emplace_back(&nfa.back());
+                            }
+                            size_t child_end_id = nfa.size();
+                            nfa.emplace_back();
+                            for(FiniteState* end : child_ends){
+                                end->edges.emplace_back(FiniteState::Edge{std::nullopt, child_end_id});
+                            }
+                        }
+                        if(m >= node->min){
+                            accepted.emplace_back(start);
+                        }
+                    }
+                    end_id = nfa.size() - 1;
+                    if(node->max == 0){
+                        nfa.back().edges.emplace_back(FiniteState::Edge{std::nullopt, last_start});
+                    }
+                    for(FiniteState* state : accepted){
+                        state->edges.emplace_back(FiniteState::Edge{std::nullopt, end_id});
+                    }
                 }
             }break;
         }
         cur = cur->next;
+    }
+    if(initial){
+        nfa.back().final = true;
     }
 }
 
@@ -485,9 +523,9 @@ std::ostream& operator<< (std::ostream& os, CharType& type){
     return os;
 }
 
-std::ostream& operator<< (std::ostream& os, std::deque<NFAState>& nfa){
+std::ostream& operator<< (std::ostream& os, std::deque<FiniteState>& nfa){
     size_t i = 0;
-    for(NFAState& state : nfa){
+    for(FiniteState& state : nfa){
         os << "S" << i;
         if(state.final){
             os << " [shape = doublecircle]";
@@ -495,7 +533,7 @@ std::ostream& operator<< (std::ostream& os, std::deque<NFAState>& nfa){
             os << " [shape = circle]";
         }
         os << ";" << std::endl;
-        for(NFAState::Edge& edge: state.edges){
+        for(FiniteState::Edge& edge: state.edges){
             os << "S" << i << "-> S" << edge.second << " [label=\"";
             if(edge.first.has_value()){
                 os << edge.first.value();
@@ -513,8 +551,8 @@ std::deque<Autometa::State> create_states(Pargen::Rule& rule){
     static int rule_id = 0;
     std::deque<Autometa::State> states;
     Node* root = parse_pattern(rule.pattern);
-    std::deque<NFAState> nfa(1);
-    convert_to_nfa(root, nfa);
+    std::deque<FiniteState> nfa;
+    create_nfa(root, nfa);
     // dump 
     std::ofstream fout("state" + std::to_string(rule_id++) + ".dot");
     fout << "digraph {" << std::endl;
@@ -634,10 +672,10 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         // Write function
         std::string signature = append_func_name(func, class_name);
         if(signature.starts_with("template")){
-            os << "// TODO: " << signature << "\n" << std::endl;
+            os << "// TODO : " << signature << "\n" << std::endl;
         }else{
             os << signature << "{" << std::endl;
-            os << "    // TODO: implement function here" << std::endl;
+            os << "    // TODO : implement function here" << std::endl;
             os << "}\n" << std::endl;
         }
     }

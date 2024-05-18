@@ -10,7 +10,7 @@ BISON_TARGET(pxml_parser ${PROJECT_SOURCE_DIR}/src/pxml/pxml.y ${CMAKE_CURRENT_B
 
 add_custom_command(OUTPUT pxml_lexer.cpp
   COMMAND flex -o ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l 
-  DEPENDS pxml_parser
+  DEPENDS pxml_parser ${PROJECT_SOURCE_DIR}/src/pxml/pxml.l
 )
 
 add_library(pargen

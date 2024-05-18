@@ -429,7 +429,7 @@ void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
             }else if(child_pxml.tag == "state"){
                 lexer.emplace_back(elem_state(pargen, child_pxml));
             }else{
-                throw Exception::Exception("invalid element under <lexer>");
+                throw Exception::SyntaxError("invalid element under <lexer>", child_pxml.pos);
             }
         }
     }
