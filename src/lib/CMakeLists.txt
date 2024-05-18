@@ -13,17 +13,13 @@ add_custom_command(OUTPUT pxml_lexer.cpp
   DEPENDS pxml_parser
 )
 
-add_library(pxml
-  Pxml.cpp
+add_library(pargen
+  ParGen.cpp
+  elem.cpp
+  tokens.cpp
+  lexer.cpp
   exception.cpp
   ${BISON_pxml_parser_OUTPUTS}
   ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp
   Util.cpp
-)
-
-add_library(pargen
-  ParGen.cpp
-  elements.cpp
-  tokens.cpp
-  lexer.cpp
 )

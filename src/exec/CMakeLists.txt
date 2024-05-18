@@ -4,7 +4,6 @@ add_executable(pargen-exec
 )
 target_link_libraries(pargen-exec
   pargen
-  pxml
 )
 set_target_properties(pargen-exec PROPERTIES OUTPUT_NAME "pargen")
 target_compile_definitions(pargen PUBLIC

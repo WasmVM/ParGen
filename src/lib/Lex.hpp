@@ -5,8 +5,8 @@
 #include <filesystem>
 #include <location.hh>
 
-struct Lexer : public yyFlexLexer {
-    Lexer(std::filesystem::path filename, std::istream& stream) : yyFlexLexer(stream, std::cout){
+struct Lex : public yyFlexLexer {
+    Lex(std::filesystem::path filename, std::istream& stream) : yyFlexLexer(stream, std::cout){
         loc.initialize(new std::filesystem::path(filename));
     };
     yy::parser::symbol_type lex();

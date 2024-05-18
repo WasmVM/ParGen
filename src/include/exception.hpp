@@ -9,7 +9,7 @@
 #include <filesystem>
 
 #include <Util.hpp>
-#include <ParGen.hpp>
+#include <Pxml.hpp>
 
 namespace Exception{
 
@@ -34,11 +34,9 @@ namespace Exception{
     };
 
     struct SyntaxError : public Exception {
-        std::filesystem::path filename;
-        size_t line;
-        size_t column;
-        SyntaxError(std::string msg, std::filesystem::path filename, size_t line, size_t column) : 
-            Exception(msg), filename(filename), line(line), column(column){}
+        PXML::Position pos;
+        SyntaxError(std::string msg, PXML::Position pos) : 
+            Exception(msg), pos(pos){}
     };
 }
 

@@ -1,8 +1,8 @@
 %{
 #include "pxml_parser.hpp"
-#include <Lexer.hpp>
+#include <Lex.hpp>
 
-#define YY_DECL yy::parser::symbol_type Lexer::lex()
+#define YY_DECL yy::parser::symbol_type Lex::lex()
 
 #define yyterminate() return yy::parser::make_END(loc)
 

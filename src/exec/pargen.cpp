@@ -84,7 +84,7 @@ int main(int argc, const char* argv[]){
         }
         
     }catch(Exception::SyntaxError& err){
-        std::cerr << err.filename.string() << ":" << err.line << ":" << err.column
+        std::cerr << err.pos.path.string() << ":" << err.pos.line << ":" << err.pos.column
             << " " COLOR_Error ": " << err.what() << std::endl;
         return -2;
     }catch(Exception::Exception &err){

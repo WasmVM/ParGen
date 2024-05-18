@@ -8,24 +8,32 @@
 %define api.filename.type {std::filesystem::path}
 %define parse.error detailed
 %define parse.lac full
-%parse-param { Lexer& lexer }{ PXML::Pxml& pxml }
+%parse-param { Lex& lexer }{ PXML::Pxml& pxml }
 
 %code requires {
     #include <list>
     #include <utility>
     #include <filesystem>
     #include <Pxml.hpp>
-    #include <color.hpp>
 #ifndef yyFlexLexerOnce
     #include <FlexLexer.h>
 #endif
-    struct Lexer;
+    struct Lex;
 }
 
 %code {
     #include <exception.hpp>
-    #include <Lexer.hpp>
+    #include <Lex.hpp>
     #define yylex() lexer.lex()
+
+    PXML::Position to_pos(yy::location& loc){
+        PXML::Position pos {
+            .path = *loc.begin.filename,
+            .line = (size_t)loc.begin.line,
+            .column = (size_t)loc.begin.column,
+        };
+        return pos;
+    }
 }
 
 %token DOCTYPE EQUAL CLOSE INLINE
@@ -46,21 +54,19 @@
 
 %start  pxml;
 
-pxml :  DOCTYPE spaces element spaces END
+pxml :  DOCTYPE spaces element spaces END 
     {
-        if($3.tag != "pxml"){
-            error(@3, "the root element should be <pxml>");
-        }
         pxml = $3;
+        pxml.pos = to_pos(@3);
     }
 
-content :   element { $$ = $1; }
-    |       text    { $$ = $1; }
+content :   element { $$.first = to_pos(@1); $$.second = $1; }
+    |       text    { $$.first = to_pos(@1); $$.second = $1; }
 
 body :  body content
         { 
-            if(!$1.empty() && std::holds_alternative<std::string>($1.back()) && std::holds_alternative<std::string>($2)){
-                std::get<std::string>($1.back()) += std::get<std::string>($2);
+            if(!$1.empty() && std::holds_alternative<std::string>($1.back().second) && std::holds_alternative<std::string>($2.second)){
+                std::get<std::string>($1.back().second) += std::get<std::string>($2.second);
             }else{
                 $1.emplace_back($2);
             }
@@ -74,6 +80,7 @@ element :   TAG attr_list CLOSE body TAIL
                 error(@5, "tag not match");
             }
             $$.tag = $1;
+            $$.pos = to_pos(@1);
             for(auto attr_pair : $2){
                 $$[attr_pair.first] = attr_pair.second;
             }
@@ -82,6 +89,7 @@ element :   TAG attr_list CLOSE body TAIL
     |       TAG attr_list INLINE
         {
             $$.tag = $1;
+            $$.pos = to_pos(@1);
             for(auto attr_pair : $2){
                 $$[attr_pair.first] = attr_pair.second;
             }
@@ -111,19 +119,18 @@ text :  TEXT    { $$ = $1; }
 attr_list : attr_list attribute { $1.emplace_back($2); $$ = $1; }
     |       %empty {}
 
-attribute : ID EQUAL value  { $$.first = $1; $$.second = $3; }
-    |       ID  { $$.first = $1; }
+attribute : ID EQUAL value  { $$.first = $1; $$.second = $3; $$.second.first = to_pos(@1);}
+    |       ID  { $$.first = $1; $$.second.first = to_pos(@1);}
 
-value : BOOL    { $$.emplace<bool>($1); }
-    |   NUMBER  { $$.emplace<double>($1); }
-    |   STRING  { $$.emplace<std::string>($1.substr(1, $1.size() - 2)); }
+value : BOOL    { $$.first = to_pos(@1); $$.second.emplace<bool>($1); }
+    |   NUMBER  { $$.first = to_pos(@1); $$.second.emplace<double>($1); }
+    |   STRING  { $$.first = to_pos(@1); $$.second.emplace<std::string>($1.substr(1, $1.size() - 2)); }
 
 %%
 
 #include <sstream>
 
 void yy::parser::error(yy::location const& loc, std::string const& msg){
-    std::stringstream ss;
-    ss << loc.begin.filename->filename().string() << ":" << loc.begin.line << ":" << loc.begin.column << " " COLOR_Error ": " << msg;
-    throw Exception::SyntaxError(ss.str());
+    yy::location l = loc;
+    throw Exception::SyntaxError(msg, to_pos(l));
 }
