@@ -41,7 +41,6 @@
     </tokens>
     {% Lexer %}
     <lexer class="PxmlLexer" newLine="\n" headerFile="PxmlLexer.hpp" sourceFile="PxmlLexer.cpp">
-        <rule pattern="(true|false)" />
         {% DOCTYPE %}
         <rule pattern="<!DOCTYPE pxml>">
             return Doctype();

@@ -24,47 +24,58 @@
 #include <variant>
 #include <cctype>
 #include <fstream>
+#include <memory>
+#include <functional>
+#include <algorithm>
+#include <set>
 #include <unordered_map>
-#include <unordered_set>
 
 using namespace Pargen;
 
-static void collect_rule(std::list<std::variant<Rule, Use, State>>& state, std::unordered_map<std::string, Rule>& rule_map){
-    for(std::variant<Rule, Use, State>& elem : state){
-        std::visit(overloaded {
-            [&](Rule& rule){
-                if(!rule.id.empty()){
-                    rule_map[rule.id] = rule;
-                }
-            },
-            [&](State& st){
-                collect_rule(st, rule_map);
-            },
-            [](Use&){}
-        }, elem);
-    }
-}
-
-static void resolve_use(std::list<std::variant<Rule, Use, State>>& state, std::unordered_map<std::string, Rule>& rule_map){
-    for(std::variant<Rule, Use, State>& elem : state){
-        std::visit(overloaded {
-            [&](State& st){
-                resolve_use(st, rule_map);
-            },
-            [&](Use& use){
-                if(rule_map.contains(use.id)){
-                    elem.emplace<Rule>(rule_map[use.id]);
-                }else{
-                    throw Exception::Exception("rule id '" + use.id + "' not exist");
-                }
-            },
-            [](Rule&){}
-        }, elem);
-    }
-}
+/* Use */
 
 static void resolve_use(std::list<std::variant<Rule, State>>& rules){
+
     std::unordered_map<std::string, Rule> rule_map;
+
+    std::function<void(std::list<std::variant<Rule, Use, State>>&)> collect_rule = 
+        [&collect_rule, &rule_map](std::list<std::variant<Rule, Use, State>>& state)
+    {
+        for(std::variant<Rule, Use, State>& elem : state){
+            std::visit(overloaded {
+                [&](Rule& rule){
+                    if(!rule.id.empty()){
+                        rule_map[rule.id] = rule;
+                    }
+                },
+                [&](State& st){
+                    collect_rule(st);
+                },
+                [](Use&){}
+            }, elem);
+        }
+    };
+
+    std::function<void(std::list<std::variant<Rule, Use, State>>&)> resolve_state_use = 
+        [&resolve_state_use, &rule_map](std::list<std::variant<Rule, Use, State>>& state)
+    {
+        for(std::variant<Rule, Use, State>& elem : state){
+            std::visit(overloaded {
+                [&](State& st){
+                    resolve_state_use(st);
+                },
+                [&](Use& use){
+                    if(rule_map.contains(use.id)){
+                        elem.emplace<Rule>(rule_map[use.id]);
+                    }else{
+                        throw Exception::Exception("rule id '" + use.id + "' not exist");
+                    }
+                },
+                [](Rule&){}
+            }, elem);
+        }
+    };
+
     for(std::variant<Rule, State>& elem : rules){
         std::visit(overloaded {
             [&](Rule& rule){
@@ -73,7 +84,7 @@ static void resolve_use(std::list<std::variant<Rule, State>>& rules){
                 }
             },
             [&](State& state){
-                collect_rule(state, rule_map);
+                collect_rule(state);
             }
         }, elem);
     }
@@ -81,18 +92,78 @@ static void resolve_use(std::list<std::variant<Rule, State>>& rules){
         std::visit(overloaded {
             [](Rule&){},
             [&](State& state){
-                resolve_use(state, rule_map);
+                resolve_state_use(state);
             }
         }, elem);
     }
 }
 
-enum class CharClass {
-    Number, NotNumber,
-    Alphabet, NotAlphabet,
-    Alnum, NotAlnum,
-    Space, NotSpace,
+/* Character */
+
+struct CharType : public std::set<char>{
+    enum Class {Number, Alphabet, Space};
+    bool negate = false;
+    CharType() = default;
+
+    CharType(const char ch){
+        insert(ch);
+    }
+
+    CharType(const Class cl){
+        switch(cl){
+            case Number:
+                insert({'0','1','2','3','4','5','6','7','8','9'});
+            break;
+            case Alphabet:
+                insert({
+                    'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+                    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+                });
+            break;
+            case Space:
+                insert({' ', '\t', '\r', '\v', '\f', '\n'});
+            break;
+        }
+    }
+
+    operator bool(){
+        return negate || !empty();
+    }
+
+    bool is_any(){
+        return negate && empty();
+    }
+
+    CharType operator!(){
+        negate = !negate;
+        return *this;
+    }
+    CharType operator+(const CharType& rhs){
+        CharType result;
+        result.negate = true;
+        if(negate == rhs.negate){
+            if(negate){
+                std::set_intersection(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
+            }else{
+                std::set_union(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
+                result.negate = false;
+            }
+        }else{
+            if(negate){
+                std::set_difference(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
+            }else{
+                std::set_difference(rhs.begin(), rhs.end(), begin(), end(), std::inserter(result, result.end()));
+            }
+        }
+        return result;
+    }
+    CharType& operator+=(const CharType& rhs){
+        *this = (*this + rhs);
+        return *this;
+    }
 };
+
+/* Node */
 
 struct Node {
     enum Type {Char, Group};
@@ -107,13 +178,9 @@ struct Node {
     virtual ~Node(){
         if(next != nullptr){
             delete next;
+            next = nullptr;
         }
     }
-};
-
-struct CharType {
-    bool negate = false;
-    std::vector<std::variant<char, CharClass>> chars;
 };
 
 struct CharNode : public Node{
@@ -127,17 +194,18 @@ struct GroupNode : public Node{
     ~GroupNode(){
         if(next != nullptr){
             delete next;
+            next = nullptr;
         }
         for(Node* child : children){
             if(child != nullptr){
                 delete child;
+                child = nullptr;
             }
         }
     }
 };
 
-static std::vector<std::variant<char, CharClass>> escape_sequence(std::string::iterator& it, const std::string::iterator& end){
-    std::vector<std::variant<char, CharClass>> characters;
+static CharType escape_sequence(std::string::iterator& it, const std::string::iterator& end){
     char ch = *(++it);
     switch(ch){
         case 'x':
@@ -146,7 +214,7 @@ static std::vector<std::variant<char, CharClass>> escape_sequence(std::string::i
                 hex += *(++it); 
                 hex += *(++it);
                 if(std::isxdigit(hex[0]) && std::isxdigit(hex[1])){
-                    characters.emplace_back((char)std::stoi(hex, nullptr, 16));
+                    return (char)std::stoi(hex, nullptr, 16);
                 }else{
                     throw Exception::Exception("expected 2 hex digits for hex escape in pattern");
                 }
@@ -155,48 +223,47 @@ static std::vector<std::variant<char, CharClass>> escape_sequence(std::string::i
             }
         break;
         case 't':
-            characters.emplace_back('\t');
+            return '\t';
         break;
         case 'r':
-            characters.emplace_back('\r');
+            return '\r';
         break;
         case 'v':
-            characters.emplace_back('\v');
+            return '\v';
         break;
         case 'f':
-            characters.emplace_back('\f');
+            return '\f';
         break;
         case 'n':
-            characters.emplace_back('\n');
+            return '\n';
         break;
         case 'd':
-            characters.emplace_back(CharClass::Number);
+            return CharType(CharType::Number);
         break;
         case 'D':
-            characters.emplace_back(CharClass::NotNumber);
+            return !CharType(CharType::Number);
         break;
         case 's':
-            characters.emplace_back(CharClass::Space);
+            return CharType(CharType::Space);
         break;
         case 'S':
-            characters.emplace_back(CharClass::NotSpace);
+            return !CharType(CharType::Space);
         break;
         case 'w':
-            characters.emplace_back(CharClass::Alnum);
+            return CharType(CharType::Alphabet) + CharType(CharType::Number);
         break;
         case 'W':
-            characters.emplace_back(CharClass::NotAlnum);
+            return !(CharType(CharType::Alphabet) + CharType(CharType::Number));
         break;
         case 'a':
-            characters.emplace_back(CharClass::Alphabet);
+            return CharType(CharType::Alphabet);
         break;
         case 'A':
-            characters.emplace_back(CharClass::NotAlphabet);
+            return !CharType(CharType::Alphabet);
         break;
         default:
-            characters.emplace_back(ch);
+            return ch;
     }
-    return characters;
 }
 
 static Node* parse_pattern(std::string& pattern){
@@ -208,7 +275,7 @@ static Node* parse_pattern(std::string& pattern){
     for(auto it = pattern.begin(); it != pattern.end(); ++it){
         switch(*it){
             case '[':{
-                std::vector<std::variant<char, CharClass>> characters;
+                CharType char_type;
                 bool negate = false;
                 if(it != pattern.end()){
                     if(*(std::next(it)) == '^'){
@@ -217,45 +284,54 @@ static Node* parse_pattern(std::string& pattern){
                     }
                     ++it;
                 }
+                std::optional<char> last = std::nullopt;
                 while((it != pattern.end()) && (*it != ']')){
                     if(*it == '\\'){
                         if(std::next(it) == pattern.end()){
                             throw Exception::Exception("expected character after '\\' in pattern");
                         }else{
-                            std::vector<std::variant<char, CharClass>> escapes = escape_sequence(it, pattern.end());
-                            characters.insert(characters.end(), escapes.begin(), escapes.end());
+                            CharType escaped = escape_sequence(it, pattern.end());
+                            char_type += escaped;
+                            if(!escaped.negate && escaped.size() == 1){
+                                last = *escaped.begin();
+                            }else{
+                                last.reset();
+                            }
                         }
                     }else if(*it == '-'){
                         if(std::next(it) == pattern.end()){
                             throw Exception::Exception("expected character after '-' in pattern");
-                        }else if(characters.empty()){
+                        }else if(char_type.empty()){
                             throw Exception::Exception("expected character before '-' in pattern");
-                        }else if(std::holds_alternative<char>(characters.back())){
+                        }else if(!last.has_value()){
+                            throw Exception::Exception("invalid character before '-' in pattern");
+                        }else{
                             ++it;
-                            for(char ch = std::get<char>(characters.back()) + 1; ch <= *it; ++ch){
-                                characters.emplace_back(ch);
+                            for(char ch = (last.value() + 1); ch <= *it; ++ch){
+                                char_type += ch;
                             }
                         }
                     }else{
-                        characters.emplace_back(*it);
+                        char_type += *it;
                     }
                     ++it;
                 }
-                if(characters.empty()){
+                if(negate){
+                    char_type = !char_type;
+                }
+                if(char_type == false){
                     throw Exception::Exception("empty [] in pattern");
                 }
                 CharNode* node = new CharNode;
-                node->char_type.chars = characters;
-                node->char_type.negate = negate;
+                node->char_type = char_type;
                 current = node;
                 *next = node;
                 next = &(node->next);
             }break;
             case '\\':{
                 if(it != pattern.end()){
-                    std::vector<std::variant<char, CharClass>> characters = escape_sequence(it, pattern.end());
                     CharNode* node = new CharNode;
-                    node->char_type.chars = characters;
+                    node->char_type = escape_sequence(it, pattern.end());
                     current = node;
                     *next = node;
                     next = &(node->next);
@@ -359,7 +435,7 @@ static Node* parse_pattern(std::string& pattern){
             }break;
             default:{
                 CharNode* node = new CharNode;
-                node->char_type.chars.emplace_back(*it);
+                node->char_type += *it;
                 current = node;
                 *next = node;
                 next = &(node->next);
@@ -371,6 +447,8 @@ static Node* parse_pattern(std::string& pattern){
     }
     return root;
 }
+
+/* Autometa */
 
 struct Autometa {
 
@@ -407,31 +485,34 @@ struct FiniteState {
     std::list<Edge> edges;
 };
 
-static void create_nfa(Node* root, std::deque<FiniteState>& nfa){
-    bool initial = nfa.empty();
+static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* nfa = nullptr){
+    bool initial = (nfa == nullptr);
     if(initial){
-        nfa.resize(1);
+        nfa = new std::deque<FiniteState>(2);
     }
     Node* cur = root;
     while(cur != nullptr){
-        size_t start_id = nfa.size() - 1;
         size_t end_id = (size_t)-1;
         switch(cur->type){
             case Node::Char:{
                 CharNode* node = (CharNode*)cur;
                 std::list<FiniteState*> accepted;
                 for(size_t m = 0; m < std::max(std::max(node->min, (size_t)1), node->max); ++m){
-                    FiniteState& back = nfa.back();
-                    back.edges.emplace_back(FiniteState::Edge{node->char_type, nfa.size()});
-                    nfa.emplace_back();
+                    FiniteState& back = nfa->back();
+                    // Create state
+                    back.edges.emplace_back(FiniteState::Edge{node->char_type, nfa->size()});
+                    nfa->emplace_back();
+                    // Add accepted edges
                     if(m >= node->min){
                         accepted.emplace_back(&back);
                     }
                 }
-                end_id = nfa.size() - 1;
+                end_id = nfa->size() - 1;
+                // Handle loop
                 if(node->max == 0){
-                    nfa.back().edges.emplace_back(FiniteState::Edge{node->char_type, end_id});
+                    nfa->back().edges.emplace_back(FiniteState::Edge{node->char_type, end_id});
                 }
+                // Link accepted states to end
                 for(FiniteState* state : accepted){
                     state->edges.emplace_back(FiniteState::Edge{std::nullopt, end_id});
                 }
@@ -440,34 +521,42 @@ static void create_nfa(Node* root, std::deque<FiniteState>& nfa){
                 GroupNode* node = (GroupNode*)cur;
                 if(!node->children.empty()){
                     std::list<FiniteState*> accepted;
-                    size_t last_start = nfa.size() - 1;
+                    size_t last_start = nfa->size() - 1;
                     for(size_t m = 0; m < std::max(std::max(node->min, (size_t)1), node->max); ++m){
-                        FiniteState* start = &nfa.back();
-                        last_start = nfa.size() - 1;
+                        FiniteState* start = &nfa->back();
+                        last_start = nfa->size() - 1;
+                        // Create states
                         if(node->children.size() == 1){
+                            // One child
                             create_nfa(node->children.front(), nfa);
                         }else{
+                            // Multiple children
                             std::list<FiniteState*> child_ends;
                             for(Node* child : node->children){
-                                start->edges.emplace_back(FiniteState::Edge{std::nullopt, nfa.size()});
-                                nfa.emplace_back();
+                                start->edges.emplace_back(FiniteState::Edge{std::nullopt, nfa->size()});
+                                nfa->emplace_back();
                                 create_nfa(child, nfa);
-                                child_ends.emplace_back(&nfa.back());
+                                child_ends.emplace_back(&nfa->back());
                             }
-                            size_t child_end_id = nfa.size();
-                            nfa.emplace_back();
+                            size_t child_end_id = nfa->size();
+                            // Add final end state
+                            nfa->emplace_back();
+                            // Link every end to final end state
                             for(FiniteState* end : child_ends){
                                 end->edges.emplace_back(FiniteState::Edge{std::nullopt, child_end_id});
                             }
                         }
+                        // Add accepted edges
                         if(m >= node->min){
                             accepted.emplace_back(start);
                         }
                     }
-                    end_id = nfa.size() - 1;
+                    end_id = nfa->size() - 1;
+                    // Handle loop
                     if(node->max == 0){
-                        nfa.back().edges.emplace_back(FiniteState::Edge{std::nullopt, last_start});
+                        nfa->back().edges.emplace_back(FiniteState::Edge{std::nullopt, last_start});
                     }
+                    // Link accepted states to end
                     for(FiniteState* state : accepted){
                         state->edges.emplace_back(FiniteState::Edge{std::nullopt, end_id});
                     }
@@ -476,49 +565,51 @@ static void create_nfa(Node* root, std::deque<FiniteState>& nfa){
         }
         cur = cur->next;
     }
+    // Mark final state
     if(initial){
-        nfa.back().final = true;
+        nfa->back().final = true;
     }
+    return nfa;
+}
+
+static void convert_to_dfa(std::deque<FiniteState>& nfa){
+    // Collect 
 }
 
 std::ostream& operator<< (std::ostream& os, CharType& type){
     if(type.negate){
         os << "not ";
     }
-    for(std::variant<char, CharClass> ch : type.chars){
-        std::visit(overloaded {
-            [&os](char& c){
-                os << "'" << c << "'";
-            },
-            [&os](CharClass& c){
-                switch(c){
-                    case CharClass::Number:
-                        os << "number";
-                    break;
-                    case CharClass::NotNumber:
-                        os << "not-number";
-                    break;
-                    case CharClass::Alphabet:
-                        os << "alpha";
-                    break;
-                    case CharClass::NotAlphabet:
-                        os << "not-alpha";
-                    break;
-                    case CharClass::Alnum:
-                        os << "alnum";
-                    break;
-                    case CharClass::NotAlnum:
-                        os << "not-alnum";
-                    break;
-                    case CharClass::Space:
-                        os << "space";
-                    break;
-                    case CharClass::NotSpace:
-                        os << "not-space";
-                    break;
-                }
-            },
-        }, ch);
+    if(type.is_any()){
+        return os << "any";
+    }
+    std::string characters(type.begin(), type.end());
+    std::stable_sort(characters.begin(), characters.end());
+    for(char ch : characters){
+        if(std::isspace(ch)){
+            switch(ch){
+                case ' ':
+                    os << "'" << ch << "'";
+                break;
+                case '\t':
+                    os << "\\\\t";
+                break;
+                case '\r':
+                    os << "\\\\r";
+                break;
+                case '\f':
+                    os << "\\\\f";
+                break;
+                case '\v':
+                    os << "\\\\v";
+                break;
+                case '\n':
+                    os << "\\\\n";
+                break;
+            }
+        }else{
+            os << "'" << ch << "'";
+        }
     }
     return os;
 }
@@ -550,19 +641,19 @@ std::ostream& operator<< (std::ostream& os, std::deque<FiniteState>& nfa){
 std::deque<Autometa::State> create_states(Pargen::Rule& rule){
     static int rule_id = 0;
     std::deque<Autometa::State> states;
-    Node* root = parse_pattern(rule.pattern);
-    std::deque<FiniteState> nfa;
-    create_nfa(root, nfa);
+    std::shared_ptr<Node> root(parse_pattern(rule.pattern));
+    std::shared_ptr<std::deque<FiniteState>> nfa(create_nfa(root.get()));
     // dump 
     std::ofstream fout("state" + std::to_string(rule_id++) + ".dot");
     fout << "digraph {" << std::endl;
-    fout << nfa << std::endl;
+    fout << *nfa << std::endl;
     fout << "}" << std::endl;
     fout.close();
     return states;
 }
 
 Autometa::Autometa(Lexer& lexer){
+
     resolve_use(lexer);
     for(std::variant<Pargen::Rule, Pargen::State>& elem : lexer){
         std::visit(overloaded {
@@ -574,11 +665,13 @@ Autometa::Autometa(Lexer& lexer){
                 }
             },
             [&](Pargen::State& state){
-                // TODO:
+                
             }
         }, elem);
     }
 }
+
+/* Lexer */
 
 void Pargen::Lexer::generate_header(std::ostream& os){
     // prologue
