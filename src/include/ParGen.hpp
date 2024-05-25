@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <variant>
+#include <optional>
 #include <list>
 #include <regex>
 #include <iostream>
@@ -22,7 +23,7 @@ struct Token {
 struct Rule {
     std::string id;
     std::string pattern;
-    std::string push = "";
+    std::optional<std::string> push = std::nullopt;
     bool pop = false;
     bool more = false;
     std::string content;
@@ -76,19 +77,23 @@ struct Lexer : public std::list<std::variant<Rule, State>>{
     void generate_header(std::ostream& output);
     void generate_source(std::ostream& output);
 
-private:
     ParGen& parent;
 };
 
+struct Options {
+    bool debug = false;
+};
+
 struct ParGen {
-    
-    ParGen() : tokens(*this), lexer(*this){}
+
+    ParGen(Options options = {}) : tokens(*this), lexer(*this), options(options){}
     void load(std::filesystem::path pxml_path);
 
     std::string name_space = "Pargen";
     std::list<std::filesystem::path> includes;
     Tokens tokens;
     Lexer lexer;
+    Options options;
 };
 
 } // namespace Pargen

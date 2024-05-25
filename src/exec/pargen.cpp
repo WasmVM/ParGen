@@ -29,6 +29,7 @@ int main(int argc, const char* argv[]){
     CommandParser args(argc, argv, {
         CommandParser::Optional("--version", "Show version", "-v"),
         CommandParser::Optional("--namespace", "Override namespace of generated objects", 1, "-n"),
+        CommandParser::Optional("--debug", "Debug mode", "-d"),
         CommandParser::Repeated("--includes", "Add directory to include files search list", 1, "-I"),
         CommandParser::Fixed("pxml_file", "Path of main PXML file")
     },
@@ -64,6 +65,17 @@ int main(int argc, const char* argv[]){
         }
         // Load pxml
         pargen.load(pxml_file);
+
+        // Namespace
+        if(args["namespace"]){
+            pargen.name_space = std::get<std::string>(args["namespace"].value());
+        }
+
+        // Debug
+        if(args["debug"]){
+            pargen.options.debug = true;
+        }
+
         // Generate token files
         if(!pargen.tokens.empty()){
             std::ofstream header_out(pargen.tokens.header_path, std::ios::trunc);
