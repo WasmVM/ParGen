@@ -28,6 +28,7 @@
 #include <functional>
 #include <algorithm>
 #include <set>
+#include <map>
 #include <unordered_map>
 
 using namespace Pargen;
@@ -126,12 +127,8 @@ struct CharType : public std::set<char>{
         }
     }
 
-    operator bool(){
-        return negate || !empty();
-    }
-
-    bool is_any(){
-        return negate && empty();
+    bool is_any() const{
+        return contains('\0');
     }
 
     CharType operator!(){
@@ -142,14 +139,21 @@ struct CharType : public std::set<char>{
         CharType result;
         result.negate = true;
         if(negate == rhs.negate){
-            if(negate){
+            if(is_any() || rhs.is_any()){
+                result.negate = negate;
+                result += '\0';
+            }else if(negate){
                 std::set_intersection(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
             }else{
                 std::set_union(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
                 result.negate = false;
             }
         }else{
-            if(negate){
+            if(is_any()){
+                result = rhs;
+            }else if(rhs.is_any()){
+                result = *this;
+            }else if(negate){
                 std::set_difference(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
             }else{
                 std::set_difference(rhs.begin(), rhs.end(), begin(), end(), std::inserter(result, result.end()));
@@ -285,7 +289,7 @@ static Node* parse_pattern(std::string& pattern){
                     ++it;
                 }
                 std::optional<char> last = std::nullopt;
-                while((it != pattern.end()) && (*it != ']')){
+                for(;(it != pattern.end()) && (*it != ']');++it){
                     if(*it == '\\'){
                         if(std::next(it) == pattern.end()){
                             throw Exception::Exception("expected character after '\\' in pattern");
@@ -299,27 +303,27 @@ static Node* parse_pattern(std::string& pattern){
                             }
                         }
                     }else if(*it == '-'){
-                        if(std::next(it) == pattern.end()){
+                        if(++it == pattern.end()){
                             throw Exception::Exception("expected character after '-' in pattern");
                         }else if(char_type.empty()){
                             throw Exception::Exception("expected character before '-' in pattern");
                         }else if(!last.has_value()){
                             throw Exception::Exception("invalid character before '-' in pattern");
                         }else{
-                            ++it;
                             for(char ch = (last.value() + 1); ch <= *it; ++ch){
                                 char_type += ch;
                             }
                         }
                     }else{
                         char_type += *it;
+                        last = *it;
                     }
-                    ++it;
+                    
                 }
                 if(negate){
                     char_type = !char_type;
                 }
-                if(char_type == false){
+                if(!char_type.negate && char_type.empty()){
                     throw Exception::Exception("empty [] in pattern");
                 }
                 CharNode* node = new CharNode;
@@ -428,7 +432,7 @@ static Node* parse_pattern(std::string& pattern){
             }break;
             case '.':{
                 CharNode* node = new CharNode;
-                node->char_type.negate = true;
+                node->char_type += '\0';
                 current = node;
                 *next = node;
                 next = &(node->next);
@@ -465,13 +469,8 @@ struct Autometa {
         std::string content = "";
     };
 
-    using Transition = std::variant<size_t, std::string, Action*>;
-
-    struct State : public std::unordered_map<char, Transition> {
-        bool neg = false;
-        size_t fall = 0;
-        size_t min = 1;
-        size_t max = 1;
+    struct State : public std::unordered_map<std::optional<char>, size_t> {
+        std::optional<size_t> action_id;
     };
 
     std::deque<State> states;
@@ -479,20 +478,26 @@ struct Autometa {
     std::deque<Action> actions;
 };
 
+Autometa::Action::Flags& operator|=(Autometa::Action::Flags& lhs, const Autometa::Action::Flags&& rhs){
+    return lhs = (Autometa::Action::Flags)((uint8_t)lhs | (uint8_t)rhs);
+}
+
 struct FiniteState {
     using Edge = std::pair<std::optional<CharType>, size_t>;
-    bool final = false;
+    enum {None, Error, Final, Start} type = None;
     std::list<Edge> edges;
 };
 
 static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* nfa = nullptr){
     bool initial = (nfa == nullptr);
     if(initial){
-        nfa = new std::deque<FiniteState>(2);
+        nfa = new std::deque<FiniteState>{
+            FiniteState{.type = FiniteState::Error},
+            FiniteState{.type = FiniteState::Start},
+        };
     }
     Node* cur = root;
     while(cur != nullptr){
-        size_t end_id = (size_t)-1;
         switch(cur->type){
             case Node::Char:{
                 CharNode* node = (CharNode*)cur;
@@ -500,17 +505,32 @@ static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* 
                 for(size_t m = 0; m < std::max(std::max(node->min, (size_t)1), node->max); ++m){
                     FiniteState& back = nfa->back();
                     // Create state
-                    back.edges.emplace_back(FiniteState::Edge{node->char_type, nfa->size()});
+                    if(node->char_type.negate){
+                        CharType ch = node->char_type;
+                        ch.negate = false;
+                        back.edges.emplace_back(FiniteState::Edge{ch, 0});
+                        back.edges.emplace_back(FiniteState::Edge{'\0', nfa->size()});
+                    }else{
+                        back.edges.emplace_back(FiniteState::Edge{node->char_type, nfa->size()});
+                    }
                     nfa->emplace_back();
                     // Add accepted edges
                     if(m >= node->min){
                         accepted.emplace_back(&back);
                     }
                 }
-                end_id = nfa->size() - 1;
+                size_t end_id = nfa->size() - 1;
                 // Handle loop
                 if(node->max == 0){
-                    nfa->back().edges.emplace_back(FiniteState::Edge{node->char_type, end_id});
+                    FiniteState& back = nfa->back();
+                    if(node->char_type.negate){
+                        CharType ch = node->char_type;
+                        ch.negate = false;
+                        back.edges.emplace_back(FiniteState::Edge{ch, 0});
+                        back.edges.emplace_back(FiniteState::Edge{'\0', end_id});
+                    }else{
+                        back.edges.emplace_back(FiniteState::Edge{node->char_type, end_id});
+                    }
                 }
                 // Link accepted states to end
                 for(FiniteState* state : accepted){
@@ -551,7 +571,7 @@ static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* 
                             accepted.emplace_back(start);
                         }
                     }
-                    end_id = nfa->size() - 1;
+                    size_t end_id = nfa->size() - 1;
                     // Handle loop
                     if(node->max == 0){
                         nfa->back().edges.emplace_back(FiniteState::Edge{std::nullopt, last_start});
@@ -567,13 +587,103 @@ static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* 
     }
     // Mark final state
     if(initial){
-        nfa->back().final = true;
+        nfa->back().type = FiniteState::Final;
     }
     return nfa;
 }
 
-static void convert_to_dfa(std::deque<FiniteState>& nfa){
-    // Collect 
+static std::deque<FiniteState>* create_dfa(std::deque<FiniteState>* nfa){
+    if(nfa->size() < 2){
+        return nfa->empty() ? (new std::deque<FiniteState>()) : (new std::deque<FiniteState>(*nfa));
+    }
+
+    // Compute e-closure
+    std::vector<std::set<size_t>> e_closure(nfa->size());
+    for(size_t state_id = 0; state_id < nfa->size(); ++state_id){
+        std::set<size_t>& e_states = e_closure[state_id];
+        std::stack<size_t> id_stack;
+        id_stack.push(state_id);
+        while(!id_stack.empty()){
+            e_states.emplace(id_stack.top());
+            FiniteState& state = nfa->at(id_stack.top());
+            id_stack.pop();
+            for(FiniteState::Edge& edge : state.edges){
+                if(!edge.first.has_value()){
+                    id_stack.push(edge.second);
+                }
+            }
+        }
+    }
+    
+    // Create DFA
+    std::deque<FiniteState>* dfa = new std::deque<FiniteState> {
+        FiniteState{.type = FiniteState::Start}
+    };
+    std::map<std::set<size_t>, size_t> index_map {{e_closure.at(1), 0}};
+    std::queue<std::set<size_t>> set_queue;
+    set_queue.emplace(e_closure.at(1));
+    while(!set_queue.empty()){
+        std::set<size_t> state_set = set_queue.front();
+        set_queue.pop();
+        // Collect e_closure for each input of transitions
+        std::unordered_map<char, std::set<size_t>> transitions;
+        for(size_t state_id : state_set){
+            for(FiniteState::Edge& edge : nfa->at(state_id).edges){
+                if(edge.first.has_value()){
+                    for(char ch : edge.first.value()){
+                        std::set<size_t>& closure = e_closure[edge.second];
+                        transitions[ch].insert(closure.begin(), closure.end());
+                    }
+                }
+            }
+        }
+        // Transitions
+        FiniteState& state = dfa->at(index_map[state_set]);
+        for(std::pair<char, std::set<size_t>> transition : transitions){
+            // Create new state
+            if(!index_map.contains(transition.second)){
+                index_map.emplace(transition.second, dfa->size());
+                dfa->emplace_back();
+                set_queue.emplace(transition.second);
+            }
+            // Link transition
+            state.edges.emplace_back(transition.first, index_map[transition.second]);
+        }
+    }
+    
+    // Mark finals
+    std::set<size_t> error_set, final_set;
+    for(size_t i = 0; i < nfa->size(); ++i){
+        if(nfa->at(i).type == FiniteState::Final){
+            final_set.emplace(i);
+        }else if(nfa->at(i).type == FiniteState::Error){
+            error_set.emplace(i);
+        }
+    }
+    for(auto map_pair : index_map){
+        std::set<size_t> inter;
+        // Error
+        std::set_intersection(
+            map_pair.first.begin(), map_pair.first.end(),
+            error_set.begin(), error_set.end(), 
+            std::inserter(inter, inter.end())
+        );
+        if(!inter.empty()){
+            dfa->at(map_pair.second).type = FiniteState::Error;
+        }
+        // Final
+        inter.clear();
+        std::set_intersection(
+            map_pair.first.begin(), map_pair.first.end(),
+            final_set.begin(), final_set.end(), 
+            std::inserter(inter, inter.end())
+        );
+        if(!inter.empty()){
+            dfa->at(map_pair.second).type = FiniteState::Final;
+        }
+    }
+
+    return dfa;
 }
 
 std::ostream& operator<< (std::ostream& os, CharType& type){
@@ -618,10 +728,19 @@ std::ostream& operator<< (std::ostream& os, std::deque<FiniteState>& nfa){
     size_t i = 0;
     for(FiniteState& state : nfa){
         os << "S" << i;
-        if(state.final){
-            os << " [shape = doublecircle]";
-        }else{
-            os << " [shape = circle]";
+        switch(state.type){
+            case FiniteState::Final:
+                os << " [shape = doublecircle]";
+            break;
+            case FiniteState::Start:
+                os << " [shape = diamond]";
+            break;
+            case FiniteState::Error:
+                os << " [shape = doubleoctagon]";
+            break;
+            default:
+                os << " [shape = circle]";
+            break;
         }
         os << ";" << std::endl;
         for(FiniteState::Edge& edge: state.edges){
@@ -638,17 +757,45 @@ std::ostream& operator<< (std::ostream& os, std::deque<FiniteState>& nfa){
     return os;
 }
 
-std::deque<Autometa::State> create_states(Pargen::Rule& rule){
+std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rule& rule, bool debug = false){
     static int rule_id = 0;
-    std::deque<Autometa::State> states;
+    // Parse pattern to Nodes
     std::shared_ptr<Node> root(parse_pattern(rule.pattern));
-    std::shared_ptr<std::deque<FiniteState>> nfa(create_nfa(root.get()));
-    // dump 
-    std::ofstream fout("state" + std::to_string(rule_id++) + ".dot");
-    fout << "digraph {" << std::endl;
-    fout << *nfa << std::endl;
-    fout << "}" << std::endl;
-    fout.close();
+    // Nodes to NFA
+    std::shared_ptr<std::deque<FiniteState>> finites(create_nfa(root.get()));
+    if(debug){
+        // dump nfa
+        std::ofstream fout("state" + std::to_string(rule_id) + "_nfa.dot");
+        fout << "digraph {" << std::endl;
+        fout << *finites << std::endl;
+        fout << "}" << std::endl;
+        fout.close();
+    }
+    // NFA to DFA
+    finites = std::shared_ptr<std::deque<FiniteState>>(create_dfa(finites.get()));
+    if(debug){
+        // dump dfa
+        std::ofstream fout("state" + std::to_string(rule_id++) + "_dfa.dot");
+        fout << "digraph {" << std::endl;
+        fout << *finites << std::endl;
+        fout << "}" << std::endl;
+        fout.close();
+    }
+    // Action
+    size_t action_id = autometa.actions.size();
+    Autometa::Action& action = autometa.actions.emplace_back();
+    if(rule.more){
+        action.flags = Autometa::Action::More;
+    }
+    if(rule.pop){
+        action.flags |= Autometa::Action::Pop;
+    }
+    if(rule.push){
+        action.flags |= Autometa::Action::Push;
+    }
+    // DFA to States
+    std::deque<Autometa::State> states;
+
     return states;
 }
 
@@ -658,7 +805,7 @@ Autometa::Autometa(Lexer& lexer){
     for(std::variant<Pargen::Rule, Pargen::State>& elem : lexer){
         std::visit(overloaded {
             [&](Pargen::Rule& rule){
-                std::deque<Autometa::State> new_states = create_states(rule);
+                std::deque<Autometa::State> new_states = create_states(*this, rule, lexer.parent.options.debug);
                 auto inserted = states.insert(states.end(), new_states.begin(), new_states.end());
                 if(!state_map.contains("")){
                     state_map[""] = inserted;
