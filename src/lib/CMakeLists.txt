@@ -17,9 +17,12 @@ add_library(pargen
   ParGen.cpp
   elem.cpp
   tokens.cpp
-  lexer.cpp
   exception.cpp
+  Util.cpp
   ${BISON_pxml_parser_OUTPUTS}
   ${CMAKE_CURRENT_BINARY_DIR}/pxml_lexer.cpp
-  Util.cpp
+  lexer/use.cpp
+  lexer/lexer.cpp
+  lexer/node.cpp
+  lexer/autometa.cpp
 )
