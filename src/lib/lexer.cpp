@@ -141,7 +141,7 @@ struct CharType : public std::set<char>{
         if(negate == rhs.negate){
             if(is_any() || rhs.is_any()){
                 result.negate = negate;
-                result += '\0';
+                result.emplace('\0');
             }else if(negate){
                 std::set_intersection(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
             }else{
@@ -468,13 +468,14 @@ struct Autometa {
         Flags flags = None;
         std::string content = "";
     };
-
-    struct State : public std::unordered_map<std::optional<char>, size_t> {
+    enum class StateType {None, Error, Final, Start};
+    struct State : public std::deque<std::pair<std::optional<char>, size_t>> {
+        StateType type;
         std::optional<size_t> action_id;
     };
 
     std::deque<State> states;
-    std::unordered_map<std::string, std::deque<State>::iterator> state_map;
+    std::unordered_map<std::string, size_t> state_map;
     std::deque<Action> actions;
 };
 
@@ -484,7 +485,7 @@ Autometa::Action::Flags& operator|=(Autometa::Action::Flags& lhs, const Autometa
 
 struct FiniteState {
     using Edge = std::pair<std::optional<CharType>, size_t>;
-    enum {None, Error, Final, Start} type = None;
+    Autometa::StateType type;
     std::list<Edge> edges;
 };
 
@@ -492,8 +493,8 @@ static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* 
     bool initial = (nfa == nullptr);
     if(initial){
         nfa = new std::deque<FiniteState>{
-            FiniteState{.type = FiniteState::Error},
-            FiniteState{.type = FiniteState::Start},
+            FiniteState{.type = Autometa::StateType::Error},
+            FiniteState{.type = Autometa::StateType::Start},
         };
     }
     Node* cur = root;
@@ -587,7 +588,7 @@ static std::deque<FiniteState>* create_nfa(Node* root, std::deque<FiniteState>* 
     }
     // Mark final state
     if(initial){
-        nfa->back().type = FiniteState::Final;
+        nfa->back().type = Autometa::StateType::Final;
     }
     return nfa;
 }
@@ -617,7 +618,7 @@ static std::deque<FiniteState>* create_dfa(std::deque<FiniteState>* nfa){
     
     // Create DFA
     std::deque<FiniteState>* dfa = new std::deque<FiniteState> {
-        FiniteState{.type = FiniteState::Start}
+        FiniteState{.type = Autometa::StateType::Start}
     };
     std::map<std::set<size_t>, size_t> index_map {{e_closure.at(1), 0}};
     std::queue<std::set<size_t>> set_queue;
@@ -654,9 +655,9 @@ static std::deque<FiniteState>* create_dfa(std::deque<FiniteState>* nfa){
     // Mark finals
     std::set<size_t> error_set, final_set;
     for(size_t i = 0; i < nfa->size(); ++i){
-        if(nfa->at(i).type == FiniteState::Final){
+        if(nfa->at(i).type == Autometa::StateType::Final){
             final_set.emplace(i);
-        }else if(nfa->at(i).type == FiniteState::Error){
+        }else if(nfa->at(i).type == Autometa::StateType::Error){
             error_set.emplace(i);
         }
     }
@@ -669,7 +670,7 @@ static std::deque<FiniteState>* create_dfa(std::deque<FiniteState>* nfa){
             std::inserter(inter, inter.end())
         );
         if(!inter.empty()){
-            dfa->at(map_pair.second).type = FiniteState::Error;
+            dfa->at(map_pair.second).type = Autometa::StateType::Error;
         }
         // Final
         inter.clear();
@@ -679,7 +680,7 @@ static std::deque<FiniteState>* create_dfa(std::deque<FiniteState>* nfa){
             std::inserter(inter, inter.end())
         );
         if(!inter.empty()){
-            dfa->at(map_pair.second).type = FiniteState::Final;
+            dfa->at(map_pair.second).type = Autometa::StateType::Final;
         }
     }
 
@@ -717,6 +718,10 @@ std::ostream& operator<< (std::ostream& os, CharType& type){
                     os << "\\\\n";
                 break;
             }
+        }else if(ch == '\"'){
+            os << "'\\\"'";
+        }else if(ch == '\\'){
+            os << "'\\\\'";
         }else{
             os << "'" << ch << "'";
         }
@@ -729,13 +734,13 @@ std::ostream& operator<< (std::ostream& os, std::deque<FiniteState>& nfa){
     for(FiniteState& state : nfa){
         os << "S" << i;
         switch(state.type){
-            case FiniteState::Final:
+            case Autometa::StateType::Final:
                 os << " [shape = doublecircle]";
             break;
-            case FiniteState::Start:
+            case Autometa::StateType::Start:
                 os << " [shape = diamond]";
             break;
-            case FiniteState::Error:
+            case Autometa::StateType::Error:
                 os << " [shape = doubleoctagon]";
             break;
             default:
@@ -757,30 +762,107 @@ std::ostream& operator<< (std::ostream& os, std::deque<FiniteState>& nfa){
     return os;
 }
 
-std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rule& rule, bool debug = false){
+static void prune_state(std::deque<Autometa::State>& states){
+    if(states.size() < 2){
+        return;
+    }
+    // Compute e-closure
+    std::vector<std::set<size_t>> e_closure(states.size());
+    for(size_t state_id = 0; state_id < states.size(); ++state_id){
+        std::set<size_t>& e_states = e_closure[state_id];
+        std::stack<size_t> id_stack;
+        id_stack.push(state_id);
+        while(!id_stack.empty()){
+            e_states.emplace(id_stack.top());
+            Autometa::State& state = states.at(id_stack.top());
+            id_stack.pop();
+            for(auto& edge : state){
+                if(!edge.first.has_value()){
+                    id_stack.push(edge.second);
+                }
+            }
+        }
+    }
+    
+    // Create DFA
+    std::deque<Autometa::State> pruned {
+        Autometa::State {.type = Autometa::StateType::Start}
+    };
+    std::map<std::set<size_t>, size_t> index_map {{e_closure.at(0), 0}};
+    std::queue<std::set<size_t>> set_queue;
+    set_queue.emplace(e_closure.at(0));
+    while(!set_queue.empty()){
+        std::set<size_t> state_set = set_queue.front();
+        set_queue.pop();
+        // Collect e_closure for each input of transitions
+        std::unordered_map<char, std::set<size_t>> transitions;
+        for(size_t state_id : state_set){
+            for(auto& edge : states.at(state_id)){
+                if(edge.first.has_value()){
+                    std::set<size_t>& closure = e_closure[edge.second];
+                    transitions[edge.first.value()].insert(closure.begin(), closure.end());
+                }
+            }
+        }
+        // Transitions
+        Autometa::State& state = pruned.at(index_map[state_set]);
+        for(std::pair<char, std::set<size_t>> transition : transitions){
+            // Create new state
+            if(!index_map.contains(transition.second)){
+                index_map.emplace(transition.second, pruned.size());
+                pruned.emplace_back();
+                set_queue.emplace(transition.second);
+            }
+            // Link transition
+            state.emplace_back(transition.first, index_map[transition.second]);
+        }
+    }
+    
+    // Mark finals
+    std::set<size_t> error_set, final_set;
+    for(size_t i = 0; i < states.size(); ++i){
+        if(states.at(i).type == Autometa::StateType::Final){
+            final_set.emplace(i);
+        }else if(states.at(i).type == Autometa::StateType::Error){
+            error_set.emplace(i);
+        }
+    }
+    for(auto map_pair : index_map){
+        std::set<size_t> inter;
+        // Error
+        std::set_intersection(
+            map_pair.first.begin(), map_pair.first.end(),
+            error_set.begin(), error_set.end(), 
+            std::inserter(inter, inter.end())
+        );
+        if(!inter.empty()){
+            pruned.at(map_pair.second).type = Autometa::StateType::Error;
+        }
+        // Final
+        inter.clear();
+        std::set_intersection(
+            map_pair.first.begin(), map_pair.first.end(),
+            final_set.begin(), final_set.end(), 
+            std::inserter(inter, inter.end())
+        );
+        if(!inter.empty()){
+            pruned.at(map_pair.second).type = Autometa::StateType::Final;
+        }
+    }
+
+    // Save
+    states.swap(pruned);
+}
+
+static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rule& rule, bool debug = false, std::string prefix = ""){
     static int rule_id = 0;
     // Parse pattern to Nodes
     std::shared_ptr<Node> root(parse_pattern(rule.pattern));
     // Nodes to NFA
     std::shared_ptr<std::deque<FiniteState>> finites(create_nfa(root.get()));
-    if(debug){
-        // dump nfa
-        std::ofstream fout("state" + std::to_string(rule_id) + "_nfa.dot");
-        fout << "digraph {" << std::endl;
-        fout << *finites << std::endl;
-        fout << "}" << std::endl;
-        fout.close();
-    }
     // NFA to DFA
     finites = std::shared_ptr<std::deque<FiniteState>>(create_dfa(finites.get()));
-    if(debug){
-        // dump dfa
-        std::ofstream fout("state" + std::to_string(rule_id++) + "_dfa.dot");
-        fout << "digraph {" << std::endl;
-        fout << *finites << std::endl;
-        fout << "}" << std::endl;
-        fout.close();
-    }
+    rule_id += 1;
     // Action
     size_t action_id = autometa.actions.size();
     Autometa::Action& action = autometa.actions.emplace_back();
@@ -793,30 +875,166 @@ std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rule& rule
     if(rule.push){
         action.flags |= Autometa::Action::Push;
     }
+    action.content = rule.content;
     // DFA to States
     std::deque<Autometa::State> states;
+    for(FiniteState& finite_state : *finites.get()){
+        Autometa::State& state = states.emplace_back();
+        state.type = finite_state.type;
+        if(state.type == Autometa::StateType::Final){
+            state.action_id = action_id;
+        }
+        for(FiniteState::Edge finite_edge : finite_state.edges){
+            if(finite_edge.first.has_value()){
+                state.emplace_back(*finite_edge.first.value().begin(), finite_edge.second);
+            }else{
+                state.emplace_back(std::nullopt, finite_edge.second);
+            }
+        }
+    }
+    return states;
+}
 
+static std::deque<Autometa::State> expand_state(Autometa& autometa, Pargen::State& state, bool debug = false){
+    std::deque<Autometa::State> states;
+    for(std::variant<Pargen::Rule, Pargen::Use, Pargen::State>& elem : state){
+        std::visit(overloaded {
+            [&](Pargen::Rule& rule){
+                std::deque<Autometa::State> new_states = create_states(autometa, rule, debug, state.name + "_");
+                size_t state_id = states.size();
+                for(Autometa::State& state : new_states){
+                    for(auto& edge : state){
+                        edge.second += state_id;
+                    }
+                }
+                states.insert(states.end(), new_states.begin(), new_states.end());
+                if(autometa.state_map.contains(state.name)){
+                    states[0].emplace_back(std::nullopt, state_id);
+                }else{
+                    autometa.state_map[state.name] = 0;
+                }
+            },
+            [&](Pargen::State& state){
+                std::deque<Autometa::State> new_states = expand_state(autometa, state, debug);
+                prune_state(new_states);
+                size_t state_id = states.size();
+                for(Autometa::State& state : new_states){
+                    for(auto& edge : state){
+                        edge.second += state_id;
+                    }
+                }
+                states.insert(states.end(), new_states.begin(), new_states.end());
+            },
+            [](Pargen::Use&){}
+        }, elem);
+    }
     return states;
 }
 
 Autometa::Autometa(Lexer& lexer){
-
     resolve_use(lexer);
+    std::deque<Autometa::State> init_states(1);
     for(std::variant<Pargen::Rule, Pargen::State>& elem : lexer){
         std::visit(overloaded {
             [&](Pargen::Rule& rule){
                 std::deque<Autometa::State> new_states = create_states(*this, rule, lexer.parent.options.debug);
-                auto inserted = states.insert(states.end(), new_states.begin(), new_states.end());
-                if(!state_map.contains("")){
-                    state_map[""] = inserted;
+                size_t state_id = init_states.size();
+                for(Autometa::State& state : new_states){
+                    for(auto& edge : state){
+                        edge.second += state_id;
+                    }
+                }
+                init_states.insert(init_states.end(), new_states.begin(), new_states.end());
+                if(state_id != 0){
+                    init_states[0].emplace_back(std::nullopt, state_id);
                 }
             },
             [&](Pargen::State& state){
-                
+                std::deque<Autometa::State> new_states = expand_state(*this, state, lexer.parent.options.debug);
+                prune_state(new_states);
+                size_t state_id = states.size();
+                for(Autometa::State& state : new_states){
+                    for(auto& edge : state){
+                        edge.second += state_id;
+                    }
+                }
+                states.insert(states.end(), new_states.begin(), new_states.end());
             }
         }, elem);
     }
+    prune_state(init_states);
+    size_t state_id = states.size();
+    for(Autometa::State& state : init_states){
+        for(auto& edge : state){
+            edge.second += state_id;
+        }
+    }
+    states.insert(states.end(), init_states.begin(), init_states.end());
 }
+
+std::ostream& operator<< (std::ostream& os, Autometa& autometa){
+    size_t i = 0;
+    for(Autometa::State& state : autometa.states){
+        os << "S" << i;
+        switch(state.type){
+            case Autometa::StateType::Final:
+                os << " [shape = doublecircle]";
+            break;
+            case Autometa::StateType::Start:
+                os << " [shape = diamond]";
+            break;
+            case Autometa::StateType::Error:
+                os << " [shape = doubleoctagon]";
+            break;
+            default:
+                os << " [shape = circle]";
+            break;
+        }
+        os << ";" << std::endl;
+        for(auto& edge: state){
+            os << "S" << i << "-> S" << edge.second << " [label=\"";
+            if(edge.first.has_value()){
+                char ch = edge.first.value();
+                if(ch == '\0'){
+                    os << "any";
+                }else if(std::isspace(ch)){
+                    switch(ch){
+                        case ' ':
+                            os << "'" << ch << "'";
+                        break;
+                        case '\t':
+                            os << "\\\\t";
+                        break;
+                        case '\r':
+                            os << "\\\\r";
+                        break;
+                        case '\f':
+                            os << "\\\\f";
+                        break;
+                        case '\v':
+                            os << "\\\\v";
+                        break;
+                        case '\n':
+                            os << "\\\\n";
+                        break;
+                    }
+                }else if(ch == '\"'){
+                    os << "'\\\"'";
+                }else if(ch == '\\'){
+                    os << "'\\\\'";
+                }else{
+                    os << "'" << ch << "'";
+                }
+            }else{
+                os << "null";
+            }
+            os << "\"];" << std::endl;
+        }
+        ++i;
+    }
+    return os;
+}
+
 
 /* Lexer */
 
@@ -873,6 +1091,14 @@ void Pargen::Lexer::generate_source(std::ostream& os){
 
     // Create Autometa
     Autometa autometa(*this);
+    // Dump autometa
+    if(parent.options.debug){
+        std::ofstream fout("lexer.dot");
+        fout << "digraph {" << std::endl;
+        fout << autometa << std::endl;
+        fout << "}" << std::endl;
+        fout.close();
+    }
 
     // prologue
     os << "/** generated by ParGen **/" << std::endl;
