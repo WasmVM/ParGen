@@ -107,13 +107,7 @@ void Pargen::Lexer::generate_header(std::ostream& os){
     os << "    std::string text = \"\";" << std::endl;
     os << "protected:" << std::endl;
     os << "    struct Chars {" << std::endl;
-    os << "        Chars(std::initializer_list<char> init) : min(init.begin()[0]){" << std::endl;
-    os << "            if(init.size() == 1){" << std::endl;
-    os << "                max = '\\0';" << std::endl;
-    os << "            }else{" << std::endl;
-    os << "                max = init.begin()[1];" << std::endl;
-    os << "            }" << std::endl;
-    os << "        }" << std::endl;
+    os << "        Chars(std::initializer_list<char> init);" << std::endl;
     os << "        Chars(char init) : min(init), max(init){}" << std::endl;
     os << "        bool operator<(const Chars&);" << std::endl;
     os << "        char min, max;" << std::endl;
@@ -142,7 +136,7 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     if(parent.options.debug){
         std::ofstream fout("lexer.dot");
         fout << "digraph {" << std::endl;
-        fout << autometa << std::endl;
+        autometa.dump(fout) << std::endl;
         fout << "}" << std::endl;
         fout.close();
     }
@@ -161,6 +155,18 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         "    pos.path = path;\n"
         "}\n" << std::endl;
 
+    // Chars
+    os << "PxmlLexer::Chars::Chars(std::initializer_list<char> init) : min(init.begin()[0]){" << std::endl;
+    os << "    if(init.size() == 1){" << std::endl;
+    os << "        max = init.begin()[0];" << std::endl;
+    os << "    }else{" << std::endl;
+    os << "        max = init.begin()[1];" << std::endl;
+    os << "    }" << std::endl;
+    os << "}\n" << std::endl;
+    os << "bool PxmlLexer::Chars::operator<(const Chars& rhs){" << std::endl;
+    os << "    return (min < rhs.min) && (max < rhs.min);" << std::endl;
+    os << "}\n" << std::endl;
+
     // fetch
     os << "std::istream::int_type " << class_name << "::fetch(){\n"
         "    std::istream::int_type res = stream.get();\n"
@@ -176,9 +182,9 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         "    return res;\n"
         "}\n" << std::endl;
 
-    // states TODO: use array instead
-    os << "static const std::vector<std::pair<std::pair<size_t, size_t>, size_t[256]>> __states = {" << std::endl;
-    os << "};\n" << std::endl;
+    // states
+    os << "std::vector<PxmlLexer::State> PxmlLexer::states = {" << std::endl;
+    os << autometa << "};\n" << std::endl;
 
     // functions
     for(std::string func : functions){

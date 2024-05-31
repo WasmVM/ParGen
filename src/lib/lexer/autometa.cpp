@@ -21,6 +21,7 @@
 #include <stack>
 #include <map>
 #include <queue>
+#include <algorithm>
 
 Autometa::Action::Flags& operator|=(Autometa::Action::Flags& lhs, const Autometa::Action::Flags&& rhs){
     return lhs = (Autometa::Action::Flags)((uint8_t)lhs | (uint8_t)rhs);
@@ -396,7 +397,7 @@ static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rul
     return states;
 }
 
-static std::deque<Autometa::State> expand_state(Autometa& autometa, Pargen::State& state, bool debug = false){
+static std::deque<Autometa::State> expand_state(Autometa& autometa, std::unordered_map<std::string, size_t>& state_map, Pargen::State& state, bool debug = false){
     std::deque<Autometa::State> states;
     for(std::variant<Pargen::Rule, Pargen::Use, Pargen::State>& elem : state){
         std::visit(overloaded {
@@ -409,21 +410,26 @@ static std::deque<Autometa::State> expand_state(Autometa& autometa, Pargen::Stat
                     }
                 }
                 states.insert(states.end(), new_states.begin(), new_states.end());
-                if(autometa.state_map.contains(state.name)){
+                if(state_map.contains(state.name)){
                     states[0].emplace_back(std::nullopt, state_id);
                 }else{
-                    autometa.state_map[state.name] = 0;
+                    state_map[state.name] = state_id;
                 }
             },
             [&](Pargen::State& state){
-                std::deque<Autometa::State> new_states = expand_state(autometa, state, debug);
-                prune_state(new_states);
                 size_t state_id = states.size();
+                std::unordered_map<std::string, size_t> new_map;
+                std::deque<Autometa::State> new_states = expand_state(autometa, new_map, state, debug);
+                prune_state(new_states);
                 for(Autometa::State& state : new_states){
                     for(auto& edge : state){
                         edge.second += state_id;
                     }
                 }
+                for(auto& entry : new_map){
+                    state_map[entry.first] = entry.second + state_id;
+                }
+                state_map[state.name] = state_id;
                 states.insert(states.end(), new_states.begin(), new_states.end());
             },
             [](Pargen::Use&){}
@@ -451,14 +457,19 @@ Autometa::Autometa(Lexer& lexer){
                 }
             },
             [&](Pargen::State& state){
-                std::deque<Autometa::State> new_states = expand_state(*this, state, lexer.parent.options.debug);
-                prune_state(new_states);
                 size_t state_id = states.size();
+                std::unordered_map<std::string, size_t> new_map;
+                std::deque<Autometa::State> new_states = expand_state(*this, new_map, state, lexer.parent.options.debug);
+                prune_state(new_states);
                 for(Autometa::State& state : new_states){
                     for(auto& edge : state){
                         edge.second += state_id;
                     }
                 }
+                for(auto& entry : new_map){
+                    state_map[entry.first] = entry.second + state_id;
+                }
+                state_map[state.name] = state_id;
                 states.insert(states.end(), new_states.begin(), new_states.end());
             }
         }, elem);
@@ -471,11 +482,130 @@ Autometa::Autometa(Lexer& lexer){
         }
     }
     states.insert(states.end(), init_states.begin(), init_states.end());
+    state_map[""] = state_id;
 }
 
 std::ostream& operator<< (std::ostream& os, Autometa& autometa){
-    size_t i = 0;
+
+    static const auto print_char = [&](char ch){
+        if(ch == '\0'){
+            os << "'\\0'";
+        }else if(std::isspace(ch)){
+            switch(ch){
+                case ' ':
+                    os << "' '";
+                break;
+                case '\t':
+                    os << "'\\t'";
+                break;
+                case '\r':
+                    os << "'\\r'";
+                break;
+                case '\f':
+                    os << "'\\f'";
+                break;
+                case '\v':
+                    os << "'\\v'";
+                break;
+                case '\n':
+                    os << "'\\n'";
+                break;
+            }
+        }else if(ch == '\"'){
+            os << "'\\\"'";
+        }else if(ch == '\\'){
+            os << "'\\\\'";
+        }else{
+            os << "'" << ch << "'";
+        }
+    };
+
+    std::map<size_t, std::string> rev_map;
+    for(auto& state_pair : autometa.state_map){
+        rev_map[state_pair.second] = state_pair.first;
+    }
+
+    size_t state_id = 0;
     for(Autometa::State& state : autometa.states){
+        if(rev_map.contains(state_id)){
+            os << "    /* " << rev_map[state_id] << " */" << std::endl;
+        }
+        std::map<char, size_t> transitions;
+        for(auto& transition : state){
+            if(transition.first.has_value()){
+                transitions[transition.first.value()] = transition.second;
+            }
+        }
+        if(transitions.empty()){
+            os << "    {}, // S" << state_id << std::endl;
+        }else{
+            os << "    {";
+            auto start = transitions.begin();
+            while(start != transitions.end()){
+                auto end = std::adjacent_find(start, transitions.end(), 
+                    [](const std::pair<char, size_t>& lhs, const std::pair<char, size_t>& rhs){
+                        return (lhs.first == '\0') || (lhs.second != rhs.second) || (rhs.first != lhs.first + 1);
+                    }
+                );
+                os << "{{";
+                print_char(start->first);
+                if(start != end && (end != transitions.end() || std::prev(end) != start)){
+                    os << ",";
+                    if(end == transitions.end()){
+                        print_char(std::prev(end)->first);
+                    }else{
+                        print_char(end->first);
+                    }
+                }
+                os << "}," << start->second << "}, ";
+                if(end == transitions.end()){
+                    break;
+                }else{
+                    start = std::next(end);
+                }
+            }
+            os << "}, // S" << state_id << std::endl;
+        }
+        state_id += 1;
+    }
+    return os;
+}
+
+std::ostream& Autometa::dump(std::ostream& os){
+    static const auto print_char = [&](char ch){
+        if(ch == '\0'){
+            os << "any";
+        }else if(std::isspace(ch)){
+            switch(ch){
+                case ' ':
+                    os << "'" << ch << "'";
+                break;
+                case '\t':
+                    os << "\\\\t";
+                break;
+                case '\r':
+                    os << "\\\\r";
+                break;
+                case '\f':
+                    os << "\\\\f";
+                break;
+                case '\v':
+                    os << "\\\\v";
+                break;
+                case '\n':
+                    os << "\\\\n";
+                break;
+            }
+        }else if(ch == '\"'){
+            os << "'\\\"'";
+        }else if(ch == '\\'){
+            os << "'\\\\'";
+        }else{
+            os << "'" << ch << "'";
+        }
+    };
+    size_t i = 0;
+    for(Autometa::State& state : states){
         os << "S" << i;
         switch(state.type){
             case Autometa::StateType::Final:
@@ -492,44 +622,38 @@ std::ostream& operator<< (std::ostream& os, Autometa& autometa){
             break;
         }
         os << ";" << std::endl;
+
+        std::map<char, size_t> transitions;
         for(auto& edge: state){
-            os << "S" << i << "-> S" << edge.second << " [label=\"";
             if(edge.first.has_value()){
-                char ch = edge.first.value();
-                if(ch == '\0'){
-                    os << "any";
-                }else if(std::isspace(ch)){
-                    switch(ch){
-                        case ' ':
-                            os << "'" << ch << "'";
-                        break;
-                        case '\t':
-                            os << "\\\\t";
-                        break;
-                        case '\r':
-                            os << "\\\\r";
-                        break;
-                        case '\f':
-                            os << "\\\\f";
-                        break;
-                        case '\v':
-                            os << "\\\\v";
-                        break;
-                        case '\n':
-                            os << "\\\\n";
-                        break;
-                    }
-                }else if(ch == '\"'){
-                    os << "'\\\"'";
-                }else if(ch == '\\'){
-                    os << "'\\\\'";
-                }else{
-                    os << "'" << ch << "'";
-                }
+                transitions.emplace(edge.first.value(), edge.second);
             }else{
-                os << "null";
+                os << "S" << i << "-> S" << edge.second << " [label=\"null\"];" << std::endl;
+            }
+        }
+        auto start = transitions.begin();
+        while(start != transitions.end()){
+            auto end = std::adjacent_find(start, transitions.end(), 
+                [](const std::pair<char, size_t>& lhs, const std::pair<char, size_t>& rhs){
+                    return (lhs.first == '\0') || (lhs.second != rhs.second) || (rhs.first != lhs.first + 1);
+                }
+            );
+            os << "S" << i << "-> S" << start->second << " [label=\"";
+            print_char(start->first);
+            if(start != end && (end != transitions.end() || std::prev(end) != start)){
+                os << "-";
+                if(end == transitions.end()){
+                    print_char(std::prev(end)->first);
+                }else{
+                    print_char(end->first);
+                }
             }
             os << "\"];" << std::endl;
+            if(end == transitions.end()){
+                break;
+            }else{
+                start = std::next(end);
+            }
         }
         ++i;
     }

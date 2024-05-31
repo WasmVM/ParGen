@@ -252,9 +252,9 @@ Define a rule in lexer
 
             + ``\S`` : NOT [ \\t\\r\\v\\f\\n]
         
-            + ``\a`` : [a-zA-Z\_]
+            + ``\a`` : [a-zA-Z]
 
-            + ``\A`` : NOT [a-zA-Z\_]
+            + ``\A`` : NOT [a-zA-Z]
         
     Ranges
             

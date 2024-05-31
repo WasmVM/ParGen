@@ -138,6 +138,7 @@ struct Autometa {
     std::deque<State> states;
     std::unordered_map<std::string, size_t> state_map;
     std::deque<Action> actions;
+    std::ostream& dump(std::ostream& os);
 };
 
 using namespace Pargen;
