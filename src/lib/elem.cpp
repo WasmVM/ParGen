@@ -381,6 +381,8 @@ void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
             lexer.header_path = std::get<std::string>(attribute.second.second);
         }else if(attribute.first == "sourceFile"){
             lexer.source_path = std::get<std::string>(attribute.second.second);
+        }else if(attribute.first == "return"){
+            lexer.return_type = std::get<std::string>(attribute.second.second);
         }else{
             throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <lexer>", attribute.second.first);
         }

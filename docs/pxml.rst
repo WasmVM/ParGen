@@ -181,6 +181,8 @@ C++ type
 
 Define lexer
 
+A special rule without any attributes can specify custom end-of-file action;
+
 **Attributes**
 
 * class <string> : Token class name
@@ -195,6 +197,9 @@ Define lexer
 * sourceFile <string> : Path of output token source file
     - default : ``"Token.cpp"``
 
+* return <string> : Return type of get()
+    - default : ``Token``
+
 **Children**
 
 ``<rule>``, ``<state>``, ``<include>``, ``<header>``, ``<member>``, ``<function>``, ``<source>``
@@ -208,7 +213,7 @@ Define a rule in lexer
 
 * id <string> : A unique id for <use>, can only be lower/upper case alphabetic, digits and _
 
-* pattern <string> : ``[Required]`` Token match pattern, support the following grammar:
+* pattern <string> : Token match pattern, support the following grammar:
 
     Characters:
 
@@ -297,12 +302,7 @@ Define a rule in lexer
 
 * more : Consume the matched text for further $$
 
-* indent <number> : Code indention
-    - default : ``4``
-    - ``0`` : no indention
-    - negative value : keep same indention as pxml file (like HTML `<pre>`)
-
-If both push and pop specified, stack will pop current state then push new state.
+If both push and pop specified, stack will pop current state then push new state. 
 
 **Children**
 
@@ -310,9 +310,9 @@ C++ codes that may return a token.
 
 The following replacement variables can be used in the codes:
 
-* $$ : The matched text, from current pattern and previous ``more``
+* _text : The matched text, from current pattern and previous ``more``
 
-* $1...N : The submatch text in group N
+* TODO: $1...N : The submatch text in group N
 
     Example
 
@@ -320,18 +320,18 @@ The following replacement variables can be used in the codes:
 
         input: saeebbbbcd
         
-        $$: saeebbbbcd
+        _text: saeebbbbcd
         
         $1: aeebbbbc
         
         $2: bbbb
 
-* @@ : The location of matched text
+* _pos : The location of matched text
 
-* @1...N : The location of submatch text in group N
+* TODO: @1...N : The location of submatch text in group N
 
 <state>
-======
+=======
 
 Define a state in lexer
 

@@ -70,6 +70,7 @@ struct Lexer : public std::list<std::variant<Rule, State>>{
     std::string header_epilogue;
     std::string source_prologue;
     std::string source_epilogue;
+    std::string return_type;
     std::vector<std::string> members;
     std::vector<std::string> functions;
 

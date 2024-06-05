@@ -449,6 +449,11 @@ Autometa::Autometa(Lexer& lexer){
     for(std::variant<Pargen::Rule, Pargen::State>& elem : lexer){
         std::visit(overloaded {
             [&](Pargen::Rule& rule){
+                // eof action
+                if(rule.pattern.empty()){
+                    eof_action = rule.content;
+                    return;
+                }
                 std::deque<Autometa::State> new_states = create_states(*this, rule, lexer.parent.options.debug);
                 size_t state_id = init_states.size();
                 for(Autometa::State& state : new_states){

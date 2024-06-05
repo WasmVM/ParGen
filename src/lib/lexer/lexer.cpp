@@ -79,7 +79,7 @@ void Pargen::Lexer::generate_header(std::ostream& os){
     }
     os << header_prologue << std::endl;
     os << "#include <iostream>" << std::endl;
-    os << "#include <stack>" << std::endl;
+    os << "#include <deque>" << std::endl;
     os << "#include <filesystem>" << std::endl;
     os << "#include <optional>" << std::endl;
     os << "#include <map>" << std::endl;
@@ -108,7 +108,16 @@ void Pargen::Lexer::generate_header(std::ostream& os){
     // Lexer class
     os << "struct " << class_name << " {" << std::endl;
     os << "    " << class_name << "(std::filesystem::path filepath, std::istream& stream);" << std::endl;
-    os << "    " << parent.tokens.class_name << " get();" << std::endl;
+    if(return_type.empty()){
+        if(parent.tokens.empty()){
+            os << "    void";
+        }else{
+            os << "    " << parent.tokens.class_name;
+        }
+    }else{
+        os << "    " << return_type;
+    }
+    os  << " get();" << std::endl;
     // Funcs
     for(std::string& func : functions){
         os << func << std::endl;
@@ -130,7 +139,7 @@ void Pargen::Lexer::generate_header(std::ostream& os){
     os << "protected:" << std::endl;
     os << "    using State = std::map<Chars, size_t>;" << std::endl;
     os << "    static std::vector<State> states;" << std::endl;
-    os << "    std::deque<size_t> stack;" << std::endl;
+    os << "    std::deque<std::pair<size_t, std::string>> stack;" << std::endl;
     os << "    std::istream::int_type current;" << std::endl;
     os << "    size_t state;" << std::endl;
     os << "    std::string new_line = \"" << new_line << "\";" << std::endl;
@@ -166,13 +175,18 @@ void Pargen::Lexer::generate_source(std::ostream& os){
 
     // includes & namespace
     os << "\nnamespace " << parent.name_space << " {\n" << std::endl;
+    if(!parent.tokens.empty()){
+        os << "\nusing namespace " << parent.tokens.name_space << ";\n" << std::endl;
+    }
 
     // constructor
-    os << class_name << "::" << class_name << "(std::filesystem::path path, std::istream& stream) :\n"
-        "  stream(stream), current(fetch()), state(" << autometa.state_map[""] << ")\n";
-    os << "{\n"
-        "    pos.path = path;\n"
-        "}\n" << std::endl;
+    os << class_name << "::" << class_name << "(std::filesystem::path path, std::istream& stream) :\n";
+    os << "  stream(stream), current(fetch()), state(" << autometa.state_map[""] << ")\n";
+    os << "{\n";
+    if(!parent.tokens.empty()){
+        os << "    pos.path = path;\n";
+    }
+    os << "}\n" << std::endl;
 
     // Chars
     os << "PxmlLexer::Chars::Chars(std::initializer_list<char> init) : min(init.begin()[0]){" << std::endl;
@@ -192,18 +206,20 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         "    std::istream::int_type res = stream.get();\n"
         "    line_end += res;\n"
         "    if(res != std::istream::traits_type::eof()){\n";
-    if(new_line.empty()){
+    if(new_line.empty() && !parent.tokens.empty()){
         os << "        cur.column += 1;\n";
     }else{
         os << "        if(line_end.size() > " << new_line.size() << "){\n"
             "            line_end = line_end.substr(line_end.size() - " <<  new_line.size() << ");\n"
             "        }\n";
-        os << "        if(text.ends_with(\"" << new_line << "\")){\n"
-            "            cur.line += 1;\n"
-            "            cur.column = 0;\n"
-            "        }else{\n"
-            "            cur.column += 1;\n"
-            "        }\n";
+        if(!parent.tokens.empty()){
+            os << "        if(text.ends_with(\"" << new_line << "\")){\n"
+                "            cur.line += 1;\n"
+                "            cur.column = 0;\n"
+                "        }else{\n"
+                "            cur.column += 1;\n"
+                "        }\n";
+        }
     }
     os << "    }\n"
         "    return res;\n"
@@ -227,7 +243,16 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     }
 
     // get prologue
-    os << parent.tokens.class_name << " " << class_name << "::get(){" << std::endl;
+    if(return_type.empty()){
+        if(parent.tokens.empty()){
+            os << "void";
+        }else{
+            os << parent.tokens.class_name;
+        }
+    }else{
+        os << return_type;
+    }
+    os << " " << class_name << "::get(){" << std::endl;
     os << "    while(current != std::istream::traits_type::eof()){" << std::endl;
     os << "        if(states[state].contains(current)){" << std::endl;
     os << "            state = states[state][current];" << std::endl;
@@ -236,8 +261,11 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     os << "            state = states[state]['\\0'];" << std::endl;
     os << "            current = fetch();" << std::endl;
     os << "        }else{" << std::endl;
-    os << "            Position token_pos = pos;" << std::endl;
-    os << "            pos = cur;" << std::endl;
+    if(!parent.tokens.empty()){
+        os << "            Position _pos = pos;" << std::endl;
+        os << "            pos = cur;" << std::endl;
+    }
+    os << "            std::string _text = text;" << std::endl;
 
     // actions
     std::map<size_t, std::list<size_t>> action_map;
@@ -249,22 +277,57 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     }
     os << "            switch(state){";
     for(auto& action_pair : action_map){
+        Autometa::Action& action = autometa.actions[action_pair.first];
         for(size_t& state_id : action_pair.second){
             os << "\n                case " << state_id << ":";
         }
-        os << "\n                break;";
+        if(action.flags & Autometa::Action::Pop){
+            if(action.push){
+                os << "\n                    state = " << autometa.state_map[action.push.value()] <<";";      
+                if(!(action.flags & Autometa::Action::More)){
+                    os << "\n                    text.clear();";
+                }
+            }else{
+                os << "\n                    state = stack.back().first;";
+                if(action.flags & Autometa::Action::More){
+                    os << "\n                    text = stack.back().second + text;";
+                }else{
+                    os << "\n                    text = stack.back().second;";
+                }
+                os << "\n                    stack.pop_back();";
+            }
+        }else{
+            if(action.push){
+                os << "\n                    stack.emplace_back(state, text);"; 
+                os << "\n                    state = " << autometa.state_map[action.push.value()] <<";";      
+            }
+            if(!(action.flags & Autometa::Action::More)){
+                os << "\n                    text.clear();";
+            }
+        }
+        os << "\n                { // Action " << action_pair.first;
+        os << handle_indent(20, action.content) << std::endl;
+        os << "                }break;";
     }
     os << "\n                default:" << std::endl;
-    os << "                    throw UnknownToken(token_pos, text);" << std::endl;
+    if(parent.tokens.empty()){
+        os << "                    throw UnknownToken(text);" << std::endl;
+    }else{
+        os << "                    throw UnknownToken(_pos, text);" << std::endl;
+    }
     os << "            }" << std::endl;
 
     // get epilogue
     os << "        }" << std::endl;
     os << "    }" << std::endl;
-    os << "    Token token;" << std::endl;
-    os << "    token = std::monostate();" << std::endl;
-    os << "    token.pos = pos;" << std::endl;
-    os << "    return token;" << std::endl;
+    if(!autometa.eof_action.empty()){
+        os << handle_indent(4, autometa.eof_action) << std::endl;
+    }else if(!parent.tokens.empty()){
+        os << "    Token token;" << std::endl;
+        os << "    token = std::monostate();" << std::endl;
+        os << "    token.pos = pos;" << std::endl;
+        os << "    return token;" << std::endl;
+    }
     os << "}\n" << std::endl;
 
     // UnknownToken
