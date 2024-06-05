@@ -48,7 +48,6 @@
         {% Comment %}
         <rule id="Comment" pattern="\{%" push="comment" />
         <state name="comment">
-            <use id="Comment" />
             <rule pattern="%\}" pop />
             <rule pattern="." />
         </state>
@@ -81,10 +80,10 @@
             <rule pattern="=">
                 return Equal();
             </rule>
-            <rule pattern="(true|false)" push="string">
+            <rule pattern="(true|false)">
                 return Bool();
             </rule>
-            <rule pattern="\a\w*">
+            <rule pattern="[\a_][\w_]*">
                 return ID($$);
             </rule>
             <rule pattern="[+\-][0-9]+(\.[0-9]*)?([eE][+\-]?[0-9]+)?">
@@ -96,7 +95,7 @@
         <state name="string">
             <rule pattern="[^\"]" more />
             <rule pattern="\\\"" more />
-            <rule pattern="\"">
+            <rule pattern="\"" pop>
                 return String($$.substr(0, $$.size() - 1));
             </rule>
         </state>

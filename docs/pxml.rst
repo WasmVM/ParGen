@@ -17,7 +17,7 @@ Format
     - boolean (true | false)
     - string
     - double 
-* Comments are enclosed with ``{%`` ``%}``
+* Comments are enclosed with ``{%`` ``%}``, can't be nested
 * Character ``<`` should be escaped as ``\<`` in text
 
 Example:

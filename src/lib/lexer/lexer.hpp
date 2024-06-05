@@ -123,14 +123,16 @@ struct Autometa {
         enum Flags : uint8_t {
             None = 0,
             More = 1,
-            Pop = 2,
-            Push = 4
+            Pop = 2
         };
         Flags flags = None;
         std::string content = "";
+        std::optional<std::string> push;
     };
     enum class StateType {None, Error, Final, Start};
     struct State : public std::deque<std::pair<std::optional<char>, size_t>> {
+        State() = default;
+        State(const State&);
         StateType type;
         std::optional<size_t> action_id;
     };

@@ -287,9 +287,8 @@ static void prune_state(std::deque<Autometa::State>& states){
     }
     
     // Create DFA
-    std::deque<Autometa::State> pruned {
-        Autometa::State {.type = Autometa::StateType::Start}
-    };
+    std::deque<Autometa::State> pruned;
+    pruned.emplace_back().type = Autometa::StateType::Start;
     std::map<std::set<size_t>, size_t> index_map {{e_closure.at(0), 0}};
     std::queue<std::set<size_t>> set_queue;
     set_queue.emplace(e_closure.at(0));
@@ -331,6 +330,7 @@ static void prune_state(std::deque<Autometa::State>& states){
     }
     for(auto map_pair : index_map){
         std::set<size_t> inter;
+        Autometa::State& pruned_state = pruned.at(map_pair.second);
         // Error
         std::set_intersection(
             map_pair.first.begin(), map_pair.first.end(),
@@ -338,7 +338,7 @@ static void prune_state(std::deque<Autometa::State>& states){
             std::inserter(inter, inter.end())
         );
         if(!inter.empty()){
-            pruned.at(map_pair.second).type = Autometa::StateType::Error;
+            pruned_state.type = Autometa::StateType::Error;
         }
         // Final
         inter.clear();
@@ -348,7 +348,14 @@ static void prune_state(std::deque<Autometa::State>& states){
             std::inserter(inter, inter.end())
         );
         if(!inter.empty()){
-            pruned.at(map_pair.second).type = Autometa::StateType::Final;
+            pruned_state.type = Autometa::StateType::Final;
+        }
+        // action
+        for(size_t state_id : map_pair.first){
+            Autometa::State& state = states.at(state_id);
+            if(state.action_id && (!pruned_state.action_id.has_value() || pruned_state.action_id.value() > state.action_id)){
+                pruned_state.action_id = state.action_id;
+            }
         }
     }
 
@@ -374,9 +381,7 @@ static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rul
     if(rule.pop){
         action.flags |= Autometa::Action::Pop;
     }
-    if(rule.push){
-        action.flags |= Autometa::Action::Push;
-    }
+    action.push = rule.push;
     action.content = rule.content;
     // DFA to States
     std::deque<Autometa::State> states;
@@ -483,6 +488,13 @@ Autometa::Autometa(Lexer& lexer){
     }
     states.insert(states.end(), init_states.begin(), init_states.end());
     state_map[""] = state_id;
+}
+
+Autometa::State::State(const Autometa::State& state) :
+    std::deque<std::pair<std::optional<char>, size_t>>(state)
+{
+    type = state.type;
+    action_id = state.action_id;
 }
 
 std::ostream& operator<< (std::ostream& os, Autometa& autometa){
@@ -606,22 +618,41 @@ std::ostream& Autometa::dump(std::ostream& os){
     };
     size_t i = 0;
     for(Autometa::State& state : states){
-        os << "S" << i;
+        os << "S" << i << " [label=\"S" << i;
+        for(auto& state_pair : state_map){
+            if(!state_pair.first.empty() && i == state_pair.second){
+                os << "\\n" << state_pair.first;
+            }
+        }
+        if(state.action_id){
+            os << "\\nAction " << state.action_id.value();
+            Autometa::Action& action = actions[state.action_id.value()];
+            if(action.flags & Autometa::Action::More){
+                os << "\\nMore";
+            }
+            if(action.flags & Autometa::Action::Pop){
+                os << "\\nPop";
+            }
+            if(action.push){
+                os << "\\nPush " << state_map[action.push.value()];
+            }
+        }
+        os << "\"; shape = ";
         switch(state.type){
             case Autometa::StateType::Final:
-                os << " [shape = doublecircle]";
+                os << "doublecircle";
             break;
             case Autometa::StateType::Start:
-                os << " [shape = diamond]";
+                os << "diamond";
             break;
             case Autometa::StateType::Error:
-                os << " [shape = doubleoctagon]";
+                os << "doubleoctagon";
             break;
             default:
-                os << " [shape = circle]";
+                os << "circle";
             break;
         }
-        os << ";" << std::endl;
+        os << "];" << std::endl;
 
         std::map<char, size_t> transitions;
         for(auto& edge: state){

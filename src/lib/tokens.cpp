@@ -90,6 +90,7 @@ void Pargen::Tokens::generate_header(std::ostream& os){
         os << member << std::endl;
     }
     // Funcs
+    os << "using " << token_base << "::operator=;" << std::endl;
     for(std::string& func : functions){
         os << func << std::endl;
     }
