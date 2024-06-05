@@ -117,7 +117,7 @@ void Pargen::Tokens::generate_source(std::ostream& os){
     // functions
     for(std::string func : functions){
         // Write function
-        std::string signature = append_func_name(func, name_space);
+        std::string signature = append_func_name(func, parent.name_space + "::" + class_name);
         if(signature.starts_with("template")){
             os << "// TODO: " << signature << "\n" << std::endl;
         }else{
@@ -131,7 +131,7 @@ void Pargen::Tokens::generate_source(std::ostream& os){
     for(Token& token : *this){
         for(std::string func : token.functions){
             // Write function
-            std::string signature = append_func_name(func, name_space + "::" + token.name);
+            std::string signature = append_func_name(func, parent.name_space + "::" + name_space + "::" + token.name);
             if(signature.starts_with("template")){
                 os << "// TODO: " << signature << "\n" << std::endl;
             }else{

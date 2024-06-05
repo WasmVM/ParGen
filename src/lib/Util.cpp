@@ -14,6 +14,8 @@
 
 #include <Util.hpp>
 
+#include <regex>
+
 std::string strip(std::string str, bool lead, bool trail){
     size_t lead_pos = lead ? str.find_first_not_of(" \t\n\r\v") : 0;
     if(trail){
@@ -36,8 +38,8 @@ std::string append_func_name(std::string func, std::string name_space){
             }else if(func[i] == '('){
                 level -= 1;
                 if(level == 0){
-                    param = func.substr(i);
-                    func = strip(func.substr(0, i + 1));
+                    param = func.substr(i, func.find_last_not_of(';') - i + 1);
+                    func = strip(func.substr(0, i));
                 }
             }
         }
@@ -62,7 +64,22 @@ std::string append_func_name(std::string func, std::string name_space){
             func = strip(func, true, false);
             return "template<> " + func + " " + name_space + "::" + name + template_args + param;
         }else{
-            return func + name_space + "::" + name + param;
+            return func + " " + name_space + "::" + name + param;
         }
     }
+}
+
+std::string handle_indent(int indent, std::string content){
+    if(indent >= 0){
+        // measure indent
+        size_t space_pos = content.find_first_not_of(" \t\n\r\v");
+        if(space_pos != std::string::npos){
+            std::string spaces = content.substr(0, space_pos);
+            content = content.substr(space_pos);
+            content = std::regex_replace(content, std::regex("\n" + spaces), "\n" + std::string(indent, ' '));
+        }
+        content = "\n" + std::string(indent, ' ') + content;
+        content = content.substr(0, content.find_last_not_of(" \t\n\r\v") + 1);
+    }
+    return content;
 }

@@ -25,21 +25,6 @@
 
 using namespace Pargen;
 
-static std::string handle_indent(int indent, std::string content){
-    if(indent >= 0){
-        // measure indent
-        size_t space_pos = content.find_first_not_of(" \t\n\r\v");
-        if(space_pos != 0){
-            std::string spaces = content.substr(0, space_pos);
-            content = std::regex_replace(content, std::regex(spaces), "\n" + std::string(indent, ' '));
-        }else{
-            content = "\n" + std::string(indent, ' ') + content;
-        }
-        content = content.substr(0, content.find_last_not_of(" \t\n\r\v") + 1);
-    }
-    return content;
-}
-
 void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesystem::path>& includes, std::list<PXML::Pxml::Child>::iterator& pxml_pos){
     // attributes
     std::filesystem::path resolved_src;
