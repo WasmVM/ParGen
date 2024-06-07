@@ -363,7 +363,7 @@ static void prune_state(std::deque<Autometa::State>& states){
     states.swap(pruned);
 }
 
-static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rule& rule, bool debug = false, std::string prefix = ""){
+static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rule& rule, bool debug = false, std::string state_name = ""){
     static int rule_id = 0;
     // Parse pattern to Nodes
     std::shared_ptr<Node> root(parse_pattern(rule.pattern));
@@ -383,6 +383,7 @@ static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rul
     }
     action.push = rule.push;
     action.content = rule.content;
+    action.pxml_state = state_name;
     // DFA to States
     std::deque<Autometa::State> states;
     for(FiniteState& finite_state : *finites.get()){
@@ -402,12 +403,12 @@ static std::deque<Autometa::State> create_states(Autometa& autometa, Pargen::Rul
     return states;
 }
 
-static std::deque<Autometa::State> expand_state(Autometa& autometa, std::unordered_map<std::string, size_t>& state_map, Pargen::State& state, bool debug = false){
+static std::deque<Autometa::State> expand_state(Autometa& autometa, std::unordered_map<std::string, size_t>& pxml_state_map, Pargen::State& state, bool debug = false, std::string state_name = ""){
     std::deque<Autometa::State> states;
     for(std::variant<Pargen::Rule, Pargen::Use, Pargen::State>& elem : state){
         std::visit(overloaded {
             [&](Pargen::Rule& rule){
-                std::deque<Autometa::State> new_states = create_states(autometa, rule, debug, state.name + "_");
+                std::deque<Autometa::State> new_states = create_states(autometa, rule, debug, state_name);
                 size_t state_id = states.size();
                 for(Autometa::State& state : new_states){
                     for(auto& edge : state){
@@ -415,16 +416,16 @@ static std::deque<Autometa::State> expand_state(Autometa& autometa, std::unorder
                     }
                 }
                 states.insert(states.end(), new_states.begin(), new_states.end());
-                if(state_map.contains(state.name)){
+                if(pxml_state_map.contains(state_name)){
                     states[0].emplace_back(std::nullopt, state_id);
                 }else{
-                    state_map[state.name] = state_id;
+                    pxml_state_map[state_name] = state_id;
                 }
             },
             [&](Pargen::State& state){
                 size_t state_id = states.size();
                 std::unordered_map<std::string, size_t> new_map;
-                std::deque<Autometa::State> new_states = expand_state(autometa, new_map, state, debug);
+                std::deque<Autometa::State> new_states = expand_state(autometa, new_map, state, debug, state_name + "." + state.name);
                 prune_state(new_states);
                 for(Autometa::State& state : new_states){
                     for(auto& edge : state){
@@ -432,9 +433,9 @@ static std::deque<Autometa::State> expand_state(Autometa& autometa, std::unorder
                     }
                 }
                 for(auto& entry : new_map){
-                    state_map[entry.first] = entry.second + state_id;
+                    pxml_state_map[entry.first] = entry.second + state_id;
                 }
-                state_map[state.name] = state_id;
+                pxml_state_map[state_name + "." + state.name] = state_id;
                 states.insert(states.end(), new_states.begin(), new_states.end());
             },
             [](Pargen::Use&){}
@@ -446,15 +447,36 @@ static std::deque<Autometa::State> expand_state(Autometa& autometa, std::unorder
 Autometa::Autometa(Lexer& lexer){
     resolve_use(lexer);
     std::deque<Autometa::State> init_states(1);
+    bool has_eof_rule = false;
     for(std::variant<Pargen::Rule, Pargen::State>& elem : lexer){
         std::visit(overloaded {
             [&](Pargen::Rule& rule){
-                // eof action
+                std::deque<Autometa::State> new_states;
                 if(rule.pattern.empty()){
-                    eof_action = rule.content;
-                    return;
+                    // EOF
+                    if(has_eof_rule){
+                        throw Exception::Exception("multiple EOF rules are prohibited");
+                    }
+                    has_eof_rule = true;
+                    Autometa::State& eof_start = new_states.emplace_back();
+                    eof_start.type = Autometa::StateType::Start;
+                    eof_start.emplace_back(eof_char, 1);
+                    Autometa::State& eof_end = new_states.emplace_back();
+                    eof_end.type = Autometa::StateType::End;
+                    eof_end.action_id = actions.size();
+                    Autometa::Action& action = actions.emplace_back();
+                    if(rule.more){
+                        action.flags = Autometa::Action::More;
+                    }
+                    if(rule.pop){
+                        action.flags |= Autometa::Action::Pop;
+                    }
+                    action.push = rule.push;
+                    action.content = rule.content;
+                    action.pxml_state = "";
+                }else{
+                    new_states = create_states(*this, rule, lexer.parent.options.debug);
                 }
-                std::deque<Autometa::State> new_states = create_states(*this, rule, lexer.parent.options.debug);
                 size_t state_id = init_states.size();
                 for(Autometa::State& state : new_states){
                     for(auto& edge : state){
@@ -469,7 +491,7 @@ Autometa::Autometa(Lexer& lexer){
             [&](Pargen::State& state){
                 size_t state_id = states.size();
                 std::unordered_map<std::string, size_t> new_map;
-                std::deque<Autometa::State> new_states = expand_state(*this, new_map, state, lexer.parent.options.debug);
+                std::deque<Autometa::State> new_states = expand_state(*this, new_map, state, lexer.parent.options.debug, state.name);
                 prune_state(new_states);
                 for(Autometa::State& state : new_states){
                     for(auto& edge : state){
@@ -477,12 +499,28 @@ Autometa::Autometa(Lexer& lexer){
                     }
                 }
                 for(auto& entry : new_map){
-                    state_map[entry.first] = entry.second + state_id;
+                    pxml_state_map[entry.first] = entry.second + state_id;
                 }
-                state_map[state.name] = state_id;
+                pxml_state_map[state.name] = state_id;
                 states.insert(states.end(), new_states.begin(), new_states.end());
             }
         }, elem);
+    }
+    // Default EOF
+    if(has_eof_rule == false){
+        size_t state_id = init_states.size();
+        Autometa::State& eof_start = init_states.emplace_back();
+        eof_start.type = Autometa::StateType::Start;
+        eof_start.emplace_back(eof_char, state_id + 1);
+        Autometa::State& eof_end = init_states.emplace_back();
+        eof_end.type = Autometa::StateType::End;
+        eof_end.action_id = actions.size();
+        Autometa::Action& action = actions.emplace_back();
+        action.content = "return Token(std::monostate(), _pos);";
+        action.pxml_state = "";
+        if(state_id != 0){
+            init_states[0].emplace_back(std::nullopt, state_id);
+        }
     }
     prune_state(init_states);
     size_t state_id = states.size();
@@ -492,11 +530,11 @@ Autometa::Autometa(Lexer& lexer){
         }
     }
     states.insert(states.end(), init_states.begin(), init_states.end());
-    state_map[""] = state_id;
+    pxml_state_map[""] = state_id;
 }
 
 Autometa::State::State(const Autometa::State& state) :
-    std::deque<std::pair<std::optional<char>, size_t>>(state)
+    std::deque<std::pair<std::optional<char_t>, size_t>>(state)
 {
     type = state.type;
     action_id = state.action_id;
@@ -504,41 +542,8 @@ Autometa::State::State(const Autometa::State& state) :
 
 std::ostream& operator<< (std::ostream& os, Autometa& autometa){
 
-    static const auto print_char = [&](char ch){
-        if(ch == '\0'){
-            os << "'\\0'";
-        }else if(std::isspace(ch)){
-            switch(ch){
-                case ' ':
-                    os << "' '";
-                break;
-                case '\t':
-                    os << "'\\t'";
-                break;
-                case '\r':
-                    os << "'\\r'";
-                break;
-                case '\f':
-                    os << "'\\f'";
-                break;
-                case '\v':
-                    os << "'\\v'";
-                break;
-                case '\n':
-                    os << "'\\n'";
-                break;
-            }
-        }else if(ch == '\"'){
-            os << "'\\\"'";
-        }else if(ch == '\\'){
-            os << "'\\\\'";
-        }else{
-            os << "'" << ch << "'";
-        }
-    };
-
     std::map<size_t, std::string> rev_map;
-    for(auto& state_pair : autometa.state_map){
+    for(auto& state_pair : autometa.pxml_state_map){
         rev_map[state_pair.second] = state_pair.first;
     }
 
@@ -547,7 +552,7 @@ std::ostream& operator<< (std::ostream& os, Autometa& autometa){
         if(rev_map.contains(state_id)){
             os << "    /* " << rev_map[state_id] << " */" << std::endl;
         }
-        std::map<char, size_t> transitions;
+        std::map<char_t, size_t> transitions;
         for(auto& transition : state){
             if(transition.first.has_value()){
                 transitions[transition.first.value()] = transition.second;
@@ -564,14 +569,13 @@ std::ostream& operator<< (std::ostream& os, Autometa& autometa){
                         return (lhs.first == '\0') || (lhs.second != rhs.second) || (rhs.first != lhs.first + 1);
                     }
                 );
-                os << "{{";
-                print_char(start->first);
+                os << "{{" << start->first;
                 if(start != end && (end != transitions.end() || std::prev(end) != start)){
                     os << ",";
                     if(end == transitions.end()){
-                        print_char(std::prev(end)->first);
+                        os << std::prev(end)->first;
                     }else{
-                        print_char(end->first);
+                        os << end->first;
                     }
                 }
                 os << "}," << start->second << "}, ";
@@ -613,6 +617,8 @@ std::ostream& Autometa::dump(std::ostream& os){
                     os << "\\\\n";
                 break;
             }
+        }else if(ch == eof_char){
+            os << "EOF";
         }else if(ch == '\"'){
             os << "'\\\"'";
         }else if(ch == '\\'){
@@ -624,7 +630,7 @@ std::ostream& Autometa::dump(std::ostream& os){
     size_t i = 0;
     for(Autometa::State& state : states){
         os << "S" << i << " [label=\"S" << i;
-        for(auto& state_pair : state_map){
+        for(auto& state_pair : pxml_state_map){
             if(!state_pair.first.empty() && i == state_pair.second){
                 os << "\\n" << state_pair.first;
             }
@@ -639,7 +645,7 @@ std::ostream& Autometa::dump(std::ostream& os){
                 os << "\\nPop";
             }
             if(action.push){
-                os << "\\nPush " << state_map[action.push.value()];
+                os << "\\nPush " << pxml_state_map[action.push.value()];
             }
         }
         os << "\"; shape = ";
@@ -651,6 +657,9 @@ std::ostream& Autometa::dump(std::ostream& os){
                 os << "diamond";
             break;
             case Autometa::StateType::Error:
+                os << "doubleoctagon";
+            break;
+            case Autometa::StateType::End:
                 os << "doubleoctagon";
             break;
             default:

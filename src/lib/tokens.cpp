@@ -62,10 +62,13 @@ void Pargen::Tokens::generate_header(std::ostream& os){
         for(std::string& func : token.functions){
             os << func << std::endl;
         }
-        // Value
+        // Value & Constructor
+        os << "\n    " << token.name << "() = default;";
         if(token.types.size() == 1){
-            os << "\n    " << token.types[0] << " value;" << std::endl;           
+            os << "\n    " << token.name << "(" << token.types[0] << " value) : value(value){}";
+            os << "\n    " << token.types[0] << " value;";
         }else if(token.types.size() > 1){
+            os << "\n    template<typename T>" << token.name << "(T value) : value(value){}";
             os << "\n    std::variant<";
             for(size_t i = 0; i < token.types.size(); ++i){
                 if(i > 0){
@@ -76,7 +79,7 @@ void Pargen::Tokens::generate_header(std::ostream& os){
             os << "> value;" << std::endl;
         }
         // close
-        os << "};\n" << std::endl;
+        os << "\n};\n" << std::endl;
     }
     token_base = token_base + "\n>";
 
@@ -90,7 +93,7 @@ void Pargen::Tokens::generate_header(std::ostream& os){
         os << member << std::endl;
     }
     // Funcs
-    os << "using " << token_base << "::operator=;" << std::endl;
+    os << "template<typename T> Token(T token, Position pos): " << token_base << "(token), pos(pos){}" << std::endl;
     for(std::string& func : functions){
         os << func << std::endl;
     }

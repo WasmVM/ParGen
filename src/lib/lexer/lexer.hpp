@@ -9,12 +9,15 @@
 #include <variant>
 #include <deque>
 
-struct CharType : public std::set<char>{
+using char_t = std::istream::int_type;
+constexpr char_t eof_char = std::istream::traits_type::eof();
+
+struct CharType : public std::set<char_t>{
     enum Class {Number, Alphabet, Space};
     bool negate = false;
     CharType() = default;
 
-    CharType(const char ch){
+    CharType(const char_t ch){
         insert(ch);
     }
 
@@ -126,11 +129,12 @@ struct Autometa {
             Pop = 2
         };
         Flags flags = None;
+        std::string pxml_state;
         std::string content = "";
         std::optional<std::string> push;
     };
-    enum class StateType {None, Error, Final, Start};
-    struct State : public std::deque<std::pair<std::optional<char>, size_t>> {
+    enum class StateType {None, Error, Final, Start, End};
+    struct State : public std::deque<std::pair<std::optional<char_t>, size_t>> {
         State() = default;
         State(const State&);
         StateType type;
@@ -138,7 +142,7 @@ struct Autometa {
     };
 
     std::deque<State> states;
-    std::unordered_map<std::string, size_t> state_map;
+    std::unordered_map<std::string, size_t> pxml_state_map;
     std::deque<Action> actions;
     std::string eof_action;
     std::ostream& dump(std::ostream& os);
