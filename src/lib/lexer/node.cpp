@@ -22,7 +22,7 @@
 
 using namespace Pargen;
 
-static CharType escape_sequence(std::string::iterator& it, const std::string::iterator& end){
+static CharNode::Char escape_sequence(std::string::iterator& it, const std::string::iterator& end){
     char ch = *(++it);
     switch(ch){
         case 'x':
@@ -31,7 +31,7 @@ static CharType escape_sequence(std::string::iterator& it, const std::string::it
                 hex += *(++it); 
                 hex += *(++it);
                 if(std::isxdigit(hex[0]) && std::isxdigit(hex[1])){
-                    return (char)std::stoi(hex, nullptr, 16);
+                    return std::stoi(hex, nullptr, 16);
                 }else{
                     throw Exception::Exception("expected 2 hex digits for hex escape in pattern");
                 }
@@ -55,32 +55,91 @@ static CharType escape_sequence(std::string::iterator& it, const std::string::it
             return '\n';
         break;
         case 'd':
-            return CharType(CharType::Number);
+            return CharNode::Char(CharNode::Char::Number);
         break;
         case 'D':
-            return !CharType(CharType::Number);
+            return !CharNode::Char(CharNode::Char::Number);
         break;
         case 's':
-            return CharType(CharType::Space);
+            return CharNode::Char(CharNode::Char::Space);
         break;
         case 'S':
-            return !CharType(CharType::Space);
+            return !CharNode::Char(CharNode::Char::Space);
         break;
         case 'w':
-            return CharType(CharType::Alphabet) + CharType(CharType::Number);
+            return CharNode::Char(CharNode::Char::Alphabet) + CharNode::Char(CharNode::Char::Number);
         break;
         case 'W':
-            return !(CharType(CharType::Alphabet) + CharType(CharType::Number));
+            return !(CharNode::Char(CharNode::Char::Alphabet) + CharNode::Char(CharNode::Char::Number));
         break;
         case 'a':
-            return CharType(CharType::Alphabet);
+            return CharNode::Char(CharNode::Char::Alphabet);
         break;
         case 'A':
-            return !CharType(CharType::Alphabet);
+            return !CharNode::Char(CharNode::Char::Alphabet);
         break;
         default:
             return ch;
     }
+}
+
+CharNode::Char::Char(const Class cl){
+    switch(cl){
+        case Number:
+            insert({'0','1','2','3','4','5','6','7','8','9'});
+        break;
+        case Alphabet:
+            insert({
+                'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+                'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+            });
+        break;
+        case Space:
+            insert({' ', '\t', '\r', '\v', '\f', '\n'});
+        break;
+    }
+}
+
+std::ostream& operator<< (std::ostream& os, CharNode::Char& character){
+    if(character.negate){
+        os << "not ";
+    }
+    if(character.is_any()){
+        return os << "any";
+    }
+    std::string characters(character.begin(), character.end());
+    std::stable_sort(characters.begin(), characters.end());
+    for(char ch : characters){
+        if(std::isspace(ch)){
+            switch(ch){
+                case ' ':
+                    os << "'" << ch << "'";
+                break;
+                case '\t':
+                    os << "\\\\t";
+                break;
+                case '\r':
+                    os << "\\\\r";
+                break;
+                case '\f':
+                    os << "\\\\f";
+                break;
+                case '\v':
+                    os << "\\\\v";
+                break;
+                case '\n':
+                    os << "\\\\n";
+                break;
+            }
+        }else if(ch == '\"'){
+            os << "'\\\"'";
+        }else if(ch == '\\'){
+            os << "'\\\\'";
+        }else{
+            os << "'" << ch << "'";
+        }
+    }
+    return os;
 }
 
 Node* parse_pattern(std::string& pattern){
@@ -92,7 +151,7 @@ Node* parse_pattern(std::string& pattern){
     for(auto it = pattern.begin(); it != pattern.end(); ++it){
         switch(*it){
             case '[':{
-                CharType char_type;
+                CharNode::Char value;
                 bool negate = false;
                 if(it != pattern.end()){
                     if(*(std::next(it)) == '^'){
@@ -107,8 +166,8 @@ Node* parse_pattern(std::string& pattern){
                         if(std::next(it) == pattern.end()){
                             throw Exception::Exception("expected character after '\\' in pattern");
                         }else{
-                            CharType escaped = escape_sequence(it, pattern.end());
-                            char_type += escaped;
+                            CharNode::Char escaped = escape_sequence(it, pattern.end());
+                            value += escaped;
                             if(!escaped.negate && escaped.size() == 1){
                                 last = *escaped.begin();
                             }else{
@@ -118,29 +177,29 @@ Node* parse_pattern(std::string& pattern){
                     }else if(*it == '-'){
                         if(++it == pattern.end()){
                             throw Exception::Exception("expected character after '-' in pattern");
-                        }else if(char_type.empty()){
+                        }else if(value.empty()){
                             throw Exception::Exception("expected character before '-' in pattern");
                         }else if(!last.has_value()){
                             throw Exception::Exception("invalid character before '-' in pattern");
                         }else{
                             for(char ch = (last.value() + 1); ch <= *it; ++ch){
-                                char_type += ch;
+                                value += ch;
                             }
                         }
                     }else{
-                        char_type += *it;
+                        value += *it;
                         last = *it;
                     }
                     
                 }
                 if(negate){
-                    char_type = !char_type;
+                    value = !value;
                 }
-                if(!char_type.negate && char_type.empty()){
+                if(!value.negate && value.empty()){
                     throw Exception::Exception("empty [] in pattern");
                 }
                 CharNode* node = new CharNode;
-                node->char_type = char_type;
+                node->value = value;
                 current = node;
                 *next = node;
                 next = &(node->next);
@@ -148,7 +207,7 @@ Node* parse_pattern(std::string& pattern){
             case '\\':{
                 if(it != pattern.end()){
                     CharNode* node = new CharNode;
-                    node->char_type = escape_sequence(it, pattern.end());
+                    node->value = escape_sequence(it, pattern.end());
                     current = node;
                     *next = node;
                     next = &(node->next);
@@ -245,14 +304,14 @@ Node* parse_pattern(std::string& pattern){
             }break;
             case '.':{
                 CharNode* node = new CharNode;
-                node->char_type += '\0';
+                node->value += '\0';
                 current = node;
                 *next = node;
                 next = &(node->next);
             }break;
             default:{
                 CharNode* node = new CharNode;
-                node->char_type += *it;
+                node->value += *it;
                 current = node;
                 *next = node;
                 next = &(node->next);

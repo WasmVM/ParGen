@@ -10,72 +10,54 @@
 #include <deque>
 
 using char_t = std::istream::int_type;
-constexpr char_t eof_char = std::istream::traits_type::eof();
 
-struct CharType : public std::set<char_t>{
-    enum Class {Number, Alphabet, Space};
-    bool negate = false;
-    CharType() = default;
+struct Autometa {
 
-    CharType(const char_t ch){
-        insert(ch);
-    }
+    Autometa(Pargen::Lexer& lexer);
 
-    CharType(const Class cl){
-        switch(cl){
-            case Number:
-                insert({'0','1','2','3','4','5','6','7','8','9'});
-            break;
-            case Alphabet:
-                insert({
-                    'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-                    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
-                });
-            break;
-            case Space:
-                insert({' ', '\t', '\r', '\v', '\f', '\n'});
-            break;
-        }
-    }
+    struct Action {
+        enum Flags : uint8_t {
+            None = 0,
+            More = 1,
+            Pop = 2
+        };
+        Flags flags = None;
+        std::string pxml_state;
+        std::string content = "";
+        std::optional<std::string> push;
+    };
+    
+    enum class StateType {None, Final, Start, End};
+    
+    struct Char : public std::optional<char_t> {
+        static constexpr char_t eof = std::istream::traits_type::eof();
+        Char(std::optional<char_t> value = std::nullopt, bool negate = false)
+            : std::optional<char_t>(value), negate(negate){}
 
-    bool is_any() const{
-        return contains('\0');
-    }
-
-    CharType operator!(){
-        negate = !negate;
-        return *this;
-    }
-    CharType operator+(const CharType& rhs){
-        CharType result;
-        result.negate = true;
-        if(negate == rhs.negate){
-            if(is_any() || rhs.is_any()){
-                result.negate = negate;
-                result.emplace('\0');
-            }else if(negate){
-                std::set_intersection(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
-            }else{
-                std::set_union(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
-                result.negate = false;
+        bool operator<(const Char& rhs) const {
+            if(negate != rhs.negate){
+                return negate;
+            }else if(has_value() != rhs.has_value()){
+                return !has_value();
+            }else if(has_value()){
+                return value() < rhs.value();
             }
-        }else{
-            if(is_any()){
-                result = rhs;
-            }else if(rhs.is_any()){
-                result = *this;
-            }else if(negate){
-                std::set_difference(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
-            }else{
-                std::set_difference(rhs.begin(), rhs.end(), begin(), end(), std::inserter(result, result.end()));
-            }
+            return false;
         }
-        return result;
-    }
-    CharType& operator+=(const CharType& rhs){
-        *this = (*this + rhs);
-        return *this;
-    }
+        bool negate;
+    };
+
+    struct State : public std::deque<std::pair<Char, size_t>> {
+        State() = default;
+        State(const State&);
+        StateType type;
+        std::optional<size_t> action_id;
+    };
+
+    std::deque<State> states;
+    std::unordered_map<std::string, size_t> group_map;
+    std::deque<Action> actions;
+    std::ostream& dump(std::ostream& os);
 };
 
 struct Node {
@@ -96,8 +78,59 @@ struct Node {
     }
 };
 
-struct CharNode : public Node{
-    CharType char_type;
+struct CharNode : public Node {
+
+    struct Char : public std::set<char_t>{
+        static constexpr char_t eof = std::istream::traits_type::eof();
+        enum Class {Number, Alphabet, Space};
+        bool negate = false;
+        Char() = default;
+        Char(const Class cl);
+        Char(const char_t ch){
+            insert(ch);
+        }
+
+        bool is_any() const{
+            return contains('\0');
+        }
+
+        Char operator!(){
+            negate = !negate;
+            return *this;
+        }
+        Char operator+(const Char& rhs){
+            Char result;
+            result.negate = true;
+            if(negate == rhs.negate){
+                if(is_any() || rhs.is_any()){
+                    result.negate = negate;
+                    result.emplace('\0');
+                }else if(negate){
+                    std::set_intersection(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
+                }else{
+                    std::set_union(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
+                    result.negate = false;
+                }
+            }else{
+                if(is_any()){
+                    result = rhs;
+                }else if(rhs.is_any()){
+                    result = *this;
+                }else if(negate){
+                    std::set_difference(begin(), end(), rhs.begin(), rhs.end(), std::inserter(result, result.end()));
+                }else{
+                    std::set_difference(rhs.begin(), rhs.end(), begin(), end(), std::inserter(result, result.end()));
+                }
+            }
+            return result;
+        }
+        Char& operator+=(const Char& rhs){
+            *this = (*this + rhs);
+            return *this;
+        }
+    };
+
+    Char value;
     CharNode() : Node(Node::Char){}
 };
 
@@ -118,41 +151,12 @@ struct GroupNode : public Node{
     }
 };
 
-struct Autometa {
-
-    Autometa(Pargen::Lexer& lexer);
-
-    struct Action {
-        enum Flags : uint8_t {
-            None = 0,
-            More = 1,
-            Pop = 2
-        };
-        Flags flags = None;
-        std::string pxml_state;
-        std::string content = "";
-        std::optional<std::string> push;
-    };
-    enum class StateType {None, Error, Final, Start, End};
-    struct State : public std::deque<std::pair<std::optional<char_t>, size_t>> {
-        State() = default;
-        State(const State&);
-        StateType type;
-        std::optional<size_t> action_id;
-    };
-
-    std::deque<State> states;
-    std::unordered_map<std::string, size_t> pxml_state_map;
-    std::deque<Action> actions;
-    std::string eof_action;
-    std::ostream& dump(std::ostream& os);
-};
-
 using namespace Pargen;
 
-void resolve_use(std::list<std::variant<Rule, State>>& rules);
+void resolve_use(std::list<std::variant<Rule, Group>>& rules);
 Node* parse_pattern(std::string& pattern);
-std::ostream& operator<< (std::ostream& os, CharType& type);
+std::ostream& operator<< (std::ostream& os, CharNode::Char& character);
+std::ostream& operator<< (std::ostream& os, Autometa::Char& character);
 std::ostream& operator<< (std::ostream& os, Autometa& autometa);
 
 #endif

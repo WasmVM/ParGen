@@ -23,35 +23,35 @@
 
 using namespace Pargen;
 
-void resolve_use(std::list<std::variant<Rule, State>>& rules){
+void resolve_use(std::list<std::variant<Rule, Group>>& rules){
 
     std::unordered_map<std::string, Rule> rule_map;
 
-    std::function<void(std::list<std::variant<Rule, Use, State>>&)> collect_rule = 
-        [&collect_rule, &rule_map](std::list<std::variant<Rule, Use, State>>& state)
+    std::function<void(std::list<std::variant<Rule, Use, Group>>&)> collect_rule = 
+        [&collect_rule, &rule_map](std::list<std::variant<Rule, Use, Group>>& group)
     {
-        for(std::variant<Rule, Use, State>& elem : state){
+        for(std::variant<Rule, Use, Group>& elem : group){
             std::visit(overloaded {
                 [&](Rule& rule){
                     if(!rule.id.empty()){
                         rule_map[rule.id] = rule;
                     }
                 },
-                [&](State& st){
-                    collect_rule(st);
+                [&](Group& group){
+                    collect_rule(group);
                 },
                 [](Use&){}
             }, elem);
         }
     };
 
-    std::function<void(std::list<std::variant<Rule, Use, State>>&)> resolve_state_use = 
-        [&resolve_state_use, &rule_map](std::list<std::variant<Rule, Use, State>>& state)
+    std::function<void(std::list<std::variant<Rule, Use, Group>>&)> resolve_state_use = 
+        [&resolve_state_use, &rule_map](std::list<std::variant<Rule, Use, Group>>& group)
     {
-        for(std::variant<Rule, Use, State>& elem : state){
+        for(std::variant<Rule, Use, Group>& elem : group){
             std::visit(overloaded {
-                [&](State& st){
-                    resolve_state_use(st);
+                [&](Group& gr){
+                    resolve_state_use(gr);
                 },
                 [&](Use& use){
                     if(rule_map.contains(use.id)){
@@ -65,23 +65,23 @@ void resolve_use(std::list<std::variant<Rule, State>>& rules){
         }
     };
 
-    for(std::variant<Rule, State>& elem : rules){
+    for(std::variant<Rule, Group>& elem : rules){
         std::visit(overloaded {
             [&](Rule& rule){
                 if(!rule.id.empty()){
                     rule_map[rule.id] = rule;
                 }
             },
-            [&](State& state){
-                collect_rule(state);
+            [&](Group& group){
+                collect_rule(group);
             }
         }, elem);
     }
-    for(std::variant<Rule, State>& elem : rules){
+    for(std::variant<Rule, Group>& elem : rules){
         std::visit(overloaded {
             [](Rule&){},
-            [&](State& state){
-                resolve_state_use(state);
+            [&](Group& group){
+                resolve_state_use(group);
             }
         }, elem);
     }

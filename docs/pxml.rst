@@ -17,7 +17,7 @@ Format
     - boolean (true | false)
     - string
     - double 
-* Comments are enclosed with ``{%`` ``%}``, can't be nested
+* Comments are enclosed with ``{%`` ``%}``, can be nested
 * Character ``<`` should be escaped as ``\<`` in text
 
 Example:
@@ -181,7 +181,9 @@ C++ type
 
 Define lexer
 
-A special rule without any attributes can specify custom end-of-file action;
+A special rule without any attributes can specify custom end-of-file rule.
+
+Only one end-of-file is allowed in lexer.
 
 **Attributes**
 
@@ -202,7 +204,7 @@ A special rule without any attributes can specify custom end-of-file action;
 
 **Children**
 
-``<rule>``, ``<state>``, ``<include>``, ``<header>``, ``<member>``, ``<function>``, ``<source>``
+``<rule>``, ``<group>``, ``<include>``, ``<header>``, ``<member>``, ``<function>``, ``<source>``
 
 <rule>
 ======
@@ -298,11 +300,11 @@ Define a rule in lexer
 
 * push <string> : State name to push into stack
 
-* pop : Pop current state from stack
+* pop : Pop current group from stack
 
 * more : Consume the matched text for further $$
 
-If both push and pop specified, stack will pop current state then push new state. 
+If both push and pop specified, stack will pop current group then push new group. 
 
 **Children**
 
@@ -330,14 +332,14 @@ The following replacement variables can be used in the codes:
 
 * TODO: @1...N : The location of submatch text in group N
 
-<state>
+<group>
 =======
 
-Define a state in lexer
+Define a group in lexer
 
 **Attributes**
 
-* name <string> : ``[Required]`` State name
+* name <string> : ``[Required]`` Group name
 
 **Children**
 

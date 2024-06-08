@@ -291,15 +291,15 @@ Use elem_use(PXML::Pxml& pxml){
     return use;
 }
 
-State elem_state(ParGen& pargen, PXML::Pxml& pxml){
-    State state;
+Group elem_group(ParGen& pargen, PXML::Pxml& pxml){
+    Group group;
     // attributes
     int indent = 4;
     for(auto attribute : pxml){
         if(attribute.first == "name"){
-            state.name = std::get<std::string>(attribute.second.second);
+            group.name = std::get<std::string>(attribute.second.second);
         }else{
-            throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <state>", attribute.second.first);
+            throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <group>", attribute.second.first);
         }
     }
     // Content
@@ -309,17 +309,17 @@ State elem_state(ParGen& pargen, PXML::Pxml& pxml){
             if(child_pxml.tag == "include"){
                 elem_include(pxml, child_pxml, pargen.includes, child_it);
             }else if(child_pxml.tag == "rule"){
-                state.emplace_back(elem_rule(pargen, child_pxml));
-            }else if(child_pxml.tag == "state"){
-                state.emplace_back(elem_state(pargen, child_pxml));
+                group.emplace_back(elem_rule(pargen, child_pxml));
+            }else if(child_pxml.tag == "group"){
+                group.emplace_back(elem_group(pargen, child_pxml));
             }else if(child_pxml.tag == "use"){
-                state.emplace_back(elem_use(child_pxml));
+                group.emplace_back(elem_use(child_pxml));
             }else{
                 throw Exception::SyntaxError("invalid element under <lexer>", child_pxml.pos);
             }
         }
     }
-    return state;
+    return group;
 }
 
 void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
@@ -413,8 +413,8 @@ void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
                 lexer.functions.emplace_back(elem_function(child_pxml));
             }else if(child_pxml.tag == "rule"){
                 lexer.emplace_back(elem_rule(pargen, child_pxml));
-            }else if(child_pxml.tag == "state"){
-                lexer.emplace_back(elem_state(pargen, child_pxml));
+            }else if(child_pxml.tag == "group"){
+                lexer.emplace_back(elem_group(pargen, child_pxml));
             }else{
                 throw Exception::SyntaxError("invalid element under <lexer>", child_pxml.pos);
             }

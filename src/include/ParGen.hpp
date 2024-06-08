@@ -33,7 +33,7 @@ struct Use {
     std::string id;
 };
 
-struct State : public std::list<std::variant<Rule, Use, State>> {
+struct Group : public std::list<std::variant<Rule, Use, Group>> {
     std::string name;
 };
 
@@ -60,7 +60,7 @@ private:
     ParGen& parent;
 };
 
-struct Lexer : public std::list<std::variant<Rule, State>>{
+struct Lexer : public std::list<std::variant<Rule, Group>>{
 
     std::string class_name = "Lexer";
     std::string new_line;

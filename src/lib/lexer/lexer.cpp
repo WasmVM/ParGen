@@ -26,44 +26,41 @@
 
 using namespace Pargen;
 
-std::ostream& operator<< (std::ostream& os, CharType& type){
-    if(type.negate){
+std::ostream& operator<< (std::ostream& os, Autometa::Char& character){
+    if(character.negate){
         os << "not ";
     }
-    if(type.is_any()){
+    if(character.value() == '\0'){
         return os << "any";
-    }
-    std::string characters(type.begin(), type.end());
-    std::stable_sort(characters.begin(), characters.end());
-    for(char ch : characters){
-        if(std::isspace(ch)){
-            switch(ch){
-                case ' ':
-                    os << "'" << ch << "'";
-                break;
-                case '\t':
-                    os << "\\\\t";
-                break;
-                case '\r':
-                    os << "\\\\r";
-                break;
-                case '\f':
-                    os << "\\\\f";
-                break;
-                case '\v':
-                    os << "\\\\v";
-                break;
-                case '\n':
-                    os << "\\\\n";
-                break;
-            }
-        }else if(ch == '\"'){
-            os << "'\\\"'";
-        }else if(ch == '\\'){
-            os << "'\\\\'";
-        }else{
-            os << "'" << ch << "'";
+    }else if(character.value() == Autometa::Char::eof){
+        return os << "EOF";
+    }else if(std::isspace(character.value())){
+        switch(character.value()){
+            case ' ':
+                os << "'" << character.value() << "'";
+            break;
+            case '\t':
+                os << "\\\\t";
+            break;
+            case '\r':
+                os << "\\\\r";
+            break;
+            case '\f':
+                os << "\\\\f";
+            break;
+            case '\v':
+                os << "\\\\v";
+            break;
+            case '\n':
+                os << "\\\\n";
+            break;
         }
+    }else if(character.value() == '\"'){
+        os << "'\\\"'";
+    }else if(character.value() == '\\'){
+        os << "'\\\\'";
+    }else{
+        os << "'" << (char)character.value() << "'";
     }
     return os;
 }
@@ -181,7 +178,7 @@ void Pargen::Lexer::generate_source(std::ostream& os){
 
     // constructor
     os << class_name << "::" << class_name << "(std::filesystem::path path, std::istream& stream) :\n";
-    os << "  stream(stream), state(" << autometa.pxml_state_map[""] << ")\n";
+    os << "  stream(stream), state(" << autometa.group_map[""] << ")\n";
     os << "{\n";
     os << "    current = fetch();\n";
     if(!parent.tokens.empty()){
@@ -289,7 +286,7 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         }
         if(action.flags & Autometa::Action::Pop){
             if(action.push){
-                os << "\n                    state = " << autometa.pxml_state_map[action.push.value()] <<";";      
+                os << "\n                    state = " << autometa.group_map[action.push.value()] <<";";      
                 if(!(action.flags & Autometa::Action::More)){
                     os << "\n                    text = current;";
                 }
@@ -304,10 +301,10 @@ void Pargen::Lexer::generate_source(std::ostream& os){
             }
         }else{
             if(action.push){
-                os << "\n                    stack.emplace_back(" << autometa.pxml_state_map[action.pxml_state] << ", text);"; 
-                os << "\n                    state = " << autometa.pxml_state_map[action.push.value()] <<";";
+                os << "\n                    stack.emplace_back(" << autometa.group_map[action.pxml_state] << ", text);"; 
+                os << "\n                    state = " << autometa.group_map[action.push.value()] <<";";
             }else{
-                os << "\n                    state = " << autometa.pxml_state_map[action.pxml_state] <<";";
+                os << "\n                    state = " << autometa.group_map[action.pxml_state] <<";";
             }
             if(!(action.flags & Autometa::Action::More)){
                 os << "\n                    text = current;";

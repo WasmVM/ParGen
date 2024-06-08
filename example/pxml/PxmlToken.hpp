@@ -18,47 +18,73 @@ struct Position {
 
 namespace Tokens {
 
-struct Doctype {};
+struct Doctype {
+    Doctype() = default;
+};
 
-struct Equal {};
+struct Equal {
+    Equal() = default;
+};
 
-struct Close {};
+struct Close {
+    Close() = default;
+};
 
-struct Inline {};
+struct Inline {
+    Inline() = default;
+};
 
 struct Bool {
+    Bool() = default;
+    Bool(bool value) : value(value){}
     bool value;
 };
 
 struct Number {
+    Number() = default;
+    Number(double value) : value(value){}
     double value;
 };
 
 struct Tag {
+    Tag() = default;
+    Tag(std::string value) : value(value){}
     std::string value;
 };
 
 struct Tail {
+    Tail() = default;
+    Tail(std::string value) : value(value){}
     std::string value;
 };
 
 struct String {
+    String() = default;
+    String(std::string value) : value(value){}
     std::string value;
 };
 
 struct Text {
+    Text() = default;
+    Text(std::string value) : value(value){}
     std::string value;
 };
 
 struct ID {
+    ID() = default;
+    ID(std::string value) : value(value){}
     std::string value;
 };
 
 struct Entity {
+    Entity() = default;
+    Entity(std::string value) : value(value){}
     std::string value;
 };
 
 struct Space {
+    Space() = default;
+    Space(std::string value) : value(value){}
     std::string value;
 };
 
@@ -80,6 +106,22 @@ struct Token : public std::variant<
   Tokens::Entity,
   Tokens::Space
 > {
+template<typename T> Token(T token, Position pos): std::variant<
+  std::monostate,
+  Tokens::Doctype,
+  Tokens::Equal,
+  Tokens::Close,
+  Tokens::Inline,
+  Tokens::Bool,
+  Tokens::Number,
+  Tokens::Tag,
+  Tokens::Tail,
+  Tokens::String,
+  Tokens::Text,
+  Tokens::ID,
+  Tokens::Entity,
+  Tokens::Space
+>(token), pos(pos){}
     Position pos;
 };
 
