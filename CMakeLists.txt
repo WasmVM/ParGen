@@ -13,6 +13,11 @@ endif(CONSOLE_COLOR)
 include_directories(${CMAKE_CURRENT_LIST_DIR}/src/include)
 add_subdirectory(src)
 
+set(BUILD_EXAMPLES ON CACHE BOOL "Build examples")
+if(BUILD_EXAMPLES)
+  add_subdirectory(example)
+endif(BUILD_EXAMPLES)
+
 set(BUILD_DOCS ON CACHE BOOL "Build documentation")
 if(BUILD_DOCS)
   add_subdirectory(docs)
