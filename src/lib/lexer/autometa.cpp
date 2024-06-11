@@ -518,50 +518,45 @@ Autometa::State::State(const Autometa::State& state) :
 }
 
 std::ostream& operator<< (std::ostream& os, Autometa& autometa){
-
-    std::map<size_t, std::string> rev_map;
-    for(auto& state_pair : autometa.group_map){
-        rev_map[state_pair.second] = state_pair.first;
-    }
-
     size_t state_id = 0;
-    for(Autometa::State& state : autometa.states){
-        if(rev_map.contains(state_id)){
-            os << "    /* " << rev_map[state_id] << " */" << std::endl;
+    static const auto init_state = [&](std::map<Autometa::Char, size_t>& transitions){
+        auto start = transitions.begin();
+        while(start != transitions.end()){
+            auto end = std::adjacent_find(start, transitions.end(), 
+                [](const std::pair<Autometa::Char, size_t>& lhs, const std::pair<Autometa::Char, size_t>& rhs){
+                    return (lhs.second != rhs.second) || (rhs.first.value() != lhs.first.value() + 1);
+                }
+            );
+            os << "{{" << start->first.value();
+            if(start != end && (end != transitions.end() || std::prev(end) != start)){
+                os << ",";
+                if(end == transitions.end()){
+                    os << std::prev(end)->first.value();
+                }else{
+                    os << end->first.value();
+                }
+            }
+            os << "}," << start->second << "}, ";
+            if(end == transitions.end()){
+                break;
+            }else{
+                start = std::next(end);
+            }
         }
-        std::map<char_t, size_t> transitions;
+    };
+
+    for(Autometa::State& state : autometa.states){
+        std::map<Autometa::Char, size_t> transitions;
         for(auto& transition : state){
             if(transition.first.has_value()){
-                transitions[transition.first.value()] = transition.second;
+                transitions[transition.first] = transition.second;
             }
         }
         if(transitions.empty()){
             os << "    {}, // S" << state_id << std::endl;
         }else{
             os << "    {";
-            auto start = transitions.begin();
-            while(start != transitions.end()){
-                auto end = std::adjacent_find(start, transitions.end(), 
-                    [](const std::pair<char, size_t>& lhs, const std::pair<char, size_t>& rhs){
-                        return (lhs.first == '\0') || (lhs.second != rhs.second) || (rhs.first != lhs.first + 1);
-                    }
-                );
-                os << "{{" << start->first;
-                if(start != end && (end != transitions.end() || std::prev(end) != start)){
-                    os << ",";
-                    if(end == transitions.end()){
-                        os << std::prev(end)->first;
-                    }else{
-                        os << end->first;
-                    }
-                }
-                os << "}," << start->second << "}, ";
-                if(end == transitions.end()){
-                    break;
-                }else{
-                    start = std::next(end);
-                }
-            }
+            init_state(transitions);
             os << "}, // S" << state_id << std::endl;
         }
         state_id += 1;

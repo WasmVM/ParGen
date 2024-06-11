@@ -50,7 +50,7 @@
         <group name="comment">
             <use id="Comment" />
             <rule pattern="%\}" pop />
-            <rule pattern="([^%]|%[^\}])" />
+            <rule pattern="." />
         </group>
         {% tail %}
         <rule pattern="</\a\w*" more push="tail" />
@@ -90,7 +90,8 @@
         </group>
         {% string %}
         <group name="string">
-            <rule pattern="([^\"]|\\.)+\"" pop>
+            <rule pattern="(.|\\.)" more />
+            <rule pattern="\"" pop>
                 return Token(String(_text.substr(0, _text.size() - 1)), _pos);
             </rule>
         </group>
@@ -103,7 +104,7 @@
             return Token(Space(_text), _pos);
         </rule>
         {% text %}
-        <rule pattern="([^<]|\\<)+">
+        <rule pattern="(.|\\<|\\.)">
             return Token(Text(_text), _pos);
         </rule>
     </lexer>

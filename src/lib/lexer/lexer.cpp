@@ -255,7 +255,7 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     os << "    if(current == std::istream::traits_type::eof()){" << std::endl;
     os << "        return Token(std::monostate(), pos);" << std::endl;
     os << "    }" << std::endl;
-    os << "    while(current != std::istream::traits_type::eof()){" << std::endl;
+    os << "    while(true){" << std::endl;
     os << "        if(states[state].contains(current)){" << std::endl;
     os << "            state = states[state][current];" << std::endl;
     os << "            current = fetch();" << std::endl;
@@ -267,7 +267,10 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         os << "            Position _pos = pos;" << std::endl;
         os << "            pos = cur;" << std::endl;
     }
-    os << "            std::string _text = text.substr(0, text.size() - 1);" << std::endl;
+    os << "            std::string _text = text;" << std::endl;
+    os << "            if(current != std::istream::traits_type::eof()){" << std::endl;
+    os << "                _text.pop_back();" << std::endl;
+    os << "            }" << std::endl;
 
     // actions
     std::map<size_t, std::list<size_t>> action_map;
