@@ -77,6 +77,7 @@ void Pargen::Lexer::generate_header(std::ostream& os){
     os << header_prologue << std::endl;
     os << "#include <iostream>" << std::endl;
     os << "#include <deque>" << std::endl;
+    os << "#include <vector>" << std::endl;
     os << "#include <filesystem>" << std::endl;
     os << "#include <optional>" << std::endl;
     os << "#include <map>" << std::endl;
