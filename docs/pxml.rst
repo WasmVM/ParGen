@@ -267,8 +267,6 @@ Define a rule in lexer
             
         - range: like ``[0-9]``
 
-        - exclusive: ``[^0-9]`` means NOT 0-9
-
     OR operation: 
 
         Example:
@@ -314,23 +312,7 @@ The following replacement variables can be used in the codes:
 
 * _text : The matched text, from current pattern and previous ``more``
 
-* TODO: $1...N : The submatch text in group N
-
-    Example
-
-        pattern: s(ae*(b+)c)d
-
-        input: saeebbbbcd
-        
-        _text: saeebbbbcd
-        
-        $1: aeebbbbc
-        
-        $2: bbbb
-
 * _pos : The location of matched text
-
-* TODO: @1...N : The location of submatch text in group N
 
 <group>
 =======
