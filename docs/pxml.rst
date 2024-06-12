@@ -382,6 +382,8 @@ Define a group of grammers that generate the same non-terminal as target
 
 Define a grammar in parser
 
+Grammar without pattern can be used to specify empty generation, but should not have children.
+
 **Attributes**
 
 * pattern <string> : Grammar generation pattern, as a space-separated sequence of token or target
