@@ -177,7 +177,7 @@ Indicate a C++ type
 C++ type
 
 <lexer>
-======
+=======
 
 Define lexer
 
@@ -187,20 +187,20 @@ Only one end-of-file is allowed in lexer.
 
 **Attributes**
 
-* class <string> : Token class name
-    - default : ``"Token"``
+* class <string> : Lexer class name
+    - default : ``"Lexer"``
 
-* namespace <string> : Namespace of token types
-    - default : ``"Tokens"``
+* headerFile <string> : Path of output lexer header file
+    - default : ``"Lexer.hpp"``
 
-* headerFile <string> : Path of output token header file
-    - default : ``"Token.hpp"``
+* sourceFile <string> : Path of output lexer source file
+    - default : ``"Lexer.cpp"``
 
-* sourceFile <string> : Path of output token source file
-    - default : ``"Token.cpp"``
+* newLine <string> : Define substring as new-line
+    - default : ``\"``
 
 * return <string> : Return type of get()
-    - default : ``Token``
+    - default : ``void`` if ``<token>`` not present, or same as ``<token>`` class
 
 **Children**
 
@@ -328,10 +328,61 @@ Define a group in lexer
 ``<rule>``, ``<include>``, ``<use>``
 
 <use>
-======
+=====
 
 Use a rule in lexer
 
 **Attributes**
 
 * id <string> : ``[Required]`` The rule name to use
+
+<parser>
+========
+
+Define parser
+
+**Attributes**
+
+* class <string> : Parser class name
+    - default : ``"Parser"``
+
+* headerFile <string> : Path of output parser header file
+    - default : ``"Parser.hpp"``
+
+* sourceFile <string> : Path of output parser source file
+    - default : ``"Parser.cpp"``
+
+* start <string> : Start grammar
+    - default : the first ``<grammar>``
+
+**Children**
+
+``<target>``, ``<include>``, ``<header>``, ``<member>``, ``<function>``, ``<source>``
+
+<target>
+========
+
+Define a group of grammers that generate the same non-terminal as target
+
+**Attributes**
+
+* name <string> : ``[Required]`` Target name
+
+**Children**
+
+``<grammar>``
+
+<grammar>
+=========
+
+Define a grammar in parser
+
+**Attributes**
+
+* pattern <string> : Grammar generation pattern, as a space-separated sequence of token or target
+
+    Example: "Token1 target1 Token2"
+
+**Children**
+
+C++ codes that may return a generated object.
