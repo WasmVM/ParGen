@@ -108,4 +108,44 @@
             return Token(Text(_text), _pos);
         </rule>
     </lexer>
+    <parser class="PxmlParser" headerFile="PxmlParser.hpp" sourceFile="PxmlParser.cpp" start="pxml">
+        <target name="pxml">
+            <grammar pattern="Doctype spaces element spaces EOF" />
+        </target>
+        <target name="content">
+            <grammar pattern="element" />
+            <grammar pattern="text" />
+        </target>
+        <target name="body">
+            <grammar pattern="body content" />
+            <grammar />
+        </target>
+        <target name="element">
+            <grammar pattern="Tag attributes Close body Tail" />
+            <grammar pattern="Tag attributes Inline"/>
+        </target>
+        <target name="spaces">
+            <grammar pattern="spaces Space" />
+            <grammar />
+        </target>
+        <target name="text">
+            <grammar pattern="text Text" />
+            <grammar pattern="text spaces" />
+            <grammar pattern="text ENTITY" />
+            <grammar />
+        </target>
+        <target name="attributes">
+            <grammar pattern="attributes attribute" />
+            <grammar />
+        </target>
+        <target name="attribute">
+            <grammar pattern="ID Equal value" />
+            <grammar pattern="ID" />
+        </target>
+        <target name="value">
+            <grammar pattern="Bool" />
+            <grammar pattern="Number" />
+            <grammar pattern="String" />
+        </target>
+    </parser>
 </pxml>

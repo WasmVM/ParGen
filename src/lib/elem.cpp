@@ -18,6 +18,7 @@
 #include <fstream>
 #include <regex>
 #include <utility>
+#include <ranges>
 #include <exception.hpp>
 #include <Util.hpp>
 #include <pxml_parser.hpp>
@@ -232,7 +233,7 @@ Token elem_token(ParGen& pargen, PXML::Pxml& pxml){
     return token;
 }
 
-Rule elem_rule(ParGen& pargen, PXML::Pxml& pxml){
+Rule elem_rule(PXML::Pxml& pxml){
     Rule rule;
     // attributes
     int indent = 4;
@@ -294,7 +295,6 @@ Use elem_use(PXML::Pxml& pxml){
 Group elem_group(ParGen& pargen, PXML::Pxml& pxml){
     Group group;
     // attributes
-    int indent = 4;
     for(auto attribute : pxml){
         if(attribute.first == "name"){
             group.name = std::get<std::string>(attribute.second.second);
@@ -309,7 +309,7 @@ Group elem_group(ParGen& pargen, PXML::Pxml& pxml){
             if(child_pxml.tag == "include"){
                 elem_include(pxml, child_pxml, pargen.includes, child_it);
             }else if(child_pxml.tag == "rule"){
-                group.emplace_back(elem_rule(pargen, child_pxml));
+                group.emplace_back(elem_rule(child_pxml));
             }else if(child_pxml.tag == "group"){
                 group.emplace_back(elem_group(pargen, child_pxml));
             }else if(child_pxml.tag == "use"){
@@ -320,6 +320,60 @@ Group elem_group(ParGen& pargen, PXML::Pxml& pxml){
         }
     }
     return group;
+}
+
+Grammar elem_grammar(PXML::Pxml& pxml){
+    Grammar grammar;
+    // attributes
+    int indent = 4;
+    for(auto attribute : pxml){
+        if(attribute.first == "pattern"){
+            std::string pattern = std::get<std::string>(attribute.second.second);
+            for(auto splited : std::views::split(pattern, std::string(" "))){
+                grammar.depends.emplace_back(splited.begin(), splited.end());
+            }
+        }else if(attribute.first == "indent"){
+            indent = std::get<double>(attribute.second.second);
+        }else{
+            throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <grammar>", attribute.second.first);
+        }
+    }
+    // Content
+    for(PXML::Pxml::Child child : pxml.children){
+        if(std::holds_alternative<PXML::Pxml>(child.second)){
+            throw Exception::SyntaxError("only texts are allowed in <grammar>", child.first);
+        }
+        grammar.content += std::get<std::string>(child.second);
+    }
+    grammar.content = handle_indent(indent, grammar.content);
+    return grammar;
+}
+
+void elem_target(Parser& parser, PXML::Pxml& pxml){
+    std::string target_name;
+    // attributes
+    for(auto attribute : pxml){
+        if(attribute.first == "name"){
+            target_name = std::get<std::string>(attribute.second.second);
+        }else{
+            throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <target>", attribute.second.first);
+        }
+    }
+    // Content
+    if(pxml.children.empty()){
+        throw Exception::SyntaxError("no grammar under <target>", pxml.pos);
+    }
+    for(auto child_it = pxml.children.begin(); child_it != pxml.children.end(); ++child_it){
+        if(std::holds_alternative<PXML::Pxml>(child_it->second)){
+            PXML::Pxml& child_pxml = std::get<PXML::Pxml>(child_it->second);
+            if(child_pxml.tag == "grammar"){
+                Grammar& grammar = parser.emplace_back(elem_grammar(child_pxml));
+                grammar.target = target_name;
+            }else{
+                throw Exception::SyntaxError("invalid element under <target>", child_pxml.pos);
+            }
+        }
+    }
 }
 
 void elem_tokens(ParGen& pargen, Tokens& tokens, PXML::Pxml& pxml){
@@ -412,9 +466,57 @@ void elem_lexer(ParGen& pargen, Lexer& lexer, PXML::Pxml& pxml){
             }else if(child_pxml.tag == "function"){
                 lexer.functions.emplace_back(elem_function(child_pxml));
             }else if(child_pxml.tag == "rule"){
-                lexer.emplace_back(elem_rule(pargen, child_pxml));
+                lexer.emplace_back(elem_rule(child_pxml));
             }else if(child_pxml.tag == "group"){
                 lexer.emplace_back(elem_group(pargen, child_pxml));
+            }else{
+                throw Exception::SyntaxError("invalid element under <lexer>", child_pxml.pos);
+            }
+        }
+    }
+}
+
+void elem_parser(ParGen& pargen, Pargen::Parser& parser, PXML::Pxml& pxml){
+    // attributes
+    for(auto attribute : pxml){
+        if(attribute.first == "class"){
+            parser.class_name = std::get<std::string>(attribute.second.second);
+        }else if(attribute.first == "headerFile"){
+            parser.header_path = std::get<std::string>(attribute.second.second);
+        }else if(attribute.first == "sourceFile"){
+            parser.source_path = std::get<std::string>(attribute.second.second);
+        }else if(attribute.first == "start"){
+            parser.start = std::get<std::string>(attribute.second.second);
+        }else{
+            throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <parser>", attribute.second.first);
+        }
+    }
+    // children
+    for(auto child_it = pxml.children.begin(); child_it != pxml.children.end(); ++child_it){
+        if(std::holds_alternative<PXML::Pxml>(child_it->second)){
+            PXML::Pxml& child_pxml = std::get<PXML::Pxml>(child_it->second);
+            if(child_pxml.tag == "include"){
+                elem_include(pxml, child_pxml, pargen.includes, child_it);
+            }else if(child_pxml.tag == "header"){
+                auto header_pair = elem_header(child_pxml);
+                if(header_pair.first){
+                    parser.header_prologue += header_pair.second;
+                }else{
+                    parser.header_epilogue += header_pair.second;
+                }
+            }else if(child_pxml.tag == "member"){
+                parser.members.emplace_back(elem_member(child_pxml));
+            }else if(child_pxml.tag == "source"){
+                auto source_pair = elem_source(child_pxml);
+                if(source_pair.first){
+                    parser.source_prologue += source_pair.second;
+                }else{
+                    parser.source_epilogue += source_pair.second;
+                }
+            }else if(child_pxml.tag == "function"){
+                parser.functions.emplace_back(elem_function(child_pxml));
+            }else if(child_pxml.tag == "target"){
+                elem_target(parser, child_pxml);
             }else{
                 throw Exception::SyntaxError("invalid element under <lexer>", child_pxml.pos);
             }
