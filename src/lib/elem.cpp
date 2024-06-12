@@ -18,7 +18,7 @@
 #include <fstream>
 #include <regex>
 #include <utility>
-#include <ranges>
+#include <string>
 #include <exception.hpp>
 #include <Util.hpp>
 #include <pxml_parser.hpp>
@@ -329,9 +329,11 @@ Grammar elem_grammar(PXML::Pxml& pxml){
     for(auto attribute : pxml){
         if(attribute.first == "pattern"){
             std::string pattern = std::get<std::string>(attribute.second.second);
-            for(auto splited : std::views::split(pattern, std::string(" "))){
-                grammar.depends.emplace_back(splited.begin(), splited.end());
+            for(auto found = pattern.find(' '); found != std::string::npos; found = pattern.find(' ')){
+                grammar.depends.emplace_back(pattern.substr(0, found));
+                pattern = pattern.substr(found + 1);
             }
+            grammar.depends.emplace_back(pattern);
         }else if(attribute.first == "indent"){
             indent = std::get<double>(attribute.second.second);
         }else{

@@ -94,7 +94,15 @@ int main(int argc, const char* argv[]){
             pargen.lexer.generate_source(source_out);
             source_out.close();
         }
-        
+        // Generate parser files
+        if(!pargen.parser.empty()){
+            std::ofstream header_out(pargen.parser.header_path, std::ios::trunc);
+            pargen.parser.generate_header(header_out);
+            header_out.close();
+            std::ofstream source_out(pargen.parser.source_path, std::ios::trunc);
+            pargen.parser.generate_source(source_out);
+            source_out.close();
+        }
     }catch(Exception::SyntaxError& err){
         std::cerr << err.pos.path.string() << ":" << err.pos.line << ":" << err.pos.column
             << " " COLOR_Error ": " << err.what() << std::endl;
