@@ -304,6 +304,11 @@ Define a rule in lexer
 
 If both push and pop specified, stack will pop current group then push new group. 
 
+* indent <number> : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
+
 **Children**
 
 C++ codes that may return a token.
@@ -382,6 +387,11 @@ Define a grammar in parser
 * pattern <string> : Grammar generation pattern, as a space-separated sequence of token or target
 
     Example: "Token1 target1 Token2"
+
+* indent <number> : Code indention
+    - default : ``4``
+    - ``0`` : no indention
+    - negative value : keep same indention as pxml file (like HTML `<pre>`)
 
 **Children**
 
