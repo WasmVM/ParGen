@@ -489,6 +489,8 @@ void elem_parser(ParGen& pargen, Pargen::Parser& parser, PXML::Pxml& pxml){
             parser.source_path = std::get<std::string>(attribute.second.second);
         }else if(attribute.first == "start"){
             parser.start = std::get<std::string>(attribute.second.second);
+        }else if(attribute.first == "return"){
+            parser.return_type = std::get<std::string>(attribute.second.second);
         }else{
             throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <parser>", attribute.second.first);
         }

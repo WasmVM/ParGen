@@ -93,7 +93,11 @@ struct Lexer : public std::list<std::variant<Rule, Group>>, Component{
 
 struct Parser : public std::list<Grammar>, Component {
 
+    enum class Mode {Auto, LALR, GLR};
+
+    Mode mode = Mode::Auto;
     std::string start = "";
+    std::string return_type = "void";
 
     Parser(Pargen::ParGen& parent) : std::list<Grammar>(), parent(parent){
         class_name = "Parser";

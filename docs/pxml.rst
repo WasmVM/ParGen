@@ -360,6 +360,14 @@ Define parser
 * start <string> : Start grammar
     - default : the first ``<grammar>``
 
+* mode <string> : Mode of parser table (Auto \| LALR \| GLR)
+    - default : Auto
+
+    In ``Auto`` mode, it will first use LALR, then switch to GLR if there're conflicts
+
+* return <string> : Return type of parse()
+    - default : ``void``
+
 **Children**
 
 ``<target>``, ``<include>``, ``<header>``, ``<member>``, ``<function>``, ``<source>``
@@ -389,6 +397,8 @@ Grammar without pattern can be used to specify empty generation, but should not 
 * pattern <string> : Grammar generation pattern, as a space-separated sequence of token or target
 
     Example: "Token1 target1 Token2"
+
+    A special token, ``EOF``, is used for end-of-file
 
 * indent <number> : Code indention
     - default : ``4``

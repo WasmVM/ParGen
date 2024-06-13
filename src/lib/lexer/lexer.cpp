@@ -172,7 +172,7 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     os << source_prologue << std::endl;
 
     // includes & namespace
-    os << "\nnamespace " << parent.name_space << " {\n" << std::endl;
+    os << "\nnamespace " << parent.name_space << " {" << std::endl;
     if(!parent.tokens.empty()){
         os << "\nusing namespace " << parent.tokens.name_space << ";\n" << std::endl;
     }
@@ -188,19 +188,19 @@ void Pargen::Lexer::generate_source(std::ostream& os){
     os << "}\n" << std::endl;
 
     // Chars
-    os << "PxmlLexer::Chars::Chars(std::initializer_list<Chars::char_t> init) : min(init.begin()[0]){" << std::endl;
+    os << class_name << "::Chars::Chars(std::initializer_list<Chars::char_t> init) : min(init.begin()[0]){" << std::endl;
     os << "    if(init.size() == 1){" << std::endl;
     os << "        max = init.begin()[0];" << std::endl;
     os << "    }else{" << std::endl;
     os << "        max = init.begin()[1];" << std::endl;
     os << "    }" << std::endl;
     os << "}\n" << std::endl;
-    os << "bool PxmlLexer::Chars::operator<(const Chars& rhs) const {" << std::endl;
+    os << "bool " << class_name << "::Chars::operator<(const Chars& rhs) const {" << std::endl;
     os << "    return (min < rhs.min) && (max < rhs.min);" << std::endl;
     os << "}\n" << std::endl;
 
     // fetch
-    os << "PxmlLexer::Chars::char_t " << class_name << "::fetch(){\n"
+    os << class_name << "::Chars::char_t " << class_name << "::fetch(){\n"
         "    std::string line_end = \"\";\n"
         "    Chars::char_t res = stream.get();\n"
         "    if(res != std::istream::traits_type::eof()){\n"
@@ -226,7 +226,7 @@ void Pargen::Lexer::generate_source(std::ostream& os){
         "}\n" << std::endl;
 
     // states
-    os << "std::vector<PxmlLexer::State> PxmlLexer::states = {" << std::endl;
+    os << "std::vector<" << class_name << "::State> " << class_name << "::states = {" << std::endl;
     os << autometa << "};\n" << std::endl;
 
     // functions
