@@ -45,6 +45,7 @@ Parser::ParserBase::ParserBase(Pargen::Parser& parser) : parser(parser) {
     std::set<id_t> empties;
     for(Pargen::Grammar& gram : parser){
         if(gram.depends.empty()){
+            // Empty grammar
             if(term_map[gram.target] == TermMap::none){
                 throw Exception::Exception("unknown terminal '" + gram.target + "'");
             }
@@ -52,6 +53,8 @@ Parser::ParserBase::ParserBase(Pargen::Parser& parser) : parser(parser) {
         }else{
             Parser::Grammar& grammar = grammars.emplace_back();
             grammar.target = term_map[gram.target];
+            grammar.action = actions.size();
+            actions.emplace_back(gram.content);
             std::transform(gram.depends.begin(), gram.depends.end(), std::back_inserter(grammar.depends), [&](std::string& dep){
                 if(term_map[dep] == TermMap::none){
                     throw Exception::Exception("unknown terminal '" + dep + "'");
@@ -85,6 +88,9 @@ Parser::ParserBase::ParserBase(Pargen::Parser& parser) : parser(parser) {
                 std::cout << " .";
             }
             std::cout << " " << term_map[gram.depends[i]];
+        }
+        if(gram.action){
+            std::cout << " [" << gram.action.value() << "]";
         }
         std::cout << std::endl;
     }

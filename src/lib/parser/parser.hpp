@@ -66,6 +66,7 @@ struct Grammar {
     std::vector<id_t> depends;
     std::set<id_t> lookahead;
     size_t dot_pos = 0;
+    std::optional<id_t> action;
 
     bool operator==(const Grammar& rhs) const {
         return (rhs.target == target) && (rhs.dot_pos == dot_pos) && (rhs.depends == depends);
@@ -76,6 +77,7 @@ struct ParserBase {
     ParserBase(Pargen::Parser& parser);
     ParserBase(const ParserBase& base) : term_map(base.term_map), parser(base.parser){}
     TermMap term_map;
+    std::vector<std::string> actions;
 protected:
     std::list<Grammar> grammars;
     Pargen::Parser& parser;
