@@ -40,4 +40,36 @@ Parser::ParserBase::ParserBase(Pargen::Parser& parser) : parser(parser) {
         }
         term_map.assign(tokens, nterms);
     }
+
+    // Read grammars
+    std::set<id_t> empties;
+    for(Pargen::Grammar& gram : parser){
+        if(gram.depends.empty()){
+            if(term_map[gram.target] == TermMap::none){
+                throw Exception::Exception("unknown terminal '" + gram.target + "'");
+            }
+            empties.emplace(term_map[gram.target]);
+        }else{
+            Parser::Grammar& grammar = grammars.emplace_back();
+            grammar.target = term_map[gram.target];
+            std::transform(gram.depends.begin(), gram.depends.end(), std::back_inserter(grammar.depends), [&](std::string& dep){
+                if(term_map[dep] == TermMap::none){
+                    throw Exception::Exception("unknown terminal '" + dep + "'");
+                }
+                return term_map[dep];
+            });
+        }
+    }
+
+    // FIXME: output grammars
+    for(Parser::Grammar& gram : grammars){
+        std::cout << term_map[gram.target] << " :=";
+        for(size_t i = 0; i < gram.depends.size(); ++i){
+            if(i == gram.dot_pos){
+                std::cout << " .";
+            }
+            std::cout << " " << term_map[gram.depends[i]];
+        }
+        std::cout << std::endl;
+    }
 }

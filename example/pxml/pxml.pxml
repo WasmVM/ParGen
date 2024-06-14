@@ -131,7 +131,7 @@
         <target name="text">
             <grammar pattern="text Text" />
             <grammar pattern="text spaces" />
-            <grammar pattern="text ENTITY" />
+            <grammar pattern="text Entity" />
             <grammar />
         </target>
         <target name="attributes">

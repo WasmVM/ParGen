@@ -63,7 +63,7 @@ struct Grammar {
     id_t target;
     std::vector<id_t> depends;
     std::set<id_t> lookahead;
-    size_t dot_pos;
+    size_t dot_pos = 0;
 };
 
 struct ParserBase {
