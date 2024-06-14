@@ -2,46 +2,55 @@
 #define ParGen_parser_parser_DEF
 
 #include <ParGen.hpp>
+#include <exception.hpp>
 #include "TermMap.hpp"
 
 #include <string>
 #include <vector>
-#include <list>
 #include <optional>
 #include <map>
 #include <set>
 #include <algorithm>
+#include <iostream>
 
-namespace Parser {
-
-struct Grammar {
-    id_t target;
-    std::vector<id_t> depends;
-    std::set<id_t> lookahead;
-    size_t dot_pos = 0;
-    std::optional<id_t> action;
-
-    bool operator==(const Grammar& rhs) const {
-        return (rhs.target == target) && (rhs.dot_pos == dot_pos) && (rhs.depends == depends);
-    }
-};
-
-struct ParserBase {
-    ParserBase(Pargen::Parser& parser);
-    ParserBase(const ParserBase& base) : 
-        term_map(base.term_map), actions(base.actions), grammars(base.grammars), parser(base.parser){}
+struct GLRParser {
+    GLRParser(Pargen::Parser& parser);
     TermMap term_map;
     std::vector<std::string> actions;
+
+    std::ostream& dump_terms(std::ostream& os);
+    std::ostream& dump_grammars(std::ostream& os);
+
 protected:
-    std::list<Grammar> grammars;
+
+    struct Grammar {
+        term_t target;
+        std::vector<term_t> depends;
+        std::set<term_t> lookahead;
+        size_t dot_pos = 0;
+        std::optional<size_t> action;
+
+        bool operator==(const Grammar& rhs) const {
+            return !(*this < rhs) && !(rhs < *this);
+        }
+        std::ostream& operator<<(std::ostream&);
+    };
+
+    struct State {
+        std::vector<Grammar> produtions;
+        std::map<term_t, size_t> edges;
+    };
+
     Pargen::Parser& parser;
+    std::vector<State> states;
+    std::set<Grammar> grammars;
+
+    void read_grammar();
+
+public:
+    friend bool operator<(const Grammar&, const Grammar&);    
 };
 
-struct LALR : public ParserBase {
-    LALR(ParserBase&& base);
-    LALR(Pargen::Parser& parser) : LALR(ParserBase(parser)) {}
-};
-
-} // namespace Parser
+bool operator<(const GLRParser::Grammar&, const GLRParser::Grammar&);
 
 #endif

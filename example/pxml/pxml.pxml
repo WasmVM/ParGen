@@ -110,7 +110,7 @@
     </lexer>
     <parser class="PxmlParser" headerFile="PxmlParser.hpp" sourceFile="PxmlParser.cpp" start="pxml">
         <target name="pxml">
-            <grammar pattern="Doctype spaces element spaces EOF" />
+            <grammar pattern="Doctype spaces element spaces" />
         </target>
         <target name="content">
             <grammar pattern="element" />

@@ -4,43 +4,17 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <optional>
 #include <unordered_map>
 
-using id_t = size_t;
+using term_t = size_t;
 
 struct TermMap {
-    static constexpr id_t none = (id_t)-1;
+    static constexpr term_t none = (term_t)-1;
 
-    TermMap() = default;
     TermMap(const TermMap& terms) : num_term(terms.num_term), items(terms.items), term_count(terms.term_count){}
-
-    id_t operator[](std::string key){
-        if(items.contains(key)){
-            return items[key];
-        }else{
-            return none;
-        }
-    }
-    std::string operator[](id_t value){
-        for(auto item : items){
-            if(item.second == value){
-                return item.first;
-            }
-        }
-        return "";
-    }
-    size_t size(){
-        return items.size();
-    }
-    std::unordered_map<std::string, id_t>::iterator begin() {
-        return items.begin();
-    }
-    std::unordered_map<std::string, id_t>::iterator end() {
-        return items.end();
-    }
-
-    void assign(std::vector<std::string> terms, std::set<std::string> nterms){
-        num_term = terms.size();
+    TermMap(std::vector<std::string> terms, std::set<std::string> nterms){
+        num_term = items.size() + terms.size();
         for(std::string term : terms){
             items.emplace(term, items.size());
         }
@@ -48,9 +22,38 @@ struct TermMap {
             items.emplace(nterm, items.size());
         }
     }
-    size_t num_term;
+
+    term_t operator[](std::string key){
+        if(items.contains(key)){
+            return items[key];
+        }else{
+            return none;
+        }
+    }
+    std::optional<std::string> operator[](term_t value){
+        for(auto item : items){
+            if(item.second == value){
+                return item.first;
+            }
+        }
+        return std::nullopt;
+    }
+    size_t size(){
+        return items.size();
+    }
+    std::unordered_map<std::string, term_t>::iterator begin() {
+        return items.begin();
+    }
+    std::unordered_map<std::string, term_t>::iterator end() {
+        return items.end();
+    }
+
+    bool is_term(term_t term){
+        return term < num_term;
+    }
 private:
-    std::unordered_map<std::string, id_t> items;
+    size_t num_term;
+    std::unordered_map<std::string, term_t> items = {{"", 0}, {"EOF", 1}};
     size_t term_count;
 };
 
