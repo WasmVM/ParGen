@@ -348,6 +348,10 @@ Grammar elem_grammar(PXML::Pxml& pxml){
         grammar.content += std::get<std::string>(child.second);
     }
     grammar.content = handle_indent(indent, grammar.content);
+    // Check empty
+    if(grammar.depends.empty() && !grammar.content.empty()){
+        throw Exception::SyntaxError("empty grammar should not have content", pxml.pos);
+    }
     return grammar;
 }
 

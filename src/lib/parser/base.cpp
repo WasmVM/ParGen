@@ -61,6 +61,22 @@ Parser::ParserBase::ParserBase(Pargen::Parser& parser) : parser(parser) {
         }
     }
 
+    // Expand empty grammar
+    for(auto gram_it = grammars.begin(); gram_it != grammars.end(); gram_it = std::next(gram_it)){
+        Parser::Grammar& gram = *gram_it;
+        for(size_t dep_idx = 0; dep_idx < gram.depends.size(); ++dep_idx){
+            if(empties.contains(gram.depends[dep_idx])){
+                Parser::Grammar new_gram = gram;
+                new_gram.depends.erase(new_gram.depends.begin() + dep_idx);
+                if((new_gram.depends.size() > 1 || (new_gram.depends.size() == 1 && new_gram.target != new_gram.depends[0]))
+                    && std::find(grammars.begin(), grammars.end(), new_gram) == grammars.end()
+                ){
+                    grammars.emplace_back(new_gram);
+                }
+            }
+        }
+    }
+
     // FIXME: output grammars
     for(Parser::Grammar& gram : grammars){
         std::cout << term_map[gram.target] << " :=";

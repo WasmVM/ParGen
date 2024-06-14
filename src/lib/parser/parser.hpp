@@ -5,9 +5,11 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <optional>
 #include <map>
 #include <set>
+#include <algorithm>
 
 namespace Parser {
 
@@ -64,6 +66,10 @@ struct Grammar {
     std::vector<id_t> depends;
     std::set<id_t> lookahead;
     size_t dot_pos = 0;
+
+    bool operator==(const Grammar& rhs) const {
+        return (rhs.target == target) && (rhs.dot_pos == dot_pos) && (rhs.depends == depends);
+    }
 };
 
 struct ParserBase {
@@ -71,7 +77,7 @@ struct ParserBase {
     ParserBase(const ParserBase& base) : term_map(base.term_map), parser(base.parser){}
     TermMap term_map;
 protected:
-    std::vector<Grammar> grammars;
+    std::list<Grammar> grammars;
     Pargen::Parser& parser;
 };
 
