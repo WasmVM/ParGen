@@ -14,6 +14,7 @@
 
 #include "parser.hpp"
 
+#include <map>
 #include <set>
 #include <vector>
 #include <algorithm>
@@ -45,6 +46,7 @@ static TermMap create_term_map(Pargen::Parser& parser){
 
 GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser)), parser(parser) {
     read_grammar();
+    std::map<term_t, std::set<term_t>> first_sets = create_first_sets();
 }
 
 void GLRParser::read_grammar(){
@@ -89,6 +91,34 @@ void GLRParser::read_grammar(){
     }
 }
 
+std::map<term_t, std::set<term_t>> GLRParser::create_first_sets(){
+    std::map<term_t, std::set<term_t>> first_sets;
+    std::set<term_t> modified;
+    // Update terminals
+    for(const GLRParser::Grammar& gram : grammars){
+        if(term_map.is_term(gram.depends.front())){
+            modified.emplace(gram.target);
+            first_sets[gram.target].emplace(gram.depends.front());
+        }
+    }
+    // Update non-terminals
+    while(!modified.empty()){
+        std::set<term_t> checking = modified;
+        modified.clear();
+        for(const GLRParser::Grammar& gram : grammars){
+            if(checking.contains(gram.depends.front())){
+                for(term_t term : first_sets[gram.depends.front()]){
+                    if(!first_sets[gram.target].contains(term)){
+                        modified.emplace(gram.target);
+                        first_sets[gram.target].emplace(term);
+                    }
+                }
+            }
+        }
+    }
+    return first_sets;
+}
+
 std::ostream& GLRParser::dump_terms(std::ostream& os){
     std::vector<std::pair<std::string, term_t>> term_list(term_map.begin(), term_map.end());
     std::sort(term_list.begin(), term_list.end(),
@@ -97,7 +127,7 @@ std::ostream& GLRParser::dump_terms(std::ostream& os){
         }
     );
     for(std::pair<std::string, term_t>& term_pair : term_list){
-        os << "[" << (term_map.is_term(term_pair.second) ? "term" : "non-term") << "]"
+        os << "[" << (term_map.is_term(term_pair.second) ? "term" : "non-term") << "] "
             << term_pair.second << "," << term_pair.first << std::endl;
     }
     return os;

@@ -46,6 +46,7 @@ protected:
     std::set<Grammar> grammars;
 
     void read_grammar();
+    std::map<term_t, std::set<term_t>> create_first_sets();
 
 public:
     friend bool operator<(const Grammar&, const Grammar&);    
