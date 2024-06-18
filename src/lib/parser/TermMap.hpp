@@ -11,6 +11,8 @@ using term_t = size_t;
 
 struct TermMap {
     static constexpr term_t none = (term_t)-1;
+    static constexpr term_t eof = 1;
+    static constexpr term_t start = 0;
 
     TermMap(const TermMap& terms) : num_term(terms.num_term), items(terms.items), term_count(terms.term_count){}
     TermMap(std::vector<std::string> terms, std::set<std::string> nterms){

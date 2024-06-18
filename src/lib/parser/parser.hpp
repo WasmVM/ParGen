@@ -10,16 +10,20 @@
 #include <optional>
 #include <map>
 #include <set>
+#include <list>
 #include <algorithm>
 #include <iostream>
 
 struct GLRParser {
+
     GLRParser(Pargen::Parser& parser);
+
     TermMap term_map;
     std::vector<std::string> actions;
 
     std::ostream& dump_terms(std::ostream& os);
     std::ostream& dump_grammars(std::ostream& os);
+    std::ostream& dump_states(std::ostream& os);
 
 protected:
 
@@ -33,23 +37,32 @@ protected:
         bool operator==(const Grammar& rhs) const {
             return !(*this < rhs) && !(rhs < *this);
         }
-        std::ostream& operator<<(std::ostream&);
     };
 
     struct State {
-        std::vector<Grammar> produtions;
+
+        State() = default;
+        State(const State&) = default;
+        State(Grammar grammar, std::map<term_t, std::set<Grammar>>& gram_map, std::map<term_t, std::set<term_t>>& first_sets);
+
+        std::list<Grammar> productions;
         std::map<term_t, size_t> edges;
+
+        bool try_merge(State&);
     };
 
     Pargen::Parser& parser;
     std::vector<State> states;
     std::set<Grammar> grammars;
+    term_t start;
 
     void read_grammar();
     std::map<term_t, std::set<term_t>> create_first_sets();
+    static TermMap create_term_map(Pargen::Parser& parser);
+    std::ostream& print_grammar(std::ostream&, Grammar&);
 
 public:
-    friend bool operator<(const Grammar&, const Grammar&);    
+    friend bool operator<(const Grammar&, const Grammar&);
 };
 
 bool operator<(const GLRParser::Grammar&, const GLRParser::Grammar&);

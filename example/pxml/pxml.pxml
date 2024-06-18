@@ -50,6 +50,7 @@
         <group name="comment">
             <use id="Comment" />
             <rule pattern="%\}" pop />
+            <rule pattern="\\."/>
             <rule pattern="." />
         </group>
         {% tail %}

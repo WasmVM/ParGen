@@ -26,5 +26,4 @@ add_library(pargen
   lexer/node.cpp
   lexer/autometa.cpp
   parser/parser.cpp
-  parser/glr.cpp
 )
