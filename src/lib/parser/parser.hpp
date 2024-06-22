@@ -43,12 +43,12 @@ protected:
 
         State() = default;
         State(const State&) = default;
-        State(Grammar grammar, std::map<term_t, std::set<Grammar>>& gram_map, std::map<term_t, std::set<term_t>>& first_sets);
+        State(std::set<Grammar> grammar, std::map<term_t, std::set<Grammar>>& gram_map, std::map<term_t, std::set<term_t>>& first_sets);
 
         std::list<Grammar> productions;
         std::map<term_t, size_t> edges;
 
-        bool try_merge(State&);
+        bool merge(State&);
     };
 
     Pargen::Parser& parser;

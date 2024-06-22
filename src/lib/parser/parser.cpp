@@ -180,6 +180,15 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
     // Prepare grammar
     read_grammar();
     std::map<term_t, std::set<term_t>> first_sets = create_first_sets();
+    std::ofstream fout("first.txt");
+    for(auto first_pair : first_sets){
+        fout << term_map[first_pair.first].value() << " :";
+        for(term_t elem : first_pair.second){
+            fout << " " << term_map[elem].value();
+        }
+        fout << std::endl;
+    }
+    fout.close();
     // Create grammar map
     std::map<term_t, std::set<Grammar>> gram_map;
     for(Grammar gram : grammars){
@@ -189,27 +198,40 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
     if(term_map[parser.start] == TermMap::none){
         throw Exception::Exception("can't find grammar for start");
     }
-    std::deque<Grammar> gram_queue {Grammar {
+    std::deque<std::set<Grammar>> gram_queue {{Grammar {
         .target = TermMap::start,
         .depends = {term_map[parser.start]},
         .lookahead = {TermMap::eof}
-    }};
+    }}};
     std::set<Grammar> created;
     while(!gram_queue.empty()){
         State state(gram_queue.front(), gram_map, first_sets);
         gram_queue.pop_front();
-        if(!created.contains(state.productions.front())){
-            created.emplace(state.productions.front());
-        // if(std::none_of(states.begin(), states.end(), [&](State& existing){
-        //     return state.try_merge(existing);
-        // })){
-            states.emplace_back(state);
-            for(Grammar gram : state.productions){
+        std::map<term_t, std::set<Grammar>> prod_map;
+        for(Grammar gram : state.productions){
+            if(!created.contains(gram)){
+                if(gram.dot_pos != 0){
+                    created.emplace(gram);
+                }
                 if(gram.dot_pos != gram.depends.size()){
+                    size_t pos = gram.dot_pos;
                     gram.dot_pos += 1;
-                    gram_queue.push_back(gram);
+                    prod_map[gram.depends[pos]].emplace(gram);
                 }
             }
+        }
+        for(auto prod_pair : prod_map){
+            gram_queue.push_back(prod_pair.second);
+        }
+        bool merged = false;
+        for(State& exist_state : states){
+            if(exist_state.merge(state)){
+                merged = true;
+                break;
+            }
+        }
+        if(!merged){
+            states.emplace_back(state);
         }
     }
 }
@@ -316,47 +338,68 @@ std::map<term_t, std::set<term_t>> GLRParser::create_first_sets(){
     return first_sets;
 }
 
-GLRParser::State::State(Grammar grammar, std::map<term_t, std::set<Grammar>>& gram_map, std::map<term_t, std::set<term_t>>& first_sets){
-
+GLRParser::State::State(std::set<Grammar> grammars, std::map<term_t, std::set<Grammar>>& gram_map, std::map<term_t, std::set<term_t>>& first_sets){
     // Insert grammar
-    std::set<Grammar> produced {grammar};
-    productions.emplace_back(grammar);
+    std::list<Grammar> produced(grammars.begin(), grammars.end());
+    productions.insert(productions.end(), grammars.begin(), grammars.end());
+    std::map<term_t, std::set<term_t>> lookaheads;
+    for(Grammar& prod : productions){
+        if(prod.dot_pos < prod.depends.size() - 1){
+            std::set<term_t>& first = first_sets[prod.depends[prod.dot_pos + 1]];
+            lookaheads[prod.depends[prod.dot_pos]].insert(first.begin(), first.end());
+        }
+    }
     // Expand productions
-    if(grammar.dot_pos != grammar.depends.size()){
-        for(Grammar& prod : productions){
-            // lookahead
-            std::set<term_t> lookahead(prod.lookahead.begin(), prod.lookahead.end());
-            if(prod.dot_pos < prod.depends.size() - 1){
-                lookahead = first_sets[prod.depends[prod.dot_pos + 1]];
-            }
-            // produce grammar
-            for(Grammar gram : gram_map[prod.depends[prod.dot_pos]]){
-                gram.lookahead = lookahead;
-                if(!produced.contains(gram)){
-                    produced.emplace(gram);
-                    productions.emplace_back(gram);
+    for(Grammar grammar : grammars){
+        if(grammar.dot_pos != grammar.depends.size()){
+            for(Grammar& prod : productions){
+                // lookahead
+                std::set<term_t> lookahead(prod.lookahead.begin(), prod.lookahead.end());
+                if(lookaheads.contains(prod.target)){
+                    lookahead = lookaheads[prod.target];
+                }
+                // produce grammar
+                for(Grammar gram : gram_map[prod.depends[prod.dot_pos]]){
+                    gram.lookahead = lookahead;
+                    std::list<Grammar>::iterator found = std::find_if(productions.begin(), productions.end(), [&](Grammar rhs){
+                        return (gram.target == rhs.target) && (gram.dot_pos == rhs.dot_pos) && (gram.depends == rhs.depends);
+                    });
+                    if(found == productions.end()){
+                        produced.emplace_back(gram);
+                        productions.emplace_back(gram);
+                        if(gram.dot_pos < gram.depends.size() - 1){
+                            std::set<term_t>& first = first_sets[gram.depends[gram.dot_pos + 1]];
+                            lookaheads[gram.depends[gram.dot_pos]].insert(first.begin(), first.end());
+                        }
+                    }else{
+                        found->lookahead.insert(lookahead.begin(), lookahead.end());
+                    }
                 }
             }
         }
     }
 }
 
-bool GLRParser::State::try_merge(State& existing){
+bool GLRParser::State::merge(State& state){
     const auto comp = [](const Grammar& lhs, const Grammar& rhs){
         return (lhs.target == rhs.target) && (lhs.dot_pos == rhs.dot_pos) && (lhs.depends == rhs.depends);
     };
-    for(Grammar& prod : productions){
-        if(std::none_of(existing.productions.begin(), existing.productions.end(), [&](const Grammar& exi){
-            return comp(prod, exi);
-        })){
+    std::list<std::pair<Grammar*, Grammar*>> merge_pairs;
+    for(Grammar& prod_l : state.productions){
+        bool found = false;
+        for(Grammar& prod_r : productions){
+            if(comp(prod_l, prod_r)){
+                found = true;
+                merge_pairs.emplace_back(&prod_r, &prod_l);
+                break;
+            }
+        }
+        if(!found){
             return false;
         }
     }
-    for(Grammar& prod : productions){
-        auto exist_it = std::find_if(existing.productions.begin(), existing.productions.end(), [&](const Grammar& exi){
-            return comp(prod, exi);
-        });
-        exist_it->lookahead.insert(prod.lookahead.begin(), prod.lookahead.end());
+    for(auto merge_pair : merge_pairs ){
+        merge_pair.first->lookahead.insert(merge_pair.second->lookahead.begin(), merge_pair.second->lookahead.end());
     }
     return true;
 }
@@ -408,19 +451,23 @@ std::ostream& GLRParser::dump_grammars(std::ostream& os){
 
 std::ostream& GLRParser::dump_states(std::ostream& os){
     os << "digraph {" << std::endl;
-    os << "    rankdir=LR;" << std::endl;
-    os << "    node [shape=record];" << std::endl;
+    os << "  node [shape=\"box\"]" << std::endl;
     size_t state_id = 0;
     for(State& state : states){
-        os << "S" << state_id << " [label=\"S" << state_id;
-        size_t prod_id = 0;
+        os << "S" << state_id << " [label=<<table border=\"0\" cellborder=\"0\" cellspacing=\"0\">";
+        os << "<tr><td>S" << state_id <<"</td></tr>" << state_id;
         for(Grammar& prod : state.productions){
-            os << "|<g" << prod_id << "> ";
-            std::stringstream ss;
-            print_grammar(ss, prod);
-            os << std::regex_replace(ss.str(), std::regex(" "), "&#92; ");
+            os << "<tr><td>";
+            if(prod.dot_pos == prod.depends.size()){
+                os << "<font color=\"red\">";
+                print_grammar(os, prod);
+                os << "</font>";
+            }else{
+                print_grammar(os, prod);
+            }
+            os << "</td></tr>";
         }
-        os << "\"];" << std::endl;
+        os << "</table>>];" << std::endl;
         state_id += 1;
     }
     os << "}" << std::endl;
