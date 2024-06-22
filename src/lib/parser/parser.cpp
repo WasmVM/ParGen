@@ -180,15 +180,6 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
     // Prepare grammar
     read_grammar();
     std::map<term_t, std::set<term_t>> first_sets = create_first_sets();
-    std::ofstream fout("first.txt");
-    for(auto first_pair : first_sets){
-        fout << term_map[first_pair.first].value() << " :";
-        for(term_t elem : first_pair.second){
-            fout << " " << term_map[elem].value();
-        }
-        fout << std::endl;
-    }
-    fout.close();
     // Create grammar map
     std::map<term_t, std::set<Grammar>> gram_map;
     for(Grammar gram : grammars){
@@ -203,37 +194,59 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
         .depends = {term_map[parser.start]},
         .lookahead = {TermMap::eof}
     }}};
-    std::set<Grammar> created;
-    while(!gram_queue.empty()){
-        State state(gram_queue.front(), gram_map, first_sets);
-        gram_queue.pop_front();
-        std::map<term_t, std::set<Grammar>> prod_map;
-        for(Grammar gram : state.productions){
-            if(!created.contains(gram)){
-                if(gram.dot_pos != 0){
-                    created.emplace(gram);
-                }
-                if(gram.dot_pos != gram.depends.size()){
-                    size_t pos = gram.dot_pos;
-                    gram.dot_pos += 1;
-                    prod_map[gram.depends[pos]].emplace(gram);
+    std::list<State> state_list;
+    {
+        std::set<Grammar> created;
+        while(!gram_queue.empty()){
+            State state(gram_queue.front(), gram_map, first_sets);
+            gram_queue.pop_front();
+            std::map<term_t, std::set<Grammar>> prod_map;
+            for(Grammar gram : state.productions){
+                if(!created.contains(gram)){
+                    if(gram.dot_pos != 0){
+                        created.emplace(gram);
+                    }
+                    if(gram.dot_pos != gram.depends.size()){
+                        size_t pos = gram.dot_pos;
+                        gram.dot_pos += 1;
+                        prod_map[gram.depends[pos]].emplace(gram);
+                    }
                 }
             }
-        }
-        for(auto prod_pair : prod_map){
-            gram_queue.push_back(prod_pair.second);
-        }
-        bool merged = false;
-        for(State& exist_state : states){
-            if(exist_state.merge(state)){
-                merged = true;
-                break;
+            for(auto prod_pair : prod_map){
+                gram_queue.push_back(prod_pair.second);
             }
-        }
-        if(!merged){
-            states.emplace_back(state);
+            state_list.emplace_back(state);
         }
     }
+    // Merge states
+    bool modified = true;
+    std::vector<std::list<State>::iterator> removed;
+    while(modified){
+        modified = false;
+        for(auto lhs = state_list.begin(); lhs != state_list.end(); lhs = std::next(lhs)){
+            if(std::find(removed.begin(), removed.end(), lhs) == removed.end()){
+                for(auto rhs = state_list.begin(); rhs != state_list.end(); rhs = std::next(rhs)){
+                    if((lhs != rhs)
+                        && (std::find(removed.begin(), removed.end(), rhs) == removed.end())
+                        && lhs->merge(*rhs)
+                    ){
+                        modified = true;
+                        if(std::none_of(removed.begin(), removed.end(), [&](std::list<State>::iterator& elem){
+                            return elem == rhs;
+                        })){
+                            removed.emplace_back(rhs);
+                        }
+                        break;
+                    }
+                }   
+            }
+        }
+    }
+    for(auto rem : removed){
+        state_list.erase(rem);
+    }
+    states.assign(state_list.begin(), state_list.end());
 }
 
 TermMap GLRParser::create_term_map(Pargen::Parser& parser){
