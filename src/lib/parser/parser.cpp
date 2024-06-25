@@ -180,11 +180,13 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
     // Prepare grammar
     read_grammar();
     std::map<term_t, std::set<term_t>> first_sets = create_first_sets();
+    
     // Create grammar map
     std::map<term_t, std::set<Grammar>> gram_map;
     for(Grammar gram : grammars){
         gram_map[gram.target].insert(gram);
     }
+
     // Create states
     if(term_map[parser.start] == TermMap::none){
         throw Exception::Exception("can't find grammar for start");
@@ -219,6 +221,7 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
             state_list.emplace_back(state);
         }
     }
+    
     // Merge states
     bool modified = true;
     std::vector<std::list<State>::iterator> removed;
@@ -251,6 +254,7 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
     states.assign(state_list.begin(), state_list.end());
     state_list.clear();
     removed.clear();
+
     // Create edges
     std::list<std::pair<Grammar, size_t>> edge_list;
     for(size_t state_id = 0; state_id < states.size(); ++state_id){
@@ -450,82 +454,6 @@ bool GLRParser::State::merge(State& state){
         merge_pair.first->lookahead.insert(merge_pair.second->lookahead.begin(), merge_pair.second->lookahead.end());
     }
     return true;
-}
-
-std::ostream& GLRParser::print_grammar(std::ostream& os, GLRParser::Grammar& gram){
-    os << term_map[gram.target].value() << " :";
-    for(size_t i = 0; i < gram.depends.size(); ++i){
-        if(i == gram.dot_pos){
-            os << " .";
-        }
-        os << " " << term_map[gram.depends[i]].value();
-    }
-    if(gram.dot_pos == gram.depends.size()){
-        os << " .";
-    }
-    if(!gram.lookahead.empty()){
-        os << " (";
-        for(term_t look : gram.lookahead){
-            os << term_map[look].value() << ",";
-        }
-        os << ")";
-    }
-    if(gram.action){
-        os << " [" << gram.action.value() << "]";
-    }
-    return os;
-}
-
-std::ostream& GLRParser::dump_terms(std::ostream& os){
-    std::vector<std::pair<std::string, term_t>> term_list(term_map.begin(), term_map.end());
-    std::sort(term_list.begin(), term_list.end(),
-        [](const std::pair<std::string, term_t>& lhs, const std::pair<std::string, term_t>& rhs){
-            return lhs.second < rhs.second;
-        }
-    );
-    for(std::pair<std::string, term_t>& term_pair : term_list){
-        os << "[" << (term_map.is_term(term_pair.second) ? "term" : "non-term") << "] "
-            << term_pair.second << "," << term_pair.first << std::endl;
-    }
-    return os;
-}
-
-std::ostream& GLRParser::dump_grammars(std::ostream& os){
-    for(Grammar gram : grammars){
-        print_grammar(os, gram) << std::endl;
-    }
-    return os;
-}
-
-std::ostream& GLRParser::dump_states(std::ostream& os){
-    os << "digraph {" << std::endl;
-    os << "  node [shape=\"box\"]" << std::endl;
-    size_t state_id = 0;
-    for(State& state : states){
-        // node
-        os << "S" << state_id << " [label=<<table border=\"0\" cellborder=\"0\" cellspacing=\"0\">";
-        os << "<tr><td>S" << state_id <<"</td></tr>" << state_id;
-        for(Grammar& prod : state.productions){
-            os << "<tr><td>";
-            if(prod.dot_pos == prod.depends.size()){
-                os << "<font color=\"red\">";
-                print_grammar(os, prod);
-                os << "</font>";
-            }else{
-                print_grammar(os, prod);
-            }
-            os << "</td></tr>";
-        }
-        os << "</table>>];" << std::endl;
-        // edge
-        for(auto edge : state.edges){
-            os << "S" << state_id << " -> S" << edge.second;
-            os << " [label=\"" << term_map[edge.first].value_or("") << "\"];" << std::endl;
-        }
-        state_id += 1;
-    }
-    os << "}" << std::endl;
-    return os;
 }
 
 bool operator<(const GLRParser::Grammar& lhs, const GLRParser::Grammar& rhs){

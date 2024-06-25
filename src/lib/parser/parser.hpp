@@ -12,7 +12,6 @@
 #include <set>
 #include <list>
 #include <algorithm>
-#include <iostream>
 
 struct GLRParser {
 
