@@ -224,6 +224,7 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
     std::vector<std::list<State>::iterator> removed;
     while(modified){
         modified = false;
+        size_t state_id = 0;
         for(auto lhs = state_list.begin(); lhs != state_list.end(); lhs = std::next(lhs)){
             if(std::find(removed.begin(), removed.end(), lhs) == removed.end()){
                 for(auto rhs = state_list.begin(); rhs != state_list.end(); rhs = std::next(rhs)){
@@ -239,7 +240,8 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
                         }
                         break;
                     }
-                }   
+                }
+                state_id += 1;
             }
         }
     }
@@ -247,6 +249,39 @@ GLRParser::GLRParser(Pargen::Parser& parser) : term_map(create_term_map(parser))
         state_list.erase(rem);
     }
     states.assign(state_list.begin(), state_list.end());
+    state_list.clear();
+    removed.clear();
+    // Create edges
+    std::list<std::pair<Grammar, size_t>> edge_list;
+    for(size_t state_id = 0; state_id < states.size(); ++state_id){
+        State& state = states[state_id];
+        for(Grammar& gram : state.productions){
+            if(gram.dot_pos != 0){
+                edge_list.emplace_back(gram, state_id);
+            }
+        }
+    }
+    for(State& state : states){
+        std::set<term_t> linked;
+        for(Grammar prod : state.productions){
+            if(prod.dot_pos < prod.depends.size()){
+                term_t term = prod.depends[prod.dot_pos];
+                prod.dot_pos += 1;
+                if(!linked.contains(term)){
+                    for(auto edge_pair : edge_list){
+                        Grammar& edge_gram = edge_pair.first;
+                        if((edge_gram.target == prod.target) && (edge_gram.dot_pos == prod.dot_pos) && (edge_gram.depends == prod.depends)
+                            && std::includes(edge_gram.lookahead.begin(), edge_gram.lookahead.end(), prod.lookahead.begin(), prod.lookahead.end())
+                        ){
+                            state.edges[term] = edge_pair.second;
+                            linked.emplace(term);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 TermMap GLRParser::create_term_map(Pargen::Parser& parser){
@@ -366,14 +401,14 @@ GLRParser::State::State(std::set<Grammar> grammars, std::map<term_t, std::set<Gr
     for(Grammar grammar : grammars){
         if(grammar.dot_pos != grammar.depends.size()){
             for(Grammar& prod : productions){
-                // lookahead
-                std::set<term_t> lookahead(prod.lookahead.begin(), prod.lookahead.end());
-                if(lookaheads.contains(prod.target)){
-                    lookahead = lookaheads[prod.target];
-                }
                 // produce grammar
                 for(Grammar gram : gram_map[prod.depends[prod.dot_pos]]){
-                    gram.lookahead = lookahead;
+                    // lookahead
+                    if(lookaheads.contains(gram.target)){
+                        gram.lookahead = lookaheads[gram.target];
+                    }else{
+                        gram.lookahead = prod.lookahead;
+                    }
                     std::list<Grammar>::iterator found = std::find_if(productions.begin(), productions.end(), [&](Grammar rhs){
                         return (gram.target == rhs.target) && (gram.dot_pos == rhs.dot_pos) && (gram.depends == rhs.depends);
                     });
@@ -385,7 +420,7 @@ GLRParser::State::State(std::set<Grammar> grammars, std::map<term_t, std::set<Gr
                             lookaheads[gram.depends[gram.dot_pos]].insert(first.begin(), first.end());
                         }
                     }else{
-                        found->lookahead.insert(lookahead.begin(), lookahead.end());
+                        found->lookahead.insert(gram.lookahead.begin(), gram.lookahead.end());
                     }
                 }
             }
@@ -467,6 +502,7 @@ std::ostream& GLRParser::dump_states(std::ostream& os){
     os << "  node [shape=\"box\"]" << std::endl;
     size_t state_id = 0;
     for(State& state : states){
+        // node
         os << "S" << state_id << " [label=<<table border=\"0\" cellborder=\"0\" cellspacing=\"0\">";
         os << "<tr><td>S" << state_id <<"</td></tr>" << state_id;
         for(Grammar& prod : state.productions){
@@ -481,6 +517,11 @@ std::ostream& GLRParser::dump_states(std::ostream& os){
             os << "</td></tr>";
         }
         os << "</table>>];" << std::endl;
+        // edge
+        for(auto edge : state.edges){
+            os << "S" << state_id << " -> S" << edge.second;
+            os << " [label=\"" << term_map[edge.first].value_or("") << "\"];" << std::endl;
+        }
         state_id += 1;
     }
     os << "}" << std::endl;

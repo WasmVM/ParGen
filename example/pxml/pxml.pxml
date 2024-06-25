@@ -116,6 +116,7 @@
         <target name="content">
             <grammar pattern="element" />
             <grammar pattern="text" />
+            <grammar />
         </target>
         <target name="body">
             <grammar pattern="body content" />
@@ -133,10 +134,9 @@
             <grammar pattern="text Text" />
             <grammar pattern="text spaces" />
             <grammar pattern="text Entity" />
-            <grammar />
         </target>
         <target name="attributes">
-            <grammar pattern="attributes attribute" />
+            <grammar pattern="attributes spaces attribute" />
             <grammar />
         </target>
         <target name="attribute">
