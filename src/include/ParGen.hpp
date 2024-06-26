@@ -34,6 +34,7 @@ struct Use {
 };
 
 struct Grammar {
+    std::string type;
     std::string target;
     std::vector<std::string> depends;
     std::string content;

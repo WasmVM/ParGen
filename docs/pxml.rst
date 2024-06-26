@@ -381,6 +381,8 @@ Define a group of grammers that generate the same non-terminal as target
 
 * name <string> : ``[Required]`` Target name
 
+* type <string> : C++ type of generated target object
+
 **Children**
 
 ``<grammar>``
@@ -390,7 +392,7 @@ Define a group of grammers that generate the same non-terminal as target
 
 Define a grammar in parser
 
-Grammar without pattern can be used to specify empty generation, but should not have children.
+Grammar without pattern can be used to specify empty generation.
 
 **Attributes**
 
@@ -408,3 +410,9 @@ Grammar without pattern can be used to specify empty generation, but should not 
 **Children**
 
 C++ codes that may return a generated object.
+
+The following replacement variables can be used in the codes:
+
+* _op : The operands of grammar. Use ``_opN`` to access parameter at index ``N``.
+
+* _pos : The location of matched text as array. Use ``_pos[N]`` to access position at index N.

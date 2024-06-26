@@ -1,5 +1,5 @@
 <!DOCTYPE pxml>
-<pxml namespace="PXML">
+<pxml namespace="ParsePxml">
     {% PxmlToken %}
     <tokens namespace="Tokens" headerFile="PxmlToken.hpp" sourceFile="PxmlToken.cpp">
         {% header file %}
@@ -110,43 +110,102 @@
         </rule>
     </lexer>
     <parser class="PxmlParser" headerFile="PxmlParser.hpp" sourceFile="PxmlParser.cpp" start="pxml">
-        <target name="pxml">
-            <grammar pattern="Doctype spaces element spaces" />
+        {% header file %}
+        <header indent=0 position="top">
+            #include \<Pxml.hpp>
+            #include \<exception.hpp>
+        </header>
+        {% helper function %}
+        <source indent=0 position="top">
+            static PXML::Position to_pos(ParsePxml::Position pos){
+                return PXML::Position {.path = pos.path, .line = pos.line, .column = pos.column};
+            }
+        </source>
+        {% targets %}
+        <target name="pxml" type="PXML::Pxml">
+            <grammar pattern="Doctype spaces element spaces">
+                return _op2;
+            </grammar>
         </target>
-        <target name="content">
-            <grammar pattern="element" />
-            <grammar pattern="text" />
-            <grammar />
+        <target name="content" type="PXML::Pxml::Child">
+            <grammar pattern="element">
+                return {to_pos(_pos[0]), _op0};
+            </grammar>
+            <grammar pattern="text">
+                return {to_pos(_pos[0]), _op0};
+            </grammar>
         </target>
-        <target name="body">
-            <grammar pattern="body content" />
-            <grammar />
+        <target name="body" type="std::list<PXML::Pxml::Child>">
+            <grammar pattern="body content">
+                _op0.emplace_back(_op1);
+                return _op0;
+            </grammar>
+            <grammar>
+                return {};
+            </grammar>
         </target>
-        <target name="element">
-            <grammar pattern="Tag attributes Close body Tail" />
-            <grammar pattern="Tag attributes Inline"/>
+        <target name="element" type="PXML::Pxml">
+            <grammar pattern="Tag attributes Close body Tail">
+                PXML::Position pos = to_pos(_pos[0]);
+                if(_op0.value != _op4.value){
+                    throw Exception::SyntaxError("tag not match", pos);
+                }
+                PXML::Pxml elem {.tag = _op0.value, .pos = pos};
+                elem.swap(_op1);
+                return elem;
+            </grammar>
+            <grammar pattern="Tag attributes Inline">
+                PXML::Pxml elem {.tag = _op0.value, .pos = to_pos(_pos[0])};
+                elem.swap(_op1);
+                return elem;
+            </grammar>
         </target>
-        <target name="spaces">
-            <grammar pattern="spaces Space" />
-            <grammar />
+        <target name="spaces" type="std::string">
+            <grammar pattern="spaces Space">
+                return _op0 + _op1.value;
+            </grammar>
+            <grammar>
+                return "";
+            </grammar>
         </target>
-        <target name="text">
-            <grammar pattern="text Text" />
-            <grammar pattern="text spaces" />
-            <grammar pattern="text Entity" />
+        <target name="text" type="std::string">
+            <grammar pattern="text Text">
+                return _op0 + _op1.value;
+            </grammar>
+            <grammar pattern="text spaces">
+                return _op0 + _op1;
+            </grammar>
+            <grammar pattern="text Entity">
+                return _op0 + _op1.value;
+            </grammar>
         </target>
-        <target name="attributes">
-            <grammar pattern="attributes spaces attribute" />
-            <grammar />
+        <target name="attributes" type="std::unordered_map<std::string, PXML::Value>">
+            <grammar pattern="attributes spaces attribute">
+                _op0.emplace(_op2);
+                return _op0;
+            </grammar>
+            <grammar>
+                return {};
+            </grammar>
         </target>
-        <target name="attribute">
-            <grammar pattern="ID Equal value" />
-            <grammar pattern="ID" />
+        <target name="attribute" type="std::pair<std::string, PXML::Value>">
+            <grammar pattern="ID Equal value">
+                return {_op0.value, _op2};
+            </grammar>
+            <grammar pattern="ID">
+                return {_op0.value, {to_pos(_pos[0]), std::monostate()}};
+            </grammar>
         </target>
-        <target name="value">
-            <grammar pattern="Bool" />
-            <grammar pattern="Number" />
-            <grammar pattern="String" />
+        <target name="value" type="PXML::Value">
+            <grammar pattern="Bool">
+                return {to_pos(_pos[0]), _op0.value};
+            </grammar>
+            <grammar pattern="Number">
+                return {to_pos(_pos[0]), _op0.value};
+            </grammar>
+            <grammar pattern="String">
+                return {to_pos(_pos[0]), _op0.value};
+            </grammar>
         </target>
     </parser>
 </pxml>

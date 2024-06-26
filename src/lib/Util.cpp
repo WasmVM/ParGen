@@ -76,7 +76,7 @@ std::string handle_indent(int indent, std::string content){
         if(space_pos != std::string::npos){
             std::string spaces = content.substr(0, space_pos);
             content = content.substr(space_pos);
-            content = std::regex_replace(content, std::regex("\n" + spaces), "\n" + std::string(indent, ' '));
+            content = std::regex_replace(content, std::regex(spaces), "\n" + std::string(indent, ' '));
         }
         content = "\n" + std::string(indent, ' ') + content;
         content = content.substr(0, content.find_last_not_of(" \t\n\r\v") + 1);

@@ -15,10 +15,17 @@
 
 struct GLRParser {
 
+    struct Action {
+        term_t result;
+        std::vector<term_t> params;
+        std::string body;
+    };
+
     GLRParser(Pargen::Parser& parser);
 
     TermMap term_map;
-    std::vector<std::string> actions;
+    std::vector<Action> actions;
+    std::map<term_t, std::string> type_map;
 
     std::ostream& dump_terms(std::ostream& os);
     std::ostream& dump_grammars(std::ostream& os);
@@ -32,6 +39,7 @@ protected:
         std::set<term_t> lookahead;
         size_t dot_pos = 0;
         std::optional<size_t> action;
+        std::vector<size_t> param_indices;
 
         bool operator==(const Grammar& rhs) const {
             return !(*this < rhs) && !(rhs < *this);

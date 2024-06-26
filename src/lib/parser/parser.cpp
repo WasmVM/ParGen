@@ -21,6 +21,7 @@
 #include <deque>
 #include <vector>
 #include <memory>
+#include <numeric>
 #include <fstream>
 #include <sstream>
 #include <regex>
@@ -150,6 +151,40 @@ void Pargen::Parser::generate_source(std::ostream& os){
         os << "    */" << std::endl;
     }
     os << "}\n" << std::endl;
+
+    // actions
+    for(size_t action_id = 0; action_id < parser.actions.size(); ++action_id){
+        GLRParser::Action& action = parser.actions[action_id];
+        std::string return_type = parser.type_map[action.result];
+        if(return_type.empty()){
+            return_type = "void";
+        }
+        os << "static " << return_type << " action_"<< action_id << "(";
+        bool has_first = false;
+        if(!parent.tokens.empty()){
+            os << "Position _pos[]";
+            has_first = true;
+        }
+        for(size_t param_id = 0; param_id < action.params.size(); ++param_id){
+            term_t term = action.params[param_id];
+            if(!parser.term_map.is_term(term) && parser.type_map[term].empty()){
+                continue;
+            }
+            if(has_first){
+                os << ", ";
+            }else{
+                has_first = true;
+            }
+            if(parser.term_map.is_term(term)){
+                os << parent.tokens.name_space << "::" << parser.term_map[term].value();
+            }else{
+                os << parser.type_map[term];
+            }
+            os << " _op" << param_id;
+        }
+        os << "){" << action.body << "\n}" << std::endl;
+    }
+    os << std::endl;
 
     // parse
     os << "void " << class_name << "::parse(){" << std::endl;
@@ -316,23 +351,38 @@ void GLRParser::read_grammar(){
     // Read grammars
     std::set<term_t> empties;
     for(Pargen::Grammar& gram : parser){
+        // target
+        term_t target = term_map[gram.target];
+        if(target == TermMap::none){
+            throw Exception::Exception("unknown terminal '" + gram.target + "'");
+        }
+        // action
+        Action& action = actions.emplace_back();
+        action.result = target;
+        if(!type_map.contains(target)){
+            type_map[target] = gram.type;
+        }
+        action.body = gram.content;
+        // grammar
         if(gram.depends.empty()){
             // Empty grammar
-            if(term_map[gram.target] == TermMap::none){
-                throw Exception::Exception("unknown terminal '" + gram.target + "'");
+            if(empties.contains(target)){
+                throw Exception::Exception("multiple empty grammar for '" + gram.target + "'");
             }
-            empties.emplace(term_map[gram.target]);
+            empties.emplace(target);
         }else{
             Grammar grammar;
-            grammar.target = term_map[gram.target];
+            grammar.target = target;
             grammar.action = actions.size();
-            actions.emplace_back(gram.content);
+            grammar.param_indices.resize(gram.depends.size());
+            std::iota(grammar.param_indices.begin(), grammar.param_indices.end(), 0);
             std::transform(gram.depends.begin(), gram.depends.end(), std::back_inserter(grammar.depends), [&](std::string& dep){
                 if(term_map[dep] == TermMap::none){
                     throw Exception::Exception("unknown terminal '" + dep + "'");
                 }
                 return term_map[dep];
             });
+            action.params.assign(grammar.depends.begin(), grammar.depends.end());
             grammars.emplace(grammar);
         }
     }
@@ -344,6 +394,7 @@ void GLRParser::read_grammar(){
             if(empties.contains(gram.depends[dep_idx])){
                 Grammar new_gram = gram;
                 new_gram.depends.erase(new_gram.depends.begin() + dep_idx);
+                new_gram.param_indices.erase(new_gram.param_indices.begin() + dep_idx);
                 if((new_gram.depends.size() > 1 || (new_gram.depends.size() == 1 && new_gram.target != new_gram.depends[0]))
                     && std::find(grammars.begin(), grammars.end(), new_gram) == grammars.end()
                 ){

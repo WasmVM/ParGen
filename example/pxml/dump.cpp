@@ -7,14 +7,14 @@
 #include <PxmlParser.hpp>
 #include <Util.hpp>
 
-using namespace PXML;
+using namespace ParsePxml;
 
 int main(int argc, char* argv[]){
     std::filesystem::path input_path(argv[1]);
     std::ifstream fin(input_path);
 
-    PXML::PxmlLexer lexer(input_path, fin);
-    PXML::PxmlParser parser(lexer);
+    ParsePxml::PxmlLexer lexer(input_path, fin);
+    ParsePxml::PxmlParser parser(lexer);
     try{
         parser.parse();
     }catch(UnknownToken& e){

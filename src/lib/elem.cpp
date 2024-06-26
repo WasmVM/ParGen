@@ -348,19 +348,18 @@ Grammar elem_grammar(PXML::Pxml& pxml){
         grammar.content += std::get<std::string>(child.second);
     }
     grammar.content = handle_indent(indent, grammar.content);
-    // Check empty
-    if(grammar.depends.empty() && !grammar.content.empty()){
-        throw Exception::SyntaxError("empty grammar should not have content", pxml.pos);
-    }
     return grammar;
 }
 
 void elem_target(Parser& parser, PXML::Pxml& pxml){
     std::string target_name;
+    std::string target_type;
     // attributes
     for(auto attribute : pxml){
         if(attribute.first == "name"){
             target_name = std::get<std::string>(attribute.second.second);
+        }else if(attribute.first == "type"){
+            target_type = std::get<std::string>(attribute.second.second);
         }else{
             throw Exception::SyntaxError("unknown attribute '" + attribute.first + "' in <target>", attribute.second.first);
         }
@@ -375,6 +374,7 @@ void elem_target(Parser& parser, PXML::Pxml& pxml){
             if(child_pxml.tag == "grammar"){
                 Grammar& grammar = parser.emplace_back(elem_grammar(child_pxml));
                 grammar.target = target_name;
+                grammar.type = target_type;
             }else{
                 throw Exception::SyntaxError("invalid element under <target>", child_pxml.pos);
             }
