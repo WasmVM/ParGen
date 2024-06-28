@@ -41,6 +41,8 @@ void Pargen::Parser::generate_header(std::ostream& os){
     }
     os << header_prologue << std::endl;
 
+    os << "#include <map>" << std::endl;
+    os << "#include <stack>" << std::endl;
     if(!parent.tokens.empty()){
         os << "#include " << parent.tokens.header_path.filename() << std::endl;
     }
@@ -67,6 +69,8 @@ void Pargen::Parser::generate_header(std::ostream& os){
     }
     os << "protected:" << std::endl;
     os << "    using term_t = size_t;" << std::endl;
+    os << "    using Act = std::pair<bool, size_t>; // true: shift, false: reduce" << std::endl;
+    os << "    using State = std::map<term_t, std::vector<Act>>;" << std::endl;
     if(parent.lexer.empty()){
         os << "    using token_t = std::any;" << std::endl;
     }else{
@@ -81,6 +85,7 @@ void Pargen::Parser::generate_header(std::ostream& os){
         }
         os << "    " << parent.lexer.class_name << "& lexer;" << std::endl;
     }
+    os << "    static std::vector<State> table;" << std::endl;
     os << "    std::pair<term_t,token_t> fetch();" << std::endl;
     os << "};\n" << std::endl;
 
@@ -185,6 +190,40 @@ void Pargen::Parser::generate_source(std::ostream& os){
         os << "){" << action.body << "\n}" << std::endl;
     }
     os << std::endl;
+
+    // table
+    os << "std::vector<" << class_name << "::State> " << class_name << "::table = {" << std::endl;
+    for(const GLRParser::State& state : parser.states){
+        std::map<term_t, std::list<std::pair<bool, size_t>>> acts;
+        // Shift
+        for(const std::pair<const term_t, size_t>& edge : state.edges){
+            acts[edge.first].emplace_back(true, edge.second);
+        }
+        // Reduce
+        for(const GLRParser::Grammar& prod : state.productions){
+            if(prod.dot_pos == prod.depends.size()){
+                if(prod.target == 0){
+                    acts[prod.target] = {};
+                }else{
+                    for(term_t lookahead : prod.lookahead){
+                        acts[lookahead].emplace_back(false, prod.action.value());
+                    }
+                }
+            }
+        }
+        // Output state
+        os << "    {";
+        for(auto act_pair : acts){
+            // Term
+            os << "{" << act_pair.first << ", {";
+            for(std::pair<bool, size_t> act : act_pair.second){
+                os << "{" << act.first << "," << act.second << "},";
+            }
+            os << "}},";
+        }
+        os << "}," << std::endl;
+    }
+    os << "};\n" << std::endl;
 
     // parse
     os << "void " << class_name << "::parse(){" << std::endl;
@@ -538,4 +577,8 @@ bool operator<(const GLRParser::Grammar& lhs, const GLRParser::Grammar& rhs){
         return lhs.action.value() < rhs.action.value();
     }
     return !lhs.action.has_value() && rhs.action.has_value();
+}
+
+std::ostream& operator<<(std::ostream& os, GLRParser& parser){
+
 }

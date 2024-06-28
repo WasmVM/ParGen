@@ -21,18 +21,6 @@ struct GLRParser {
         std::string body;
     };
 
-    GLRParser(Pargen::Parser& parser);
-
-    TermMap term_map;
-    std::vector<Action> actions;
-    std::map<term_t, std::string> type_map;
-
-    std::ostream& dump_terms(std::ostream& os);
-    std::ostream& dump_grammars(std::ostream& os);
-    std::ostream& dump_states(std::ostream& os);
-
-protected:
-
     struct Grammar {
         term_t target;
         std::vector<term_t> depends;
@@ -58,8 +46,22 @@ protected:
         bool merge(State&);
     };
 
-    Pargen::Parser& parser;
+    GLRParser(Pargen::Parser& parser);
+
+    TermMap term_map;
+    std::vector<Action> actions;
+    std::map<term_t, std::string> type_map;
     std::vector<State> states;
+
+    std::ostream& dump_terms(std::ostream& os);
+    std::ostream& dump_grammars(std::ostream& os);
+    std::ostream& dump_states(std::ostream& os);
+
+    friend bool operator<(const GLRParser::Grammar&, const GLRParser::Grammar&);
+
+protected:
+
+    Pargen::Parser& parser;
     std::set<Grammar> grammars;
     term_t start;
 
@@ -68,10 +70,9 @@ protected:
     static TermMap create_term_map(Pargen::Parser& parser);
     std::ostream& print_grammar(std::ostream&, Grammar&);
 
-public:
-    friend bool operator<(const Grammar&, const Grammar&);
 };
 
 bool operator<(const GLRParser::Grammar&, const GLRParser::Grammar&);
+std::ostream& operator<<(std::ostream& os, GLRParser& parser);
 
 #endif
