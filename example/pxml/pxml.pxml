@@ -109,7 +109,7 @@
             return Token(Text(_text), _pos);
         </rule>
     </lexer>
-    <parser class="PxmlParser" headerFile="PxmlParser.hpp" sourceFile="PxmlParser.cpp" start="pxml">
+    <parser class="PxmlParser" headerFile="PxmlParser.hpp" sourceFile="PxmlParser.cpp" start="pxml" return="PXML::Pxml">
         {% header file %}
         <header indent=0 position="top">
             #include \<Pxml.hpp>

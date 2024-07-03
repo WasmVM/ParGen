@@ -14,7 +14,7 @@ struct TermMap {
     static constexpr term_t eof = 1;
     static constexpr term_t start = 0;
 
-    TermMap(const TermMap& terms) : num_term(terms.num_term), items(terms.items), term_count(terms.term_count){}
+    TermMap(const TermMap& terms) : num_term(terms.num_term), items(terms.items){}
     TermMap(std::vector<std::string> terms, std::set<std::string> nterms){
         num_term = items.size() + terms.size();
         for(std::string term : terms){
@@ -56,7 +56,6 @@ struct TermMap {
 private:
     size_t num_term;
     std::unordered_map<std::string, term_t> items = {{"", 0}, {"EOF", 1}};
-    size_t term_count;
 };
 
 

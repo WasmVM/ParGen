@@ -73,6 +73,5 @@ protected:
 };
 
 bool operator<(const GLRParser::Grammar&, const GLRParser::Grammar&);
-std::ostream& operator<<(std::ostream& os, GLRParser& parser);
 
 #endif
