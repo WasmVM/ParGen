@@ -34,9 +34,7 @@ std::ostream& GLRParser::print_grammar(std::ostream& os, GLRParser::Grammar& gra
         }
         os << ")";
     }
-    if(gram.action){
-        os << " [" << gram.action.value() << "]";
-    }
+    os << " [" << gram.action << "]";
     return os;
 }
 

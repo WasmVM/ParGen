@@ -24,6 +24,7 @@ struct TermMap {
             items.emplace(nterm, items.size());
         }
     }
+    TermMap(Pargen::Parser& parser);
 
     term_t operator[](std::string key){
         if(items.contains(key)){

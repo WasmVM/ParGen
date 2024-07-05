@@ -26,7 +26,7 @@ struct GLRParser {
         std::vector<term_t> depends;
         std::set<term_t> lookahead;
         size_t dot_pos = 0;
-        std::optional<size_t> action;
+        size_t action = 0;
         std::vector<size_t> param_indices;
 
         bool operator==(const Grammar& rhs) const {
@@ -62,12 +62,11 @@ struct GLRParser {
 protected:
 
     Pargen::Parser& parser;
-    std::set<Grammar> grammars;
+    std::list<Grammar> grammars;
     term_t start;
 
     void read_grammar();
     std::map<term_t, std::set<term_t>> create_first_sets();
-    static TermMap create_term_map(Pargen::Parser& parser);
     std::ostream& print_grammar(std::ostream&, Grammar&);
 
 };

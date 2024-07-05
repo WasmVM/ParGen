@@ -165,7 +165,7 @@
                 return _op0 + _op1.value;
             </grammar>
             <grammar>
-                return "";
+                return std::string();
             </grammar>
         </target>
         <target name="text" type="std::string">
@@ -178,10 +178,16 @@
             <grammar pattern="text Entity">
                 return _op0 + _op1.value;
             </grammar>
+            <grammar>
+                return std::string();
+            </grammar>
         </target>
         <target name="attributes" type="std::unordered_map<std::string, PXML::Value>">
-            <grammar pattern="attributes spaces attribute">
-                _op0.emplace(_op2);
+            <grammar pattern="attributes attribute">
+                _op0.emplace(_op1);
+                return _op0;
+            </grammar>
+            <grammar pattern="attributes spaces">
                 return _op0;
             </grammar>
             <grammar>
