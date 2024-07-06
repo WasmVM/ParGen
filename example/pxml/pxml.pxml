@@ -105,9 +105,16 @@
             return Token(Space(_text), _pos);
         </rule>
         {% text %}
-        <rule pattern="(.|\\<|\\.)">
-            return Token(Text(_text), _pos);
-        </rule>
+        <rule pattern="(.|\\<|\\.|\{)" more push="text"/>
+        <group name="text">
+            <use id="Comment" />
+            <rule pattern="(.|\\<|\\.|\{)" more />
+            <rule pattern="<" pop>
+                text = "\<" + text;
+                state = states[state]['\<'];
+                return Token(Text(_text.substr(0, _text.size() - 1)), _pos);
+            </rule>
+        </group>
     </lexer>
     <parser class="PxmlParser" headerFile="PxmlParser.hpp" sourceFile="PxmlParser.cpp" start="pxml" return="PXML::Pxml">
         {% header file %}
@@ -127,17 +134,13 @@
                 return _op2;
             </grammar>
         </target>
-        <target name="content" type="PXML::Pxml::Child">
-            <grammar pattern="element">
-                return {to_pos(_pos[0]), _op0};
-            </grammar>
-            <grammar pattern="text">
-                return {to_pos(_pos[0]), _op0};
-            </grammar>
-        </target>
         <target name="body" type="std::list<PXML::Pxml::Child>">
-            <grammar pattern="body content">
-                _op0.emplace_back(_op1);
+            <grammar pattern="body element">
+                _op0.emplace_back(to_pos(_pos[1]), _op1);
+                return _op0;
+            </grammar>
+            <grammar pattern="body text">
+                _op0.emplace_back(to_pos(_pos[1]), _op1);
                 return _op0;
             </grammar>
             <grammar>
@@ -172,8 +175,8 @@
             <grammar pattern="text Text">
                 return _op0 + _op1.value;
             </grammar>
-            <grammar pattern="text spaces">
-                return _op0 + _op1;
+            <grammar pattern="text Space">
+                return _op0 + _op1.value;
             </grammar>
             <grammar pattern="text Entity">
                 return _op0 + _op1.value;
@@ -187,7 +190,7 @@
                 _op0.emplace(_op1);
                 return _op0;
             </grammar>
-            <grammar pattern="attributes spaces">
+            <grammar pattern="attributes Space">
                 return _op0;
             </grammar>
             <grammar>

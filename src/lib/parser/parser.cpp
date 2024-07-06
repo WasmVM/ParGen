@@ -74,7 +74,6 @@ void Pargen::Parser::generate_header(std::ostream& os){
     {
         TermMap term_map(*this);
         term_type = std::pow(2, std::ceil(std::log2(std::ceil(std::log2(term_map.size()) / CHAR_BIT)))) * CHAR_BIT;
-        term_type = 16; // FIXME:
     }
     
     // Members
@@ -109,6 +108,10 @@ void Pargen::Parser::generate_header(std::ostream& os){
     os << "        std::list<std::pair<term_t,token_t>> flatten();" << std::endl;
     os << "    };" << std::endl;
     os << "    struct Entry {" << std::endl;
+    if(parent.options.dump_tree){
+        os << "        static size_t serial;" << std::endl;
+        os << "        size_t id;" << std::endl;
+    }
     os << "        term_t term;" << std::endl;
     os << "        size_t state;"  << std::endl;
     os << "        size_t branch = 0;"  << std::endl;
@@ -116,13 +119,20 @@ void Pargen::Parser::generate_header(std::ostream& os){
     os << "    };" << std::endl;
     os << "    struct Stack : public std::list<Entry>{" << std::endl;
     os << "        void push(std::pair<term_t,token_t> token, size_t state){" << std::endl;
-    os << "            emplace_front(Entry {.term = token.first, .state = state, .elem = token.second});" << std::endl;
+    os << "            emplace_front(Entry {";
+    if(parent.options.dump_tree){
+        os << ".id = Entry::serial++, ";
+    }
+    os << ".term = token.first, .state = state, .elem = token.second});" << std::endl;
     os << "        }" << std::endl;
     os << "        void reduce(size_t action, std::vector<uint8_t> op_pos);" << std::endl;
     os << "    };\n" << std::endl;
     os << "    std::list<std::pair<term_t,token_t>> buffer;" << std::endl;
     os << "    static std::vector<State> table;" << std::endl;
     os << "    std::pair<term_t,token_t> fetch();" << std::endl;
+    if(parent.options.dump_tree){
+        os << "    void dump_tree(Entry&);" << std::endl;
+    }
     os << "};\n" << std::endl;
 
     // Parse error
@@ -178,6 +188,12 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << "#include <list>" << std::endl;
     os << "#include <variant>" << std::endl;
     os << "#include <vector>" << std::endl;
+    if(parent.options.dump_tree){
+        os << "#include <fstream>" << std::endl;
+        os << "#include <queue>" << std::endl;
+        os << "#include <map>" << std::endl;
+    }
+
     os << "\nnamespace " << parent.name_space << " {" << std::endl;
     if(!parent.tokens.empty()){
         os << "\nusing namespace " << parent.tokens.name_space << ";\n" << std::endl;
@@ -185,6 +201,36 @@ void Pargen::Parser::generate_source(std::ostream& os){
 
     // constructor
     os << class_name << "::" << class_name << "(" << parent.lexer.class_name << "& lexer) : lexer(lexer) {}\n" << std::endl;
+
+    // Dump tree 
+    if(parent.options.dump_tree){
+        os << "size_t " << class_name << "::Entry::serial = 0;" << std::endl;
+        os << "void " << class_name << "::dump_tree(" << class_name << "::Entry& tree){\n"
+                "    static std::map<term_t, std::string> term_map {\n";
+        for(auto term_pair : parser.term_map){
+            os << "        {" << term_pair.second << ",\"" << term_pair.first << "\"},\n";
+        }
+        os << "    };\n";
+        os << "    std::ofstream fout(\"tree.dot\");\n"
+            "    fout << \"graph {\" << std::endl;\n"
+            "    std::queue<Entry> node_queue;\n"
+            "    node_queue.push(tree);\n"
+            "    while(!node_queue.empty()){\n"
+            "        Entry& entry = node_queue.front();\n"
+            "        fout << \"E\" << entry.id << \" [label=\\\"\" << term_map[entry.term] << \"\\\"];\" << std::endl;\n"
+            "        if(std::holds_alternative<Node>(entry.elem)){\n"
+            "            Node& node = std::get<Node>(entry.elem);\n"
+            "            for(auto it = node.children.begin(); it != node.children.end(); ++it){\n"
+            "                fout << \"E\" << entry.id << \" -- E\" << it->id << std::endl;\n"
+            "                node_queue.emplace(*it);\n"
+            "            }\n"
+            "        }\n"
+            "        node_queue.pop();\n"
+            "    }\n"
+            "    fout << \"}\";\n"
+            "    fout.close();\n"
+            "}\n";
+    }
 
     // fetch
     os << "std::pair<" << class_name << "::term_t, " << class_name << "::token_t> " << class_name << "::fetch(){" << std::endl;
@@ -329,8 +375,12 @@ void Pargen::Parser::generate_source(std::ostream& os){
         "        }else{\n"
         "            throw_error(entry.term);\n"
         "        }\n"
-        "    }\n"
-        "    // Create AST\n"
+        "    }\n";
+    if(parent.options.dump_tree){
+        os << "    // Dump tree\n"
+            "    dump_tree(stack.back());\n";
+    }
+    os << "    // Create AST\n"
         "    return PXML::Pxml(); // FIXME:\n";
     os << "}\n" << std::endl;
 
@@ -355,8 +405,11 @@ void Pargen::Parser::generate_source(std::ostream& os){
         "        Node& child = std::get<Node>(head->elem);\n"
         "        head = &child.children.front();\n"
         "    }\n"
-        "    Entry& entry = emplace_front();\n"
-        "    entry.term = signatures[action - 1];\n"
+        "    Entry& entry = emplace_front();\n";
+    if(parent.options.dump_tree){
+        os << "    entry.id = Entry::serial++;\n";
+    }
+    os << "    entry.term = signatures[action - 1];\n"
         "    entry.state = head->state;\n"
         "    entry.elem.emplace<Node>(node);\n";
     os << "}\n" << std::endl;

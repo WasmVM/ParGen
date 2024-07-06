@@ -110,6 +110,7 @@ struct Parser : public std::list<Grammar>, Component {
 
 struct Options {
     bool debug = false;
+    bool dump_tree = false;
 };
 
 struct ParGen {

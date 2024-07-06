@@ -18,7 +18,7 @@ int main(int argc, char* argv[]){
     try{
         parser.parse();
     }catch(UnknownToken& e){
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.pos << " " << e.what() << std::endl;
     }
 
     fin.close();
