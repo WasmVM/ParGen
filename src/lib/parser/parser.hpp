@@ -27,7 +27,7 @@ struct GLRParser {
         std::set<term_t> lookahead;
         size_t dot_pos = 0;
         size_t action = 0;
-        std::vector<size_t> param_indices;
+        std::vector<bool> param_toggle;
 
         bool operator==(const Grammar& rhs) const {
             return !(*this < rhs) && !(rhs < *this);

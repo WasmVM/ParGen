@@ -155,6 +155,7 @@
                 }
                 PXML::Pxml elem {.tag = _op0.value, .pos = pos};
                 elem.swap(_op1);
+                elem.children.swap(_op3);
                 return elem;
             </grammar>
             <grammar pattern="Tag attributes Inline">

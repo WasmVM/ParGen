@@ -43,6 +43,7 @@ void Pargen::Parser::generate_header(std::ostream& os){
     os << header_prologue << std::endl;
 
     os << "#include <map>" << std::endl;
+    os << "#include <set>" << std::endl;
     os << "#include <list>" << std::endl;
     os << "#include <string>" << std::endl;
     os << "#include <utility>" << std::endl;
@@ -83,11 +84,9 @@ void Pargen::Parser::generate_header(std::ostream& os){
     os << "    constexpr static size_t End = (size_t)-1;" << std::endl;
     os << "    using term_t = uint" << term_type << "_t";
     os << ";" << std::endl;
-    os << "protected:" << std::endl;
-    os << "    using Act = std::pair<size_t, std::vector<uint8_t>>;" << std::endl;
-    os << "    using State = std::map<term_t, std::vector<Act>>;" << std::endl;
     if(parent.lexer.empty()){
         os << "    using token_t = std::any;" << std::endl;
+        os << "protected:" << std::endl;
     }else{
         if(parent.lexer.return_type.empty()){
             if(parent.tokens.empty()){
@@ -98,12 +97,15 @@ void Pargen::Parser::generate_header(std::ostream& os){
         }else{
             os << "    using token_t = " << parent.lexer.return_type << ";" << std::endl;
         }
+        os << "protected:" << std::endl;
         os << "    " << parent.lexer.class_name << "& lexer;" << std::endl;
     }
+    os << "    using Act = std::pair<size_t, std::vector<bool>>;" << std::endl;
+    os << "    using State = std::map<term_t, std::vector<Act>>;" << std::endl;
     os << "    struct Entry;" << std::endl;
     os << "    struct Node {" << std::endl;
     os << "        size_t action;" << std::endl;
-    os << "        std::vector<uint8_t> op_pos;" << std::endl;
+    os << "        std::vector<bool> param_toggle;" << std::endl;
     os << "        std::list<Entry> children;" << std::endl;
     os << "        std::list<std::pair<term_t,token_t>> flatten();" << std::endl;
     os << "    };" << std::endl;
@@ -125,11 +127,12 @@ void Pargen::Parser::generate_header(std::ostream& os){
     }
     os << ".term = token.first, .state = state, .elem = token.second});" << std::endl;
     os << "        }" << std::endl;
-    os << "        void reduce(size_t action, std::vector<uint8_t> op_pos);" << std::endl;
+    os << "        void reduce(size_t action, std::vector<bool> param_toggle);" << std::endl;
     os << "    };\n" << std::endl;
     os << "    std::list<std::pair<term_t,token_t>> buffer;" << std::endl;
     os << "    static std::vector<State> table;" << std::endl;
     os << "    std::pair<term_t,token_t> fetch();" << std::endl;
+    os << "    " << return_type << " expand_tree(Entry&);" << std::endl;
     if(parent.options.dump_tree){
         os << "    void dump_tree(Entry&);" << std::endl;
     }
@@ -188,6 +191,8 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << "#include <list>" << std::endl;
     os << "#include <variant>" << std::endl;
     os << "#include <vector>" << std::endl;
+    os << "#include <algorithm>" << std::endl;
+    os << "#include <array>" << std::endl;
     if(parent.options.dump_tree){
         os << "#include <fstream>" << std::endl;
         os << "#include <queue>" << std::endl;
@@ -258,16 +263,19 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << "}\n" << std::endl;
 
     // actions
+    std::set<std::string> returns;
     for(size_t action_id = 0; action_id < parser.actions.size(); ++action_id){
         GLRParser::Action& action = parser.actions[action_id];
         std::string return_type = parser.type_map[action.result];
         if(return_type.empty()){
             return_type = "void";
+        }else{
+            returns.insert(return_type);
         }
         os << "static " << return_type << " action_"<< action_id + 1 << "(";
         bool has_first = false;
         if(!parent.tokens.empty()){
-            os << "Position _pos[]";
+            os << "std::vector<Position> _pos";
             has_first = true;
         }
         for(size_t param_id = 0; param_id < action.params.size(); ++param_id){
@@ -294,16 +302,16 @@ void Pargen::Parser::generate_source(std::ostream& os){
     // table
     os << "std::vector<" << class_name << "::State> " << class_name << "::table = {" << std::endl;
     for(const GLRParser::State& state : parser.states){
-        std::map<term_t, std::list<std::pair<size_t, std::vector<size_t>>>> acts;
+        std::map<term_t, std::list<std::pair<size_t, std::vector<bool>>>> acts;
         // Shift
         for(const std::pair<const term_t, size_t>& edge : state.edges){
-            acts[edge.first].emplace_back((edge.second << 1) + 1, std::vector<size_t>{});
+            acts[edge.first].emplace_back((edge.second << 1) + 1, std::vector<bool>{});
         }
         // Reduce
         for(const GLRParser::Grammar& prod : state.productions){
             if(prod.dot_pos == prod.depends.size()){
                 for(term_t lookahead : prod.lookahead){
-                    acts[lookahead].emplace_back((prod.action << 1) & ((size_t)~1), prod.param_indices);
+                    acts[lookahead].emplace_back((prod.action << 1) & ((size_t)~1), prod.param_toggle);
                 }
             }
         }
@@ -312,11 +320,11 @@ void Pargen::Parser::generate_source(std::ostream& os){
         for(auto act_pair : acts){
             // Term
             os << "{" << act_pair.first << ", {";
-            for(std::pair<size_t, std::vector<size_t>> act : act_pair.second){
+            for(std::pair<size_t, std::vector<bool>> act : act_pair.second){
                 os << "{" << act.first << ",";
                 os << "{";
-                for(size_t param_idx : act.second){
-                    os << param_idx << ",";
+                for(bool toggle : act.second){
+                    os << toggle << ",";
                 }
                 os << "}";
                 os << "},";
@@ -380,12 +388,12 @@ void Pargen::Parser::generate_source(std::ostream& os){
         os << "    // Dump tree\n"
             "    dump_tree(stack.back());\n";
     }
-    os << "    // Create AST\n"
-        "    return PXML::Pxml(); // FIXME:\n";
+    os << "    // Expand tree\n"
+        "    return expand_tree(stack.back());\n";
     os << "}\n" << std::endl;
 
     // reduce
-    os << "void " << class_name << "::Stack::reduce(size_t action, std::vector<uint8_t> op_pos){" << std::endl;
+    os << "void " << class_name << "::Stack::reduce(size_t action, std::vector<bool> param_toggle){" << std::endl;
     os << "    static const std::vector<term_t> signatures {";
     for(GLRParser::Action& action : parser.actions){
         os << action.result << ",";
@@ -395,8 +403,9 @@ void Pargen::Parser::generate_source(std::ostream& os){
         "        emplace_front(Entry {.term = 0, .state = End});\n"
         "        return;\n"
         "    }\n"
-        "    Node node = {.action = action, .op_pos = op_pos};\n"
-        "    for(size_t i = 0; i < op_pos.size(); ++i){\n"
+        "    Node node = {.action = action, .param_toggle = param_toggle};\n"
+        "    size_t param_count = std::count_if(param_toggle.begin(), param_toggle.end(), [](bool val){return val;});\n"
+        "    for(size_t i = 0; i < param_count; ++i){\n"
         "        node.children.emplace_front(front());\n"
         "        pop_front();\n"
         "    }\n"
@@ -412,6 +421,122 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << "    entry.term = signatures[action - 1];\n"
         "    entry.state = head->state;\n"
         "    entry.elem.emplace<Node>(node);\n";
+    os << "}\n" << std::endl;
+
+    // stack item
+    os << "using item_t = std::variant<std::monostate,\n"
+        "    " << class_name << "::token_t,\n";
+    for(auto it = returns.begin(); it != returns.end(); it = std::next(it)){
+        os << "    " << *it;
+        if(std::next(it) != returns.end()){
+            os << ",";
+        }
+        os << std::endl;
+    }
+    os << ">;\n" << std::endl;
+    
+    // expand tree
+    os << return_type << " " << class_name << "::expand_tree(Entry& tree){" << std::endl;
+    os << "    std::list<std::variant<Node, token_t>> entry_stack;\n"
+        "    std::list<std::pair<Position, item_t>> param_stack;\n"
+        "    auto extract_entry = [&](Entry& entry){\n"
+        "        std::cout << (int)entry.term << std::endl; // FIXME:\n"
+        "        if(std::holds_alternative<token_t>(entry.elem)){\n"
+        "            entry_stack.emplace_front(std::get<token_t>(entry.elem));\n"
+        "        }else if(std::holds_alternative<Node>(entry.elem)){\n"
+        "            Node& elem = std::get<Node>(entry.elem);\n"
+        "            Node& node = std::get<Node>(entry_stack.emplace_front(Node {.action = elem.action, .param_toggle = elem.param_toggle}));\n"
+        "            node.children.swap(elem.children);\n"
+        "        }\n"
+        "    };\n"
+        "    extract_entry(tree);\n";
+
+        // invoke action
+    os << "    auto invoke_action = [&](Node& node){\n"
+        "        std::vector<Position> positions(node.param_toggle.size());\n"
+        "        std::vector<item_t> params(node.param_toggle.size());\n"
+        "        Position pos;\n"
+        "        for(size_t i = node.param_toggle.size(); i > 0; --i){\n"
+        "            size_t index = i - 1;\n"
+        "            if(node.param_toggle[index]){\n"
+        "                positions[index] = param_stack.front().first;\n"
+        "                params[index] = param_stack.front().second;\n"
+        "                param_stack.pop_front();\n"
+        "            }\n"
+        "        }\n"
+        "        for(size_t i = 0; i < node.param_toggle.size(); ++i){\n"
+        "            if(node.param_toggle[i]){\n"
+        "                pos = positions[i];\n"
+        "                break;\n"
+        "            }\n"
+        "        }\n"
+        "        switch(node.action){\n";
+    for(size_t action_id = 0; action_id < parser.actions.size(); ++action_id){
+        GLRParser::Action& action = parser.actions[action_id];
+        bool is_void = parser.type_map[action.result].empty();
+        os << "            case " << action_id + 1 << ": " << std::endl;
+        os << "                param_stack.emplace_front(pos, ";
+        if(is_void){
+            os << "std::monostate());\n"
+                << "                ";
+        }
+        os << "action_" << action_id + 1 << "(positions";
+        for(size_t param_id = 0; param_id < action.params.size(); ++param_id){
+            term_t term = action.params[param_id];
+            std::string type;
+            bool is_term = false;
+            if(parser.term_map.is_term(term)){
+                type = parent.tokens.name_space + "::" + parser.term_map[term].value();
+                is_term = true;
+            }else{
+                type = parser.type_map[term];
+            }
+            if(!type.empty()){
+                os << ",\n";
+                os << "                    node.param_toggle[" << param_id << "] ? std::get<" << type
+                    << ">(";
+                if(is_term){
+                    os << "std::get<Token>(params[" << param_id << "]))";
+                }else{
+                    os << "params[" << param_id << "])";
+                }
+                os << " : " << type << "()";
+            }
+        }
+        os << "\n                )";
+        if(is_void){
+            os << ";" << std::endl;
+        }else{
+            os << ");" << std::endl;
+        }
+        os << "            break;" << std::endl;
+    }
+    os << "            default:\n"
+        "            break;\n"
+        "        }\n"
+        "    };\n";
+    os << "    while(!entry_stack.empty()){\n"
+        "        std::variant<Node, token_t>& entry = entry_stack.front();\n"
+        "        if(std::holds_alternative<token_t>(entry)){\n"
+        "            token_t token = std::get<token_t>(entry);\n"
+        "            param_stack.emplace_front(token.pos, token);\n"
+        "            entry_stack.pop_front();\n"
+        "        }else if(std::holds_alternative<Node>(entry)){\n"
+        "            Node& node = std::get<Node>(entry);\n"
+        "            if(node.children.size() > 0){\n"
+        "                for(auto it = node.children.rbegin(); it != node.children.rend(); it = std::next(it)){\n"
+        "                    extract_entry(*it);\n"
+        "                }\n"
+        "                node.children.clear();\n"
+        "            }else{\n"
+        "                invoke_action(node);\n"
+        "                entry_stack.pop_front();\n"
+        "            }\n"
+        "        }\n"
+        "    }\n";
+    if(return_type != "void"){
+        os << "    return std::get<" << return_type << ">(param_stack.front().second);" << std::endl;
+    }
     os << "}\n" << std::endl;
 
     // functions
@@ -439,7 +564,7 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << "        }" << std::endl;
     os << "    }" << std::endl;
     os << "    return results;" << std::endl;
-    os << "}" << std::endl;
+    os << "}\n" << std::endl;
 
     // parse error
     std::vector<std::pair<std::string, term_t>> term_list(parser.term_map.begin(), parser.term_map.end());
@@ -632,8 +757,6 @@ void GLRParser::read_grammar(){
             Grammar grammar;
             grammar.target = target;
             grammar.action = actions.size();
-            grammar.param_indices.resize(gram.depends.size());
-            std::iota(grammar.param_indices.begin(), grammar.param_indices.end(), 0);
             std::transform(gram.depends.begin(), gram.depends.end(), std::back_inserter(grammar.depends), [&](std::string& dep){
                 if(term_map[dep] == TermMap::none){
                     throw Exception::Exception("unknown terminal '" + dep + "'");
@@ -641,6 +764,7 @@ void GLRParser::read_grammar(){
                 return term_map[dep];
             });
             action.params.assign(grammar.depends.begin(), grammar.depends.end());
+            grammar.param_toggle.resize(grammar.depends.size(), true);
             grammars.emplace_back(grammar);
         }
     }
@@ -652,7 +776,7 @@ void GLRParser::read_grammar(){
             if(empties.contains(gram.depends[dep_idx])){
                 Grammar new_gram = gram;
                 new_gram.depends.erase(new_gram.depends.begin() + dep_idx);
-                new_gram.param_indices.erase(new_gram.param_indices.begin() + dep_idx);
+                new_gram.param_toggle[dep_idx] = false;
                 if((new_gram.depends.size() > 1 || (new_gram.depends.size() == 1 && new_gram.target != new_gram.depends[0]))
                     && (std::find(grammars.begin(), grammars.end(), new_gram) == grammars.end())
                 ){
