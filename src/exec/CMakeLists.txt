@@ -9,3 +9,7 @@ set_target_properties(pargen-exec PROPERTIES OUTPUT_NAME "pargen")
 target_compile_definitions(pargen PUBLIC
   PARGEN_VERSION="${CMAKE_PROJECT_VERSION}"
 )
+install(TARGETS pargen-exec
+  RUNTIME DESTINATION bin
+  COMPONENT programs
+)

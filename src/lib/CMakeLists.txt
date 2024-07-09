@@ -28,3 +28,8 @@ add_library(pargen
   parser/parser.cpp
   parser/dump.cpp
 )
+
+install(TARGETS pargen
+  LIBRARY DESTINATION lib
+  COMPONENT libs
+)

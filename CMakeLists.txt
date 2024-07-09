@@ -11,6 +11,7 @@ if(CONSOLE_COLOR)
 endif(CONSOLE_COLOR)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/src/include)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 add_subdirectory(src)
 
 set(BUILD_EXAMPLES ON CACHE BOOL "Build examples")
@@ -22,3 +23,11 @@ set(BUILD_DOCS ON CACHE BOOL "Build documentation")
 if(BUILD_DOCS)
   add_subdirectory(docs)
 endif(BUILD_DOCS)
+
+include(pack)
+cpack_add_component(programs DISPLAY_NAME "Programs"
+  DESCRIPTION "ParGen programs"
+)
+cpack_add_component(libs DISPLAY_NAME "Libraries"
+  DESCRIPTION "ParGen libraries"
+)
