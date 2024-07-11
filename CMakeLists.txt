@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pargen VERSION 0.0.1)
+project(pargen VERSION 1.0.0)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED 11)
 set(CMAKE_CXX_STANDARD 20)
