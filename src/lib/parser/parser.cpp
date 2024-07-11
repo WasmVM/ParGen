@@ -440,7 +440,6 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << "    std::list<std::variant<Node, token_t>> entry_stack;\n"
         "    std::list<std::pair<Position, item_t>> param_stack;\n"
         "    auto extract_entry = [&](Entry& entry){\n"
-        "        std::cout << (int)entry.term << std::endl; // FIXME:\n"
         "        if(std::holds_alternative<token_t>(entry.elem)){\n"
         "            entry_stack.emplace_front(std::get<token_t>(entry.elem));\n"
         "        }else if(std::holds_alternative<Node>(entry.elem)){\n"

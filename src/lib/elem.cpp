@@ -21,8 +21,11 @@
 #include <string>
 #include <exception.hpp>
 #include <Util.hpp>
+
+#ifdef USE_BISON
 #include <pxml_parser.hpp>
 #include "Lex.hpp"
+#endif
 
 using namespace Pargen;
 
@@ -51,9 +54,11 @@ void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesyste
     PXML::Pxml included;
     {
         std::ifstream stream(resolved_src);
+    #ifdef USE_BISON
         Lex lex(resolved_src, stream);
         yy::parser parser(lex, included);
         parser();
+    #endif
         stream.close();
     }
 

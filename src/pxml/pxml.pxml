@@ -105,10 +105,16 @@
             return Token(Space(_text), _pos);
         </rule>
         {% text %}
+        <rule pattern="\\<" more push="text">
+            text.erase(text.end() - 3);
+        </rule>
         <rule pattern="(.|\\<|\\.|\{)" more push="text"/>
         <group name="text">
             <use id="Comment" />
-            <rule pattern="(.|\\<|\\.|\{)" more />
+            <rule pattern="\\<" more>
+                text.erase(text.end() - 3);
+            </rule>
+            <rule pattern="(.|\\.|\{)" more />
             <rule pattern="<" pop>
                 text = "\<" + text;
                 state = states[state]['\<'];

@@ -17,8 +17,14 @@
 #include <iostream>
 #include <fstream>
 #include <exception.hpp>
+
+#ifdef USE_BISON
 #include <pxml_parser.hpp>
 #include <Lex.hpp>
+#else
+#include "PxmlLexer.hpp"
+#include "PxmlParser.hpp"
+#endif
 
 using namespace Pargen;
 
@@ -32,9 +38,15 @@ void ParGen::load(std::filesystem::path pxml_path){
     PXML::Pxml pxml;
     {
         std::ifstream stream(pxml_path);
+    #ifdef USE_BISON
         Lex lex(pxml_path, stream);
         yy::parser parser(lex, pxml);
         parser();
+    #else
+        ParsePxml::PxmlLexer lexer(pxml_path, stream);
+        ParsePxml::PxmlParser parser(lexer);
+        pxml = parser.parse();
+    #endif
         stream.close();
     }
 
