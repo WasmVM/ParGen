@@ -41,7 +41,7 @@ jobs:
     - name: Bootstrap build with flex
       run: >
         cmake --build "${{ steps.strings.outputs.build-output-dir }}_flex" --config ${{ matrix.build_type }} -j ${{matrix.parallel}}
-        && cd ${{ steps.strings.outputs.build-output-dir }}_flex" && sudo make install
+        && cd "${{ steps.strings.outputs.build-output-dir }}_flex" && sudo make install
 
     - name: Configure CMake
       run: >
