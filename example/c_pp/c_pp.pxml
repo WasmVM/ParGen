@@ -1,5 +1,0 @@
-<!DOCTYPE pxml>
-<pxml namespace="WasmVM::PP" >
-    {% token definition %}
-    <include src="token.pxml" />
-</pxml>
