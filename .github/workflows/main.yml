@@ -14,11 +14,11 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         build_type: [Release]
-        c_compiler: [gcc]
+        c_compiler: [clang]
         include:
           - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
+            c_compiler: clang
+            cpp_compiler: clang++
             parallel: 6
 
     steps:
@@ -28,12 +28,6 @@ jobs:
       id: strings
       shell: bash
       run: echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
-    - name: Install Flex
-      run: |
-        wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
-        tar -zxf flex-2.6.4.tar.gz
-        cd flex-2.6.4 && ./configure && sudo make install
 
     - name: Configure CMake
       run: >
