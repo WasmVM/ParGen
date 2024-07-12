@@ -302,6 +302,13 @@ Node* parse_pattern(std::string& pattern){
                 current = nullptr;
                 next = &(groups.top()->children.back());
             }break;
+            case '$':{
+                CharNode* node = new CharNode;
+                node->value += CharNode::Char::eof;
+                current = node;
+                *next = node;
+                next = &(node->next);
+            }break;
             case '.':{
                 CharNode* node = new CharNode;
                 node->value += '\0';

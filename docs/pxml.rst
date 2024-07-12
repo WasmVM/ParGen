@@ -294,7 +294,10 @@ Define a rule in lexer
         - ``{N, M}``: ``N`` to ``M`` times (``N``, ``M`` are integers)
 
     Wildcard:
+    
         - ``.``: any supported character
+
+        - ``$``: end-of-file
 
 * push <string> : State name to push into stack
 
