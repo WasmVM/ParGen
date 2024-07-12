@@ -25,6 +25,9 @@ set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
 
 # Productbuild
+if(APPLE)
+set(CPACK_GENERATOR productbuild CACHE STRING "CPack generator")
 set(CPACK_PRODUCTBUILD_IDENTIFIER org.WasmVM.ParGen)
+endif(APPLE)
 
 include(CPack)
