@@ -175,14 +175,29 @@ Node* parse_pattern(std::string& pattern){
                             }
                         }
                     }else if(*it == '-'){
-                        if(++it == pattern.end()){
+                        ++it;
+                        if(it == pattern.end()){
                             throw Exception::Exception("expected character after '-' in pattern");
                         }else if(value.empty()){
                             throw Exception::Exception("expected character before '-' in pattern");
                         }else if(!last.has_value()){
                             throw Exception::Exception("invalid character before '-' in pattern");
                         }else{
-                            for(char ch = (last.value() + 1); ch <= *it; ++ch){
+                            char ended = 0;
+                            if(*it == '\\'){
+                                if(std::next(it) == pattern.end()){
+                                    throw Exception::Exception("expected character after '\\' in pattern");
+                                }else{
+                                    CharNode::Char escaped = escape_sequence(it, pattern.end());
+                                    if(escaped.size() != 1){
+                                        throw Exception::Exception("invalid escape character after '-' in pattern");
+                                    }
+                                    ended = *escaped.begin();
+                                }
+                            }else{
+                                ended = *it;
+                            }
+                            for(char ch = (last.value() + 1); ch <= ended; ++ch){
                                 value += ch;
                             }
                         }

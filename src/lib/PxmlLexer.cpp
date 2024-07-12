@@ -381,6 +381,7 @@ Token PxmlLexer::get(){
                     state = 54;
                     text = current;
                 {
+                    return Token(std::monostate(), _pos);
                 }break;
                 default:
                     throw UnknownToken(_pos, text);

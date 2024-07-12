@@ -588,6 +588,11 @@ std::ostream& Autometa::dump(std::ostream& os){
                 case '\n':
                     os << "\\\\n";
                 break;
+                default:{
+                    auto flags = os.flags();
+                    os << "\\\\" << std::hex << (int)ch << "";
+                    os.setf(flags);
+                }break;
             }
         }else if(ch == Char::eof){
             os << "EOF";
@@ -595,8 +600,12 @@ std::ostream& Autometa::dump(std::ostream& os){
             os << "'\\\"'";
         }else if(ch == '\\'){
             os << "'\\\\'";
-        }else{
+        }else if(std::isprint(ch)){
             os << "'" << ch << "'";
+        }else{
+            auto flags = os.flags();
+            os << "\\\\" << std::hex << (int)ch << "";
+            os.setf(flags);
         }
     };
     size_t i = 0;
