@@ -64,7 +64,11 @@ void elem_include(PXML::Pxml& parent, PXML::Pxml& pxml, std::list<std::filesyste
     #else
         ParsePxml::PxmlLexer lexer(resolved_src, stream);
         ParsePxml::PxmlParser parser(lexer);
-        included = parser.parse();
+        try{
+            included = parser.parse();
+        }catch(ParsePxml::UnknownToken& e){
+            throw Exception::SyntaxError(e.msg, PXML::Position {.path = e.pos.path, .line = e.pos.line, .column = e.pos.column});
+        }
     #endif
         stream.close();
     }

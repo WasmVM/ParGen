@@ -45,7 +45,11 @@ void ParGen::load(std::filesystem::path pxml_path){
     #else
         ParsePxml::PxmlLexer lexer(pxml_path, stream);
         ParsePxml::PxmlParser parser(lexer);
-        pxml = parser.parse();
+        try{
+            pxml = parser.parse();
+        }catch(ParsePxml::UnknownToken& e){
+            throw Exception::SyntaxError(e.msg, PXML::Position {.path = e.pos.path, .line = e.pos.line, .column = e.pos.column});
+        }
     #endif
         stream.close();
     }

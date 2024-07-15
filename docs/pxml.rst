@@ -418,6 +418,8 @@ C++ codes that may return a generated object.
 
 The following replacement variables can be used in the codes:
 
+* _this : Reference of parser.
+
 * _op : The operands of grammar. Use ``_opN`` to access parameter at index ``N``.
 
 * _pos : The location of matched text as array. Use ``_pos[N]`` to access position at index N.

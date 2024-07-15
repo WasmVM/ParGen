@@ -272,7 +272,7 @@ void Pargen::Parser::generate_source(std::ostream& os){
         }else{
             returns.insert(return_type);
         }
-        os << "static " << return_type << " action_"<< action_id + 1 << "(";
+        os << "static " << return_type << " action_"<< action_id + 1 << "(" << class_name << "& _this, ";
         bool has_first = false;
         if(!parent.tokens.empty()){
             os << "std::vector<Position> _pos";
@@ -481,7 +481,7 @@ void Pargen::Parser::generate_source(std::ostream& os){
             os << "std::monostate());\n"
                 << "                ";
         }
-        os << "action_" << action_id + 1 << "(positions";
+        os << "action_" << action_id + 1 << "(*this, positions";
         for(size_t param_id = 0; param_id < action.params.size(); ++param_id){
             term_t term = action.params[param_id];
             if(term == TermMap::eof){
@@ -775,12 +775,19 @@ void GLRParser::read_grammar(){
 
     // Expand empty grammar
     for(auto gram_it = grammars.begin(); gram_it != grammars.end(); gram_it = std::next(gram_it)){
-        Grammar gram = *gram_it;
-        for(size_t dep_idx = 0; dep_idx < gram.depends.size(); ++dep_idx){
-            if(empties.contains(gram.depends[dep_idx])){
+        Grammar& gram = *gram_it;
+        std::vector<std::pair<term_t, size_t>> dep_pairs;
+        for(size_t dep_idx = 0, tog_idx = 0; tog_idx < gram.param_toggle.size(); ++tog_idx){
+            if(gram.param_toggle[dep_idx]){
+                dep_pairs.emplace_back(gram.depends[dep_idx], dep_idx);
+                dep_idx += 1;
+            }
+        }
+        for(size_t pair_idx = 0; pair_idx < dep_pairs.size(); ++pair_idx){
+            if(empties.contains(dep_pairs[pair_idx].first)){
                 Grammar new_gram = gram;
-                new_gram.depends.erase(new_gram.depends.begin() + dep_idx);
-                new_gram.param_toggle[dep_idx] = false;
+                new_gram.depends.erase(new_gram.depends.begin() + pair_idx);
+                new_gram.param_toggle[dep_pairs[pair_idx].second] = false;
                 if((new_gram.depends.size() > 1 || (new_gram.depends.size() == 1 && new_gram.target != new_gram.depends[0]))
                     && (std::find(grammars.begin(), grammars.end(), new_gram) == grammars.end())
                 ){
