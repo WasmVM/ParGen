@@ -280,7 +280,9 @@ void Pargen::Parser::generate_source(std::ostream& os){
         }
         for(size_t param_id = 0; param_id < action.params.size(); ++param_id){
             term_t term = action.params[param_id];
-            if(!parser.term_map.is_term(term) && parser.type_map[term].empty()){
+            if((!parser.term_map.is_term(term) && parser.type_map[term].empty())
+                || (term == TermMap::eof)
+            ){
                 continue;
             }
             if(has_first){
@@ -482,6 +484,9 @@ void Pargen::Parser::generate_source(std::ostream& os){
         os << "action_" << action_id + 1 << "(positions";
         for(size_t param_id = 0; param_id < action.params.size(); ++param_id){
             term_t term = action.params[param_id];
+            if(term == TermMap::eof){
+                continue;
+            }
             std::string type;
             bool is_term = false;
             if(parser.term_map.is_term(term)){
