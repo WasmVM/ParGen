@@ -1,8 +1,8 @@
-`v1.0.0`
-# v1.0.0 1st implementation
+`v1.0.1`
+# v1.0.1 Update README, fix include & EOF
 
-第一個功能完整的版本
-The 1st functional implementation with pxml example
+* Update examples & README
+* Fix `<include>` & handle EOF
 
 ## Install guides
 
