@@ -140,7 +140,11 @@ void Pargen::Parser::generate_header(std::ostream& os){
 
     // Parse error
     os << "struct ParseError : public std::exception {" << std::endl;
-    os << "    ParseError(" << class_name << "::term_t term);" << std::endl;
+    os << "    ParseError(";
+    if(!parent.tokens.empty()){
+        os << "Position pos, ";
+    }
+    os << class_name << "::term_t term);" << std::endl;
     os << "    std::string msg;" << std::endl;
     os << "    const char* what(){" << std::endl;
     os << "        return msg.c_str();" << std::endl;
@@ -343,9 +347,17 @@ void Pargen::Parser::generate_source(std::ostream& os){
         "    std::stack<Stack::iterator> branches;\n"
         "    Stack stack;\n"
         "    stack.push(fetch(), 0);\n"
-        "    auto throw_error = [&](term_t term){\n"
+        "    auto throw_error = [&](";
+    if(!parent.tokens.empty()){
+        os << "token_t token, ";
+    }
+    os << "term_t term){\n"
         "        if(branches.empty()){\n"
-        "            throw ParseError(term);\n"
+        "            throw ParseError(";
+    if(!parent.tokens.empty()){
+        os << "token.pos, ";
+    }
+    os << "term);\n"
         "        }\n"
         "        auto& saved = branches.top();\n"
         "        auto buf_top = buffer.begin();\n"
@@ -382,9 +394,21 @@ void Pargen::Parser::generate_source(std::ostream& os){
         "                }\n"
         "                stack.reduce(act.first >> 1, act.second);\n"
         "            }\n"
-        "        }else{\n"
-        "            throw_error(entry.term);\n"
-        "        }\n"
+        "        }else{\n";
+    if(parent.tokens.empty()){
+        os << "            throw_error(entry.term);\n";
+    }else{
+        os << "            Entry* ptr = &entry;\n"
+            "            while(std::holds_alternative<Node>(ptr->elem)){\n"
+            "                ptr = &std::get<Node>(ptr->elem).children.front();\n"
+            "            }\n"
+            "            if(std::holds_alternative<token_t>(ptr->elem)){\n"
+            "                throw_error(std::get<token_t>(ptr->elem), entry.term);\n"
+            "            }else{\n"
+            "                throw_error(Token(std::monostate(), Position()), entry.term);\n"
+            "            }\n";
+    }
+    os << "        }\n"
         "    }\n";
     if(parent.options.dump_tree){
         os << "    // Dump tree\n"
@@ -577,7 +601,11 @@ void Pargen::Parser::generate_source(std::ostream& os){
             return lhs.second < rhs.second;
         }
     );
-    os << parent.name_space << "::ParseError::ParseError(" << class_name << "::term_t term){" << std::endl;
+    os << parent.name_space << "::ParseError::ParseError(";
+    if(!parent.tokens.empty()){
+        os << "Position pos, ";
+    }
+    os << class_name << "::term_t term){" << std::endl;
     os << "    static const std::vector<std::string> terms {" << std::endl;
     for(auto term_pair : term_list){
         os << "        \"" << term_pair.first << "\"," << std::endl;
