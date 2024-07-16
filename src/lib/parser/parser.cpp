@@ -141,10 +141,12 @@ void Pargen::Parser::generate_header(std::ostream& os){
     // Parse error
     os << "struct ParseError : public std::exception {" << std::endl;
     os << "    ParseError(";
-    if(!parent.tokens.empty()){
-        os << "Position pos, ";
+    if(parent.tokens.empty()){
+        os << class_name << "::term_t term);" << std::endl;
+    }else{
+        os << "Position pos, " << class_name << "::term_t term);" << std::endl;
+        os << "    Position pos;" << std::endl;
     }
-    os << class_name << "::term_t term);" << std::endl;
     os << "    std::string msg;" << std::endl;
     os << "    const char* what(){" << std::endl;
     os << "        return msg.c_str();" << std::endl;
@@ -605,12 +607,17 @@ void Pargen::Parser::generate_source(std::ostream& os){
     if(!parent.tokens.empty()){
         os << "Position pos, ";
     }
-    os << class_name << "::term_t term){" << std::endl;
+    os << class_name << "::term_t term)";
+    if(!parent.tokens.empty()){
+        os << " : pos(pos) ";
+    }
+    os << "{" << std::endl;
     os << "    static const std::vector<std::string> terms {" << std::endl;
     for(auto term_pair : term_list){
         os << "        \"" << term_pair.first << "\"," << std::endl;
     }
     os << "    };" << std::endl;
+    
     os << "    msg = \"unexpected \" + terms[term];" << std::endl;
     os << "}" << std::endl;
 
