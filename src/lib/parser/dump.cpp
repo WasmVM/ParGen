@@ -35,11 +35,6 @@ std::ostream& GLRParser::print_grammar(std::ostream& os, GLRParser::Grammar& gra
         os << ")";
     }
     os << " [" << gram.action << "]";
-    os << " {";
-    for(bool toggle : gram.param_toggle){
-        os << toggle << ",";
-    }
-    os << "}";
     return os;
 }
 
