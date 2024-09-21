@@ -1,8 +1,8 @@
-`v1.0.1`
-# v1.0.1 Update README, fix include & EOF
+`v1.0.2`
+# v1.0.2 Fix branch restore
 
-* Update examples & README
-* Fix `<include>` & handle EOF
+* Fix the branch restore mechanism that cause parse failure
+* Remove param_toggle note
 
 ## Install guides
 
