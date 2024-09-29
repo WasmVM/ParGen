@@ -16,7 +16,7 @@
 
 #include "parser.hpp"
 
-std::ostream& GLRParser::print_grammar(std::ostream& os, GLRParser::Grammar& gram){
+std::ostream& GLRParser::print_grammar(std::ostream& os, const GLRParser::Grammar& gram){
     os << term_map[gram.target].value() << " :";
     for(size_t i = 0; i < gram.depends.size(); ++i){
         if(i == gram.dot_pos){
@@ -67,7 +67,7 @@ std::ostream& GLRParser::dump_states(std::ostream& os){
         // node
         os << "S" << state_id << " [label=<<table border=\"0\" cellborder=\"0\" cellspacing=\"0\">";
         os << "<tr><td>S" << state_id <<"</td></tr>" << state_id;
-        for(Grammar& prod : state.productions){
+        for(const Grammar& prod : state.productions){
             os << "<tr><td>";
             if(prod.dot_pos == prod.depends.size()){
                 os << "<font color=\"red\">";
