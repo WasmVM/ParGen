@@ -62,11 +62,10 @@ std::ostream& GLRParser::dump_grammars(std::ostream& os){
 std::ostream& GLRParser::dump_states(std::ostream& os){
     os << "digraph {" << std::endl;
     os << "  node [shape=\"box\"]" << std::endl;
-    size_t state_id = 0;
     for(State& state : states){
         // node
-        os << "S" << state_id << " [label=<<table border=\"0\" cellborder=\"0\" cellspacing=\"0\">";
-        os << "<tr><td>S" << state_id <<"</td></tr>" << state_id;
+        os << "S" << state.id << " [label=<<table border=\"0\" cellborder=\"0\" cellspacing=\"0\">";
+        os << "<tr><td>S" << state.id <<"</td></tr>" << state.id;
         for(const Grammar& prod : state.productions){
             os << "<tr><td>";
             if(prod.dot_pos == prod.depends.size()){
@@ -81,10 +80,9 @@ std::ostream& GLRParser::dump_states(std::ostream& os){
         os << "</table>>];" << std::endl;
         // edge
         for(auto edge : state.edges){
-            os << "S" << state_id << " -> S" << edge.second;
+            os << "S" << state.id << " -> S" << edge.second;
             os << " [label=\"" << term_map[edge.first].value_or("") << "\"];" << std::endl;
         }
-        state_id += 1;
     }
     os << "}" << std::endl;
     return os;

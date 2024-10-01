@@ -5,7 +5,7 @@
 #include <utility>
 #include <variant>
 #include <list>
-#include <unordered_map>
+#include <map>
 #include <filesystem>
 
 namespace PXML {
@@ -18,7 +18,7 @@ struct Position {
 
 using Value = std::pair<Position, std::variant<std::monostate, bool, std::string, double>>;
 
-struct Pxml : std::unordered_map<std::string, Value>{
+struct Pxml : std::map<std::string, Value>{
     using Child = std::pair<Position, std::variant<std::string, Pxml>>;
     std::string tag;
     std::list<Child> children;
