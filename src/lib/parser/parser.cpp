@@ -636,18 +636,17 @@ void Pargen::Parser::generate_source(std::ostream& os){
     os << source_epilogue << std::endl;
 }
 
-struct GrammarLike {
-    bool operator()(const GLRParser::Grammar& lhs, const GLRParser::Grammar& rhs) const{
-        return (lhs.dot_pos < rhs.dot_pos)
-            || (lhs.depends < rhs.depends)
-            || (lhs.target < rhs.target);
-    }
-};
+bool gram_similar(const GLRParser::Grammar& lhs, const GLRParser::Grammar& rhs){
+    return (lhs.dot_pos == rhs.dot_pos)
+        && (lhs.depends == rhs.depends)
+        && (lhs.target == rhs.target)
+        && (lhs.action == rhs.action);
+}
 
 GLRParser::GLRParser(Pargen::Parser& parser) : term_map(parser), parser(parser) {
     read_grammar();
     create_states();
-    reduce_states();
+    // reduce_states();
     create_edges();
 }
 
@@ -808,7 +807,7 @@ void GLRParser::create_states(){
     }
 
     std::queue<State> state_queue;
-    state_queue.emplace(std::set<Grammar>{{
+    state_queue.emplace(std::list<Grammar>{{
         .target = TermMap::start,
         .depends = {term_map[parser.start]},
         .lookahead = {TermMap::eof}
@@ -820,7 +819,7 @@ void GLRParser::create_states(){
         state.id = state_id++;
         state_queue.pop();
         // Expand production
-        std::set<Grammar> produced;
+        std::list<Grammar> produced;
         while(state.productions != produced){
             std::set<Grammar> diff;
             std::set_difference(
@@ -829,7 +828,7 @@ void GLRParser::create_states(){
                 std::inserter(diff, diff.begin())
             );
             produced = state.productions;
-            std::list<Grammar> productions(state.productions.begin(), state.productions.end());
+            std::list<Grammar> productions = state.productions;
             bool modified = false;
             for(const Grammar& gram : diff){
                 term_t nterm = gram.depends[gram.dot_pos];
@@ -840,8 +839,7 @@ void GLRParser::create_states(){
                     }
                     for(Grammar prod : gram_map[nterm]){
                         auto liked = std::find_if(productions.begin(), productions.end(), [&](const Grammar& value){
-                            GrammarLike comp;
-                            return !comp(value, prod) && !comp(prod, value);
+                            return gram_similar(value, prod);
                         });
                         if(liked != productions.end()){
                             liked->lookahead.insert(lookahead.begin(), lookahead.end());
@@ -854,8 +852,8 @@ void GLRParser::create_states(){
                 }
             }
             if(modified){
-                state.productions.clear();
-                state.productions.insert(productions.begin(), productions.end());
+                productions.sort();
+                state.productions.swap(productions);
             }
         }
         // Expand states
@@ -874,7 +872,7 @@ void GLRParser::create_states(){
         }
         // Push new states into queue
         for(auto prod_pair : prod_map){
-            state_queue.emplace(prod_pair.second);
+            state_queue.emplace(std::list<Grammar>(prod_pair.second.begin(), prod_pair.second.end()));
         }
     }
 }
@@ -925,24 +923,36 @@ void GLRParser::reduce_states(){
             return lhs.productions.size() > rhs.productions.size();
         });
         for(auto lhs_it = states.begin(); lhs_it != states.end(); lhs_it = std::next(lhs_it)){
-            for(auto rhs_it = std::next(lhs_it); rhs_it != states.end(); rhs_it = std::next(rhs_it)){
+            for(auto rhs_it = std::next(lhs_it); rhs_it != states.end();){
                 auto cur_it = rhs_it;
-                std::set<Grammar> intersect;
-                std::set_intersection(
-                    lhs_it->productions.begin(), lhs_it->productions.end(),
-                    cur_it->productions.begin(), cur_it->productions.end(),
-                    std::inserter(intersect, intersect.end()), GrammarLike()
-                );
+                rhs_it = std::next(rhs_it);
+                std::list<std::pair<std::list<Grammar>::iterator, std::set<term_t>>> intersect;
+                for(const Grammar& cur : cur_it->productions){
+                    auto found = std::find_if(
+                        lhs_it->productions.begin(), lhs_it->productions.end(),
+                        [&](const Grammar& lhs){
+                            return gram_similar(lhs, cur);
+                        }
+                    );
+                    if(found != lhs_it->productions.end()){
+                        intersect.emplace_back(found, cur.lookahead);
+                    }
+                }
                 if(intersect.size() == cur_it->productions.size()){
                     // mergeable
-                    std::cout << lhs_it->id << " and " << cur_it->id << " are mergeable" << std::endl;
+                    std::cout << "Merge " << lhs_it->id << " and " << cur_it->id << std::endl;
+                    for(auto inter_pair : intersect){
+                        inter_pair.first->lookahead.insert(inter_pair.second.begin(), inter_pair.second.begin());
+                    }
+                    states.erase(cur_it);
+                    modified = true;
                 }
             }
         }
     }
 }
 
-GLRParser::State::State(std::set<Grammar> productions) : productions(productions){
+GLRParser::State::State(std::list<Grammar> productions) : productions(productions){
 }
 
 bool operator<(const GLRParser::Grammar& lhs, const GLRParser::Grammar& rhs){
@@ -959,17 +969,5 @@ bool operator<(const GLRParser::Grammar& lhs, const GLRParser::Grammar& rhs){
 }
 
 bool operator<(const GLRParser::State& lhs, const GLRParser::State& rhs){
-    if(lhs.productions.size() != rhs.productions.size()){
-        return lhs.productions.size() < rhs.productions.size();
-    }
-    std::set<GLRParser::Grammar> diff;
-    std::set_symmetric_difference(
-        lhs.productions.begin(), lhs.productions.end(),
-        rhs.productions.begin(), rhs.productions.end(),
-        std::inserter(diff, diff.begin())
-    );
-    if(!diff.empty()){
-        return lhs.productions.contains(*diff.begin());
-    }
-    return false;
+    return lhs.productions < rhs.productions;
 }
