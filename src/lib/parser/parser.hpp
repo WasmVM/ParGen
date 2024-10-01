@@ -38,9 +38,9 @@ struct GLRParser {
 
         State() = default;
         State(const State&) = default;
-        State(std::set<Grammar> productions);
+        State(std::list<Grammar> productions);
 
-        std::set<Grammar> productions;
+        std::list<Grammar> productions;
         std::map<term_t, size_t> edges;
         static constexpr size_t None = SIZE_MAX;
         size_t id = None;
