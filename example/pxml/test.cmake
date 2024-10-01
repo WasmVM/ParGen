@@ -1,0 +1,18 @@
+exec_program(${PXML_DUMP} ARGS ${PXML_PXML} dump1.pxml RETURN_VALUE dump1_res)
+if(dump1_res)
+    message(FATAL_ERROR "error running pxml-dump for dump1.pxml")
+endif(dump1_res)
+
+exec_program(${PXML_DUMP} ARGS dump1.pxml dump2.pxml RETURN_VALUE dump2_res)
+if(dump2_res)
+    message(FATAL_ERROR "error running pxml-dump for dump2.pxml")
+endif(dump2_res)
+
+exec_program(${CMAKE_COMMAND} ARGS -E compare_files dump1.pxml dump2.pxml RETURN_VALUE compare_result)
+if(compare_result EQUAL 0)
+    message(STATUS "Pass")
+elseif(compare_result EQUAL 1)
+    message(FATAL_ERROR "dump1.pxml is different from dump2.pxml")
+else()
+    message(FATAL_ERROR "Error while comparing dump1.pxml and dump2.pxml")
+endif()
