@@ -32,8 +32,6 @@ struct GLRParser {
         inline bool operator==(const Grammar& rhs) const {
             return !(*this < rhs) && !(rhs < *this);
         }
-
-        bool like(const Grammar& rhs) const;
     };
 
     struct State {
@@ -44,8 +42,8 @@ struct GLRParser {
 
         std::set<Grammar> productions;
         std::map<term_t, size_t> edges;
-
-        // bool merge(State&);
+        static constexpr size_t None = SIZE_MAX;
+        size_t id = None;
         bool operator==(const State& rhs) const {
             return !(*this < rhs) && !(rhs < *this);
         }
@@ -72,6 +70,9 @@ protected:
     term_t start;
 
     void read_grammar();
+    void create_states();
+    void reduce_states();
+    void create_edges();
     std::map<term_t, std::set<term_t>> create_first_sets();
     std::ostream& print_grammar(std::ostream&, const Grammar&);
 
