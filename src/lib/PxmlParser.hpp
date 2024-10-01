@@ -55,7 +55,8 @@ protected:
 };
 
 struct ParseError : public std::exception {
-    ParseError(PxmlParser::term_t term);
+    ParseError(Position pos, PxmlParser::term_t term);
+    Position pos;
     std::string msg;
     const char* what(){
         return msg.c_str();

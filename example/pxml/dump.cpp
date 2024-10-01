@@ -2,10 +2,12 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <regex>
 
 #include <PxmlLexer.hpp>
 #include <PxmlParser.hpp>
 #include <Util.hpp>
+#include <exception.hpp>
 
 using namespace ParsePxml;
 
@@ -33,7 +35,7 @@ std::ostream& operator<< (std::ostream& os, PXML::Pxml pxml){
                 os << value;
             },
             [&](std::string value){
-                os << value;
+                os << std::regex_replace(value, std::regex("<"), "\\<");
             }
         }, child.second);
     }
@@ -45,16 +47,25 @@ int main(int argc, char* argv[]){
     std::filesystem::path input_path(argv[1]);
     std::ifstream fin(input_path);
 
+    std::string output_path = "dump.pxml";
+    if(argc == 3){
+        output_path = argv[2];
+    }
+
     ParsePxml::PxmlLexer lexer(input_path, fin);
     ParsePxml::PxmlParser parser(lexer);
     try{
         PXML::Pxml pxml = parser.parse();
-        std::ofstream fout("dump.pxml");
+        std::ofstream fout(output_path);
         fout << "<!DOCTYPE pxml>" << std::endl;
         fout << pxml;
         fout.close();
     }catch(UnknownToken& e){
         std::cerr << e.pos << " " << e.what() << std::endl;
+    }catch(ParsePxml::ParseError& e){
+        std::cerr << e.pos << " " <<  e.what() << std::endl;
+    }catch(Exception::Exception& e){
+        std::cerr << e.what() << std::endl;
     }
 
     fin.close();

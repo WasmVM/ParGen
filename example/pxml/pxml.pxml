@@ -141,13 +141,13 @@
             </grammar>
         </target>
         <target name="body" type="std::list<PXML::Pxml::Child>">
-            <grammar pattern="body element">
-                _op0.emplace_back(to_pos(_pos[1]), _op1);
-                return _op0;
+            <grammar pattern="element body">
+                _op1.emplace_front(to_pos(_pos[0]), _op0);
+                return _op1;
             </grammar>
-            <grammar pattern="body text">
-                _op0.emplace_back(to_pos(_pos[1]), _op1);
-                return _op0;
+            <grammar pattern="text body">
+                _op1.emplace_front(to_pos(_pos[0]), _op0);
+                return _op1;
             </grammar>
             <grammar>
                 return {};
@@ -171,34 +171,34 @@
             </grammar>
         </target>
         <target name="spaces" type="std::string">
-            <grammar pattern="spaces Space">
-                return _op0 + _op1.value;
+            <grammar pattern="Space spaces">
+                return _op0.value + _op1;
             </grammar>
             <grammar>
-                return std::string();
+                return "";
             </grammar>
         </target>
         <target name="text" type="std::string">
-            <grammar pattern="text Text">
-                return _op0 + _op1.value;
+            <grammar pattern="Text text">
+                return _op0.value + _op1;
             </grammar>
-            <grammar pattern="text Space">
-                return _op0 + _op1.value;
+            <grammar pattern="Space text">
+                return _op0.value + _op1;
             </grammar>
-            <grammar pattern="text Entity">
-                return _op0 + _op1.value;
+            <grammar pattern="Entity text">
+                return _op0.value + _op1;
             </grammar>
             <grammar>
                 return std::string();
             </grammar>
         </target>
-        <target name="attributes" type="std::unordered_map<std::string, PXML::Value>">
-            <grammar pattern="attributes attribute">
-                _op0.emplace(_op1);
-                return _op0;
+        <target name="attributes" type="std::map<std::string, PXML::Value>">
+            <grammar pattern="attribute attributes">
+                _op1.emplace(_op0);
+                return _op1;
             </grammar>
-            <grammar pattern="attributes Space">
-                return _op0;
+            <grammar pattern="Space attributes">
+                return _op1;
             </grammar>
             <grammar>
                 return {};

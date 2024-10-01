@@ -9,3 +9,11 @@ add_executable(pxml-dump
   PxmlParser.cpp
   PxmlToken.cpp
 )
+if(BUILD_TESTS)
+  add_test(NAME example_pxml
+    COMMAND ${CMAKE_COMMAND} 
+      -DPXML_DUMP=$<TARGET_FILE:pxml-dump>
+      -DPXML_PXML=${CMAKE_CURRENT_LIST_DIR}/pxml.pxml
+      -P ${CMAKE_CURRENT_LIST_DIR}/test.cmake
+  )
+endif(BUILD_TESTS)

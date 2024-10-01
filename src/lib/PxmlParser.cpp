@@ -31,18 +31,18 @@ std::pair<PxmlParser::term_t, PxmlParser::token_t> PxmlParser::fetch(){
 static PXML::Pxml action_1(PxmlParser& _this, std::vector<Position> _pos, Tokens::Doctype _op0, std::string _op1, PXML::Pxml _op2, std::string _op3){
     return _op2;
 }
-static std::list<PXML::Pxml::Child> action_2(PxmlParser& _this, std::vector<Position> _pos, std::list<PXML::Pxml::Child> _op0, PXML::Pxml _op1){
-    _op0.emplace_back(to_pos(_pos[1]), _op1);
-    return _op0;
+static std::list<PXML::Pxml::Child> action_2(PxmlParser& _this, std::vector<Position> _pos, PXML::Pxml _op0, std::list<PXML::Pxml::Child> _op1){
+    _op1.emplace_front(to_pos(_pos[0]), _op0);
+    return _op1;
 }
-static std::list<PXML::Pxml::Child> action_3(PxmlParser& _this, std::vector<Position> _pos, std::list<PXML::Pxml::Child> _op0, std::string _op1){
-    _op0.emplace_back(to_pos(_pos[1]), _op1);
-    return _op0;
+static std::list<PXML::Pxml::Child> action_3(PxmlParser& _this, std::vector<Position> _pos, std::string _op0, std::list<PXML::Pxml::Child> _op1){
+    _op1.emplace_front(to_pos(_pos[0]), _op0);
+    return _op1;
 }
 static std::list<PXML::Pxml::Child> action_4(PxmlParser& _this, std::vector<Position> _pos){
     return {};
 }
-static PXML::Pxml action_5(PxmlParser& _this, std::vector<Position> _pos, Tokens::Tag _op0, std::unordered_map<std::string, PXML::Value> _op1, Tokens::Close _op2, std::list<PXML::Pxml::Child> _op3, Tokens::Tail _op4){
+static PXML::Pxml action_5(PxmlParser& _this, std::vector<Position> _pos, Tokens::Tag _op0, std::map<std::string, PXML::Value> _op1, Tokens::Close _op2, std::list<PXML::Pxml::Child> _op3, Tokens::Tail _op4){
     PXML::Position pos = to_pos(_pos[0]);
     if(_op0.value != _op4.value){
         throw Exception::SyntaxError("tag not match", pos);
@@ -52,37 +52,37 @@ static PXML::Pxml action_5(PxmlParser& _this, std::vector<Position> _pos, Tokens
     elem.children.swap(_op3);
     return elem;
 }
-static PXML::Pxml action_6(PxmlParser& _this, std::vector<Position> _pos, Tokens::Tag _op0, std::unordered_map<std::string, PXML::Value> _op1, Tokens::Inline _op2){
+static PXML::Pxml action_6(PxmlParser& _this, std::vector<Position> _pos, Tokens::Tag _op0, std::map<std::string, PXML::Value> _op1, Tokens::Inline _op2){
     PXML::Pxml elem {.tag = _op0.value, .pos = to_pos(_pos[0])};
     elem.swap(_op1);
     return elem;
 }
-static std::string action_7(PxmlParser& _this, std::vector<Position> _pos, std::string _op0, Tokens::Space _op1){
-    return _op0 + _op1.value;
+static std::string action_7(PxmlParser& _this, std::vector<Position> _pos, Tokens::Space _op0, std::string _op1){
+    return _op0.value + _op1;
 }
 static std::string action_8(PxmlParser& _this, std::vector<Position> _pos){
-    return std::string();
+    return "";
 }
-static std::string action_9(PxmlParser& _this, std::vector<Position> _pos, std::string _op0, Tokens::Text _op1){
-    return _op0 + _op1.value;
+static std::string action_9(PxmlParser& _this, std::vector<Position> _pos, Tokens::Text _op0, std::string _op1){
+    return _op0.value + _op1;
 }
-static std::string action_10(PxmlParser& _this, std::vector<Position> _pos, std::string _op0, Tokens::Space _op1){
-    return _op0 + _op1.value;
+static std::string action_10(PxmlParser& _this, std::vector<Position> _pos, Tokens::Space _op0, std::string _op1){
+    return _op0.value + _op1;
 }
-static std::string action_11(PxmlParser& _this, std::vector<Position> _pos, std::string _op0, Tokens::Entity _op1){
-    return _op0 + _op1.value;
+static std::string action_11(PxmlParser& _this, std::vector<Position> _pos, Tokens::Entity _op0, std::string _op1){
+    return _op0.value + _op1;
 }
 static std::string action_12(PxmlParser& _this, std::vector<Position> _pos){
     return std::string();
 }
-static std::unordered_map<std::string, PXML::Value> action_13(PxmlParser& _this, std::vector<Position> _pos, std::unordered_map<std::string, PXML::Value> _op0, std::pair<std::string, PXML::Value> _op1){
-    _op0.emplace(_op1);
-    return _op0;
+static std::map<std::string, PXML::Value> action_13(PxmlParser& _this, std::vector<Position> _pos, std::pair<std::string, PXML::Value> _op0, std::map<std::string, PXML::Value> _op1){
+    _op1.emplace(_op0);
+    return _op1;
 }
-static std::unordered_map<std::string, PXML::Value> action_14(PxmlParser& _this, std::vector<Position> _pos, std::unordered_map<std::string, PXML::Value> _op0, Tokens::Space _op1){
-    return _op0;
+static std::map<std::string, PXML::Value> action_14(PxmlParser& _this, std::vector<Position> _pos, Tokens::Space _op0, std::map<std::string, PXML::Value> _op1){
+    return _op1;
 }
-static std::unordered_map<std::string, PXML::Value> action_15(PxmlParser& _this, std::vector<Position> _pos){
+static std::map<std::string, PXML::Value> action_15(PxmlParser& _this, std::vector<Position> _pos){
     return {};
 }
 static std::pair<std::string, PXML::Value> action_16(PxmlParser& _this, std::vector<Position> _pos, Tokens::ID _op0, Tokens::Equal _op1, PXML::Value _op2){
@@ -103,47 +103,61 @@ static PXML::Value action_20(PxmlParser& _this, std::vector<Position> _pos, Toke
 
 std::vector<PxmlParser::State> PxmlParser::table = {
     {{2, {{3,{}},}},{19, {{5,{}},}},},
-    {{8, {{69,{}},}},{14, {{23,{}},}},{18, {{7,{}},}},{20, {{9,{}},}},},
+    {{8, {{7,{}},}},{14, {{9,{}},}},{18, {{11,{}},}},{20, {{13,{}},}},},
     {{1, {{0,{}},}},},
-    {{1, {{2,{1,0,1,0,}},}},{14, {{23,{}},}},{20, {{11,{}},}},},
-    {{8, {{69,{}},}},{14, {{13,{}},}},{18, {{15,{}},}},},
-    {{1, {{2,{1,0,1,1,}},}},{14, {{13,{}},}},},
-    {{1, {{14,{1,1,}},}},{8, {{14,{1,1,}},}},{14, {{14,{1,1,}},}},},
-    {{1, {{2,{1,1,1,0,}},}},{14, {{23,{}},}},{20, {{25,{}},}},},
-    {{6, {{37,{}},}},{7, {{39,{}},}},{10, {{41,{}},}},{22, {{43,{}},}},},
-    {{4, {{28,{1,1,}},}},{5, {{28,{1,1,}},}},{12, {{28,{1,1,}},}},{14, {{28,{1,1,}},}},},
-    {{4, {{26,{1,1,}},}},{5, {{26,{1,1,}},}},{12, {{26,{1,1,}},}},{14, {{26,{1,1,}},}},},
-    {{1, {{14,{0,1,}},}},{8, {{14,{0,1,}},}},{14, {{14,{0,1,}},}},},
-    {{1, {{2,{1,1,1,1,}},}},{14, {{13,{}},}},},
-    {{8, {{4,{1,1,}},}},{9, {{4,{1,1,}},}},{11, {{4,{1,1,}},}},{13, {{4,{1,1,}},}},{14, {{4,{1,1,}},}},},
-    {{8, {{6,{1,1,}},}},{9, {{6,{1,1,}},}},{11, {{31,{}},{6,{1,1,}},}},{13, {{33,{}},{6,{1,1,}},}},{14, {{35,{}},{6,{1,1,}},}},},
+    {{4, {{15,{}},}},{5, {{17,{}},}},{12, {{19,{}},}},{14, {{21,{}},}},{15, {{23,{}},}},{16, {{25,{}},}},},
+    {{8, {{14,{1,0,}},}},{14, {{9,{}},}},{20, {{27,{}},}},},
+    {{1, {{2,{1,0,1,0,}},}},{14, {{29,{}},}},{20, {{31,{}},}},},
+    {{8, {{7,{}},}},{18, {{33,{}},}},},
+    {{8, {{35,{}},}},{9, {{37,{}},}},{11, {{39,{}},}},{13, {{41,{}},}},{14, {{43,{}},}},{17, {{45,{}},}},{18, {{47,{}},}},{21, {{49,{}},}},},
+    {{1, {{12,{1,0,1,}},}},{14, {{12,{1,0,1,}},}},},
+    {{3, {{51,{}},}},{4, {{34,{1,}},}},{5, {{34,{1,}},}},{12, {{34,{1,}},}},{14, {{34,{1,}},}},},
+    {{4, {{28,{1,0,}},}},{5, {{28,{1,0,}},}},{12, {{19,{}},}},{14, {{21,{}},}},{15, {{23,{}},}},{16, {{53,{}},}},},
+    {{4, {{26,{1,0,}},}},{5, {{26,{1,0,}},}},{12, {{19,{}},}},{14, {{21,{}},}},{15, {{23,{}},}},{16, {{55,{}},}},},
+    {{4, {{57,{}},}},{5, {{59,{}},}},},
+    {{8, {{14,{1,1,}},}},},
+    {{1, {{14,{1,0,}},}},{14, {{29,{}},}},{20, {{61,{}},}},},
+    {{1, {{2,{1,0,1,1,}},}},},
+    {{1, {{2,{1,1,1,0,}},}},{14, {{29,{}},}},{20, {{63,{}},}},},
+    {{4, {{65,{}},}},{5, {{67,{}},}},{12, {{19,{}},}},{14, {{21,{}},}},{15, {{23,{}},}},{16, {{69,{}},}},},
+    {{1, {{10,{1,0,1,0,1,}},}},{14, {{10,{1,0,1,0,1,}},}},},
+    {{8, {{18,{1,0,}},}},{9, {{18,{1,0,}},}},{11, {{39,{}},{18,{1,0,}},}},{13, {{41,{}},{18,{1,0,}},}},{14, {{43,{}},{18,{1,0,}},}},{21, {{71,{}},}},},
+    {{8, {{22,{1,0,}},}},{9, {{22,{1,0,}},}},{11, {{39,{}},{22,{1,0,}},}},{13, {{41,{}},{22,{1,0,}},}},{14, {{43,{}},{22,{1,0,}},}},{21, {{73,{}},}},},
+    {{8, {{20,{1,0,}},}},{9, {{20,{1,0,}},}},{11, {{39,{}},{20,{1,0,}},}},{13, {{41,{}},{20,{1,0,}},}},{14, {{43,{}},{20,{1,0,}},}},{21, {{75,{}},}},},
+    {{9, {{77,{}},}},},
+    {{8, {{35,{}},}},{9, {{4,{1,0,}},}},{11, {{39,{}},}},{13, {{41,{}},}},{14, {{43,{}},}},{17, {{79,{}},}},{18, {{47,{}},}},{21, {{49,{}},}},},
+    {{8, {{35,{}},}},{9, {{6,{1,0,}},}},{11, {{39,{}},}},{13, {{41,{}},}},{14, {{43,{}},}},{17, {{81,{}},}},{18, {{47,{}},}},{21, {{49,{}},}},},
+    {{6, {{83,{}},}},{7, {{85,{}},}},{10, {{87,{}},}},{22, {{89,{}},}},},
+    {{4, {{28,{1,1,}},}},{5, {{28,{1,1,}},}},},
+    {{4, {{26,{1,1,}},}},{5, {{26,{1,1,}},}},},
+    {{8, {{35,{}},}},{9, {{91,{}},}},{11, {{39,{}},}},{13, {{41,{}},}},{14, {{43,{}},}},{17, {{93,{}},}},{18, {{47,{}},}},{21, {{49,{}},}},},
+    {{1, {{12,{1,1,1,}},}},{14, {{12,{1,1,1,}},}},},
+    {{1, {{14,{1,1,}},}},},
+    {{1, {{2,{1,1,1,1,}},}},},
+    {{8, {{35,{}},}},{9, {{95,{}},}},{11, {{39,{}},}},{13, {{41,{}},}},{14, {{43,{}},}},{17, {{97,{}},}},{18, {{47,{}},}},{21, {{49,{}},}},},
+    {{8, {{12,{1,0,1,}},}},{9, {{12,{1,0,1,}},}},{11, {{12,{1,0,1,}},}},{13, {{12,{1,0,1,}},}},{14, {{12,{1,0,1,}},}},},
+    {{4, {{99,{}},}},{5, {{101,{}},}},},
     {{8, {{18,{1,1,}},}},{9, {{18,{1,1,}},}},{11, {{18,{1,1,}},}},{13, {{18,{1,1,}},}},{14, {{18,{1,1,}},}},},
     {{8, {{22,{1,1,}},}},{9, {{22,{1,1,}},}},{11, {{22,{1,1,}},}},{13, {{22,{1,1,}},}},{14, {{22,{1,1,}},}},},
     {{8, {{20,{1,1,}},}},{9, {{20,{1,1,}},}},{11, {{20,{1,1,}},}},{13, {{20,{1,1,}},}},{14, {{20,{1,1,}},}},},
+    {{1, {{10,{1,0,1,1,1,}},}},{14, {{10,{1,0,1,1,1,}},}},},
+    {{9, {{4,{1,1,}},}},},
+    {{9, {{6,{1,1,}},}},},
     {{4, {{36,{1,}},}},{5, {{36,{1,}},}},{12, {{36,{1,}},}},{14, {{36,{1,}},}},},
     {{4, {{38,{1,}},}},{5, {{38,{1,}},}},{12, {{38,{1,}},}},{14, {{38,{1,}},}},},
     {{4, {{40,{1,}},}},{5, {{40,{1,}},}},{12, {{40,{1,}},}},{14, {{40,{1,}},}},},
     {{4, {{32,{1,1,1,}},}},{5, {{32,{1,1,1,}},}},{12, {{32,{1,1,1,}},}},{14, {{32,{1,1,1,}},}},},
-    {{8, {{69,{}},}},{9, {{51,{}},}},{11, {{73,{}},}},{13, {{75,{}},}},{14, {{77,{}},}},{17, {{53,{}},}},{18, {{67,{}},}},{21, {{55,{}},}},},
-    {{1, {{12,{1,0,1,}},}},{8, {{12,{1,0,1,}},}},{9, {{12,{1,0,1,}},}},{11, {{12,{1,0,1,}},}},{13, {{12,{1,0,1,}},}},{14, {{12,{1,0,1,}},}},},
-    {{4, {{57,{}},}},{5, {{59,{}},}},{12, {{83,{}},}},{14, {{19,{}},}},{15, {{21,{}},}},},
-    {{1, {{10,{1,0,1,0,1,}},}},{8, {{10,{1,0,1,0,1,}},}},{9, {{10,{1,0,1,0,1,}},}},{11, {{10,{1,0,1,0,1,}},}},{13, {{10,{1,0,1,0,1,}},}},{14, {{10,{1,0,1,0,1,}},}},},
-    {{8, {{69,{}},}},{9, {{61,{}},}},{11, {{73,{}},}},{13, {{75,{}},}},{14, {{77,{}},}},{18, {{27,{}},}},{21, {{29,{}},}},},
-    {{8, {{6,{0,1,}},}},{9, {{6,{0,1,}},}},{11, {{31,{}},{6,{0,1,}},}},{13, {{33,{}},{6,{0,1,}},}},{14, {{35,{}},{6,{0,1,}},}},},
-    {{8, {{69,{}},}},{9, {{63,{}},}},{11, {{73,{}},}},{13, {{75,{}},}},{14, {{77,{}},}},{17, {{65,{}},}},{18, {{67,{}},}},{21, {{55,{}},}},},
-    {{1, {{12,{1,1,1,}},}},{8, {{12,{1,1,1,}},}},{9, {{12,{1,1,1,}},}},{11, {{12,{1,1,1,}},}},{13, {{12,{1,1,1,}},}},{14, {{12,{1,1,1,}},}},},
-    {{1, {{10,{1,0,1,1,1,}},}},{8, {{10,{1,0,1,1,1,}},}},{9, {{10,{1,0,1,1,1,}},}},{11, {{10,{1,0,1,1,1,}},}},{13, {{10,{1,0,1,1,1,}},}},{14, {{10,{1,0,1,1,1,}},}},},
-    {{1, {{10,{1,1,1,0,1,}},}},{8, {{10,{1,1,1,0,1,}},}},{9, {{10,{1,1,1,0,1,}},}},{11, {{10,{1,1,1,0,1,}},}},{13, {{10,{1,1,1,0,1,}},}},{14, {{10,{1,1,1,0,1,}},}},},
-    {{8, {{69,{}},}},{9, {{71,{}},}},{11, {{73,{}},}},{13, {{75,{}},}},{14, {{77,{}},}},{18, {{27,{}},}},{21, {{29,{}},}},},
-    {{8, {{4,{0,1,}},}},{9, {{4,{0,1,}},}},{11, {{4,{0,1,}},}},{13, {{4,{0,1,}},}},{14, {{4,{0,1,}},}},},
-    {{4, {{45,{}},}},{5, {{47,{}},}},{12, {{83,{}},}},{14, {{79,{}},}},{15, {{81,{}},}},{16, {{49,{}},}},},
-    {{1, {{10,{1,1,1,1,1,}},}},{8, {{10,{1,1,1,1,1,}},}},{9, {{10,{1,1,1,1,1,}},}},{11, {{10,{1,1,1,1,1,}},}},{13, {{10,{1,1,1,1,1,}},}},{14, {{10,{1,1,1,1,1,}},}},},
-    {{8, {{18,{0,1,}},}},{9, {{18,{0,1,}},}},{11, {{18,{0,1,}},}},{13, {{18,{0,1,}},}},{14, {{18,{0,1,}},}},},
-    {{8, {{22,{0,1,}},}},{9, {{22,{0,1,}},}},{11, {{22,{0,1,}},}},{13, {{22,{0,1,}},}},{14, {{22,{0,1,}},}},},
-    {{8, {{20,{0,1,}},}},{9, {{20,{0,1,}},}},{11, {{20,{0,1,}},}},{13, {{20,{0,1,}},}},{14, {{20,{0,1,}},}},},
-    {{4, {{28,{0,1,}},}},{5, {{28,{0,1,}},}},{12, {{28,{0,1,}},}},{14, {{28,{0,1,}},}},},
-    {{4, {{26,{0,1,}},}},{5, {{26,{0,1,}},}},{12, {{26,{0,1,}},}},{14, {{26,{0,1,}},}},},
-    {{3, {{17,{}},}},{4, {{34,{1,}},}},{5, {{34,{1,}},}},{12, {{34,{1,}},}},{14, {{34,{1,}},}},},
+    {{1, {{10,{1,1,1,0,1,}},}},{14, {{10,{1,1,1,0,1,}},}},},
+    {{9, {{103,{}},}},},
+    {{8, {{10,{1,0,1,0,1,}},}},{9, {{10,{1,0,1,0,1,}},}},{11, {{10,{1,0,1,0,1,}},}},{13, {{10,{1,0,1,0,1,}},}},{14, {{10,{1,0,1,0,1,}},}},},
+    {{9, {{105,{}},}},},
+    {{8, {{35,{}},}},{9, {{107,{}},}},{11, {{39,{}},}},{13, {{41,{}},}},{14, {{43,{}},}},{17, {{109,{}},}},{18, {{47,{}},}},{21, {{49,{}},}},},
+    {{8, {{12,{1,1,1,}},}},{9, {{12,{1,1,1,}},}},{11, {{12,{1,1,1,}},}},{13, {{12,{1,1,1,}},}},{14, {{12,{1,1,1,}},}},},
+    {{1, {{10,{1,1,1,1,1,}},}},{14, {{10,{1,1,1,1,1,}},}},},
+    {{8, {{10,{1,0,1,1,1,}},}},{9, {{10,{1,0,1,1,1,}},}},{11, {{10,{1,0,1,1,1,}},}},{13, {{10,{1,0,1,1,1,}},}},{14, {{10,{1,0,1,1,1,}},}},},
+    {{8, {{10,{1,1,1,0,1,}},}},{9, {{10,{1,1,1,0,1,}},}},{11, {{10,{1,1,1,0,1,}},}},{13, {{10,{1,1,1,0,1,}},}},{14, {{10,{1,1,1,0,1,}},}},},
+    {{9, {{111,{}},}},},
+    {{8, {{10,{1,1,1,1,1,}},}},{9, {{10,{1,1,1,1,1,}},}},{11, {{10,{1,1,1,1,1,}},}},{13, {{10,{1,1,1,1,1,}},}},{14, {{10,{1,1,1,1,1,}},}},},
 };
 
 PXML::Pxml PxmlParser::parse(){
@@ -151,13 +165,15 @@ PXML::Pxml PxmlParser::parse(){
     std::stack<Stack::iterator> branches;
     Stack stack;
     stack.push(fetch(), 0);
-    auto throw_error = [&](term_t term){
+    auto throw_error = [&](token_t token, term_t term){
         if(branches.empty()){
-            throw ParseError(term);
+            throw ParseError(token.pos, term);
         }
         auto& saved = branches.top();
         auto buf_top = buffer.begin();
-        for(auto it = stack.begin(); it != saved; it = std::next(it)){
+        Stack::iterator new_head = stack.begin();
+        for(auto it = stack.begin(); (it != stack.end()) && (it != saved); it = std::next(it)){
+            new_head = it;
             if(std::holds_alternative<token_t>(it->elem)){
                 buffer.emplace(buf_top, it->term, std::get<token_t>(it->elem));
             }else{
@@ -165,7 +181,11 @@ PXML::Pxml PxmlParser::parse(){
                 buffer.insert(buf_top, flattened.begin(), flattened.end());
             }
         }
-        saved->branch += 1;
+        new_head->branch += 1;
+        new_head->term = buffer.front().first;
+        new_head->elem = buffer.front().second;
+        buffer.pop_front();
+        stack.erase(stack.begin(), new_head);
     };
     // Parse
     while(stack.front().state != End){
@@ -175,7 +195,7 @@ PXML::Pxml PxmlParser::parse(){
             std::vector<Act>& acts = state[entry.term];
             if(entry.branch == 0){
                 if(acts.size() > 1){
-                    branches.emplace(stack.begin());
+                    branches.emplace(std::next(stack.begin()));
                 }
             }else if(entry.branch == acts.size() - 1){
                 branches.pop();
@@ -191,7 +211,15 @@ PXML::Pxml PxmlParser::parse(){
                 stack.reduce(act.first >> 1, act.second);
             }
         }else{
-            throw_error(entry.term);
+            Entry* ptr = &entry;
+            while(std::holds_alternative<Node>(ptr->elem)){
+                ptr = &std::get<Node>(ptr->elem).children.front();
+            }
+            if(std::holds_alternative<token_t>(ptr->elem)){
+                throw_error(std::get<token_t>(ptr->elem), entry.term);
+            }else{
+                throw_error(Token(std::monostate(), Position()), entry.term);
+            }
         }
     }
     // Expand tree
@@ -226,9 +254,9 @@ using item_t = std::variant<std::monostate,
     PXML::Pxml,
     PXML::Value,
     std::list<PXML::Pxml::Child>,
+    std::map<std::string, PXML::Value>,
     std::pair<std::string, PXML::Value>,
-    std::string,
-    std::unordered_map<std::string, PXML::Value>
+    std::string
 >;
 
 PXML::Pxml PxmlParser::expand_tree(Entry& tree){
@@ -273,14 +301,14 @@ PXML::Pxml PxmlParser::expand_tree(Entry& tree){
             break;
             case 2: 
                 param_stack.emplace_front(pos, action_2(*this, positions,
-                    node.param_toggle[0] ? std::get<std::list<PXML::Pxml::Child>>(params[0]) : std::list<PXML::Pxml::Child>(),
-                    node.param_toggle[1] ? std::get<PXML::Pxml>(params[1]) : PXML::Pxml()
+                    node.param_toggle[0] ? std::get<PXML::Pxml>(params[0]) : PXML::Pxml(),
+                    node.param_toggle[1] ? std::get<std::list<PXML::Pxml::Child>>(params[1]) : std::list<PXML::Pxml::Child>()
                 ));
             break;
             case 3: 
                 param_stack.emplace_front(pos, action_3(*this, positions,
-                    node.param_toggle[0] ? std::get<std::list<PXML::Pxml::Child>>(params[0]) : std::list<PXML::Pxml::Child>(),
-                    node.param_toggle[1] ? std::get<std::string>(params[1]) : std::string()
+                    node.param_toggle[0] ? std::get<std::string>(params[0]) : std::string(),
+                    node.param_toggle[1] ? std::get<std::list<PXML::Pxml::Child>>(params[1]) : std::list<PXML::Pxml::Child>()
                 ));
             break;
             case 4: 
@@ -290,7 +318,7 @@ PXML::Pxml PxmlParser::expand_tree(Entry& tree){
             case 5: 
                 param_stack.emplace_front(pos, action_5(*this, positions,
                     node.param_toggle[0] ? std::get<Tokens::Tag>(std::get<Token>(params[0])) : Tokens::Tag(),
-                    node.param_toggle[1] ? std::get<std::unordered_map<std::string, PXML::Value>>(params[1]) : std::unordered_map<std::string, PXML::Value>(),
+                    node.param_toggle[1] ? std::get<std::map<std::string, PXML::Value>>(params[1]) : std::map<std::string, PXML::Value>(),
                     node.param_toggle[2] ? std::get<Tokens::Close>(std::get<Token>(params[2])) : Tokens::Close(),
                     node.param_toggle[3] ? std::get<std::list<PXML::Pxml::Child>>(params[3]) : std::list<PXML::Pxml::Child>(),
                     node.param_toggle[4] ? std::get<Tokens::Tail>(std::get<Token>(params[4])) : Tokens::Tail()
@@ -299,14 +327,14 @@ PXML::Pxml PxmlParser::expand_tree(Entry& tree){
             case 6: 
                 param_stack.emplace_front(pos, action_6(*this, positions,
                     node.param_toggle[0] ? std::get<Tokens::Tag>(std::get<Token>(params[0])) : Tokens::Tag(),
-                    node.param_toggle[1] ? std::get<std::unordered_map<std::string, PXML::Value>>(params[1]) : std::unordered_map<std::string, PXML::Value>(),
+                    node.param_toggle[1] ? std::get<std::map<std::string, PXML::Value>>(params[1]) : std::map<std::string, PXML::Value>(),
                     node.param_toggle[2] ? std::get<Tokens::Inline>(std::get<Token>(params[2])) : Tokens::Inline()
                 ));
             break;
             case 7: 
                 param_stack.emplace_front(pos, action_7(*this, positions,
-                    node.param_toggle[0] ? std::get<std::string>(params[0]) : std::string(),
-                    node.param_toggle[1] ? std::get<Tokens::Space>(std::get<Token>(params[1])) : Tokens::Space()
+                    node.param_toggle[0] ? std::get<Tokens::Space>(std::get<Token>(params[0])) : Tokens::Space(),
+                    node.param_toggle[1] ? std::get<std::string>(params[1]) : std::string()
                 ));
             break;
             case 8: 
@@ -315,20 +343,20 @@ PXML::Pxml PxmlParser::expand_tree(Entry& tree){
             break;
             case 9: 
                 param_stack.emplace_front(pos, action_9(*this, positions,
-                    node.param_toggle[0] ? std::get<std::string>(params[0]) : std::string(),
-                    node.param_toggle[1] ? std::get<Tokens::Text>(std::get<Token>(params[1])) : Tokens::Text()
+                    node.param_toggle[0] ? std::get<Tokens::Text>(std::get<Token>(params[0])) : Tokens::Text(),
+                    node.param_toggle[1] ? std::get<std::string>(params[1]) : std::string()
                 ));
             break;
             case 10: 
                 param_stack.emplace_front(pos, action_10(*this, positions,
-                    node.param_toggle[0] ? std::get<std::string>(params[0]) : std::string(),
-                    node.param_toggle[1] ? std::get<Tokens::Space>(std::get<Token>(params[1])) : Tokens::Space()
+                    node.param_toggle[0] ? std::get<Tokens::Space>(std::get<Token>(params[0])) : Tokens::Space(),
+                    node.param_toggle[1] ? std::get<std::string>(params[1]) : std::string()
                 ));
             break;
             case 11: 
                 param_stack.emplace_front(pos, action_11(*this, positions,
-                    node.param_toggle[0] ? std::get<std::string>(params[0]) : std::string(),
-                    node.param_toggle[1] ? std::get<Tokens::Entity>(std::get<Token>(params[1])) : Tokens::Entity()
+                    node.param_toggle[0] ? std::get<Tokens::Entity>(std::get<Token>(params[0])) : Tokens::Entity(),
+                    node.param_toggle[1] ? std::get<std::string>(params[1]) : std::string()
                 ));
             break;
             case 12: 
@@ -337,14 +365,14 @@ PXML::Pxml PxmlParser::expand_tree(Entry& tree){
             break;
             case 13: 
                 param_stack.emplace_front(pos, action_13(*this, positions,
-                    node.param_toggle[0] ? std::get<std::unordered_map<std::string, PXML::Value>>(params[0]) : std::unordered_map<std::string, PXML::Value>(),
-                    node.param_toggle[1] ? std::get<std::pair<std::string, PXML::Value>>(params[1]) : std::pair<std::string, PXML::Value>()
+                    node.param_toggle[0] ? std::get<std::pair<std::string, PXML::Value>>(params[0]) : std::pair<std::string, PXML::Value>(),
+                    node.param_toggle[1] ? std::get<std::map<std::string, PXML::Value>>(params[1]) : std::map<std::string, PXML::Value>()
                 ));
             break;
             case 14: 
                 param_stack.emplace_front(pos, action_14(*this, positions,
-                    node.param_toggle[0] ? std::get<std::unordered_map<std::string, PXML::Value>>(params[0]) : std::unordered_map<std::string, PXML::Value>(),
-                    node.param_toggle[1] ? std::get<Tokens::Space>(std::get<Token>(params[1])) : Tokens::Space()
+                    node.param_toggle[0] ? std::get<Tokens::Space>(std::get<Token>(params[0])) : Tokens::Space(),
+                    node.param_toggle[1] ? std::get<std::map<std::string, PXML::Value>>(params[1]) : std::map<std::string, PXML::Value>()
                 ));
             break;
             case 15: 
@@ -417,7 +445,7 @@ std::list<std::pair<PxmlParser::term_t,PxmlParser::token_t>> PxmlParser::Node::f
     return results;
 }
 
-ParsePxml::ParseError::ParseError(PxmlParser::term_t term){
+ParsePxml::ParseError::ParseError(Position pos, PxmlParser::term_t term) : pos(pos) {
     static const std::vector<std::string> terms {
         "",
         "EOF",

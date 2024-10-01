@@ -14,6 +14,12 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/src/include)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 add_subdirectory(src)
 
+set(BUILD_TESTS ON CACHE BOOL "Build tests")
+if(BUILD_TESTS)
+  include(CTest)
+  enable_testing()
+endif(BUILD_TESTS)
+
 set(BUILD_EXAMPLES ON CACHE BOOL "Build examples")
 if(BUILD_EXAMPLES)
   add_subdirectory(example)
